@@ -15,35 +15,48 @@ const NR_OF_SIDES = 6 //regular cube => 6 sides
 
 //the smalest segment is one single led
 type led struct { 
-	r uint8
-	g uint8
-	b uint8
+	Red uint8
+	Green uint8
+	Blue uint8
 }
 
-func (my led) setRGB(red, green, blue uint8) {
-	my.r = red
-	my.g = green
-	my.b = blue
+func (my *led) setRGB(red, green, blue uint8) {			//dot or not?
+	if(DEBUG_LVL >=4) {fmt.Println("setRGB called with Arguments", red, green, blue)}
+	my.Red = red
+	my.Green = green
+	my.Blue = blue
 }
 
-func (my led) printRGB() {
-	fmt.Printf("RGB values:(%d,%d,%d)", my.r, my.g, my.b)
+func (my *led) printRGB() {								//dot or not?
+	fmt.Println("RGB values:(", my.Red, my.Green, my.Blue,")")
 }
+
+type RGBrenderer func()
+type sideRenderer func(uint8,uint8,uint8)
+type edgeRenderer func(uint8,uint8,uint8)
 
 //a couple of leds in a row are an edge
 type edge struct {
+	renderer edgeRenderer
 	led [EDGE_LENGTH]led
 	/*edgeRenderer()...*/
 }
 
-//one side of my cube is framed by sour edges...it's a square ;)
+//one side of my cube is framed by four edges...it's a square ;)
 type side struct {
+	renderer sideRenderer
 	edge [EDGES_PER_SIDE]edge
 	/*sideRenderer()...*/
 }
 
 //and finally a cube is six sides glued together
-type cube struct{
+type Cube struct{
+	renderer RGBrenderer 
 	side [NR_OF_SIDES]side 
-	/*cubeRenderer()...*/
 }
+
+func NewCube() (c *Cube){
+	c = &Cube{}
+	return
+}
+

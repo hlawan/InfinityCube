@@ -1,0 +1,93 @@
+body { 
+	background-color: black;
+	color: #FFCC00;
+}
+
+.table{
+	display: table;
+    width: 100%;
+    /*border: 2px solid orange;*/
+}
+
+.row{
+    display: table-row;
+    /*border: 1px solid black;*/
+    text-align: center;
+}
+
+.right{
+    display: table-cell;
+    width: 40%;
+    /*background-color: blue;*/
+    /*border: 1px solid black;*/
+}
+
+.center{
+    display: table-cell;
+    width: 20%;
+    /*background-color: yellow;*/
+    /*border: 1px solid black;*/
+}
+
+.left{
+    display: table-cell;
+    width: 40%;
+    /*background-color: red;*/
+    /*border: 1px solid black;*/
+}
+
+#Time{
+}
+
+.timer {
+    font-size: 2em;  
+}
+
+#rightTimer {
+      text-align: left;
+}
+
+#leftTimer { 
+      text-align: right;
+}
+
+#Count{
+
+}
+
+.cupCount {
+    font-size: 2em;
+}
+
+#leftCupCount {
+    text-align: left;
+}
+
+#rightCupCount { 
+    text-align: right;
+}
+
+.title {
+    font-size: 2em;
+    text-align: center;
+    font-weight: bold;
+}
+
+#Graph {
+
+}
+
+#leftGraph {
+}
+
+#rightGraph {
+    float: right;
+}
+
+#hitOrder {
+    display: inline-block;  
+} 
+
+#hitOrderSvg{
+    margin-top: -4em;
+}
