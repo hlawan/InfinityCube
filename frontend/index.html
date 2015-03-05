@@ -5,49 +5,52 @@
   <head>
     <title>InfinityCube</title>
     <link rel="stylesheet" type="text/css" media="screen" href="style.css" />
+    <link rel="stylesheet" href="switchy.css"/>
     <script src="jquery.js" type="text/javascript"></script>
     <script src="jquery.svg.min.js" type="text/javascript"></script>
     <script src="jquery.svgdom.min.js" type="text/javascript"></script>
     <script src="infinitycube.js" type="text/javascript"></script>
+    <script src="switchy.js" type="text/javascript"></script>
+    <script src="jquery.animate-color.js" type="text/javascript"></script>
+    <script src="jquery.event.drag.js" type="text/javascript"></script>
   </head>
 
   <body>
-    <div id="cube"></div>
     <div class="table">
       <div class="row">
         <div class="left">
           <div class="table">
             <div class="row">
-              <div class="timer" id="rightTimer"></div>  
+              <div class="left" id="leftAlignRight">  
+                <img src="RubikCube.svg" alt="RubikCube" class="MainSwitch" MainSwitch='cube' style="width:28px;height:28px">             
+              </div>
+              <div class="center">                
+                  <select id="MainSwitch">
+                    <option value="cube">cube</option>
+                    <option value="side">side/edge</option>
+                  </select>    
+                </div>            
+              <div class="right" id="rightAlignLeft">                
+                  <img src="RubikCubeSide.svg" alt="RubikCubeSide" class="MainSwitch" MainSwitch='side' style="width:28px;height:28px">   
+              </div>
             </div>
-            <div class="row">
-              <div class="cupCount" id="leftCupCount"></div>
-            </div>
-            <div class="row">
-              <div id="leftGraph"></div>
-            </div> 
           </div>
         </div>
         <div class="center">
           <div class="table">
             <div class="row">
-              <div class="title" id="TimerTitle"></div>
-              <div class="title" id="CupCuntTitle"></div> 
-              <div id="hitOrder"></div>
+              <div class="title" id="ÍnfinityCube">InfinityCube</div>
+            </div>
+            <div class="row">
+              <div class="svg" id="cube"></div>
             </div>
           </div>
         </div>
         <div class="right">
           <div class="table">
-            <div class="row">
-              <div class="timer" id="leftTimer"></div>
-            </div>
              <div class="row">
-              <div class="cupCount" id="rightCupCount"></div>
+
             </div>
-            <div class="row">
-              <div id="rightGraph"></div>
-            </div> 
           </div>
         </div>      
       </div>
