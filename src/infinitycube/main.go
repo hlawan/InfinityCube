@@ -14,10 +14,12 @@ import (
 	"flag"
     "log"
     "net/http"
-    "time"
+  //  "time"
+    "fmt"
+    "reflect"
 )
 
-const DEBUG_LVL = 4
+const DEBUG_LVL = 1
 /*
 0 no debug information
 1 general information 
@@ -38,13 +40,13 @@ func main() {
 
     cube := NewCube()
     cube.RGBiteration()
-
-    go func() {
-        for {
-            cube.side[0].edge[0].led[0].printRGB()
-            time.Sleep(1000 * time.Millisecond)
-        }
-    }()
+    cube.simpleRunningLight(255,0,255)
+    //cube.side[2].edge[1].simpleRunningLight(0,255,0)
+    fooType := reflect.TypeOf(Cube{})
+    for i := 0; i < fooType.NumMethod(); i++ {
+        method := fooType.Method(i)
+        fmt.Println(method.Name)
+    }
 
 	http.Handle("/status", cube)
     http.Handle("/", http.FileServer(http.Dir(*static_path)))
@@ -53,15 +55,4 @@ func main() {
     if err != nil {
         log.Fatalf("ListenAndServe failed: %v", err)
     }
-}
-
-
-
-type Status2 struct {
-    Cups  int    
-    NoChangeSince [2]string
-    NrOfCups [2]int
-    History [2]map[string]float64
-    HitOrder []int
-    Error string
 }

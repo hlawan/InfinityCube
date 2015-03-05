@@ -6,6 +6,7 @@ import (
 )
 
 func (my *Cube) RGBiteration() {
+    const speed = 1000 //effekt speed: RGB-cycle time in ms
 
 	for i := 0; i < NR_OF_SIDES; i++ {
         my.side[i].renderer = my.side[i].setSide
@@ -23,9 +24,32 @@ func (my *Cube) RGBiteration() {
     				case 2:
         				for i := 0; i < NR_OF_SIDES; i++ {my.side[i].renderer(0,0,255)}
     			}
-    			time.Sleep(1000 * time.Millisecond)
+    			time.Sleep(speed/3 * time.Millisecond)
         	}
         }
  	}()
+}
+
+
+func (my *Cube) simpleRunningLight(red, green, blue uint8) {
+   for i := 0; i < NR_OF_SIDES; i++ {
+        for o := 0; o < EDGES_PER_SIDE; o++ {
+            my.side[i].edge[o].simpleRunningLight(red, green, blue)
+        }
+    }
+}    
+
+func (my *Cube) growingRunningLight(red, green, blue uint8) {
+    const speed = 333 //effekt speed: delay before start on next edge
+    go func() {
+        for{
+            for i := 0; i < NR_OF_SIDES; i++ {
+                for o := 0; o < EDGES_PER_SIDE; o++ {
+                    my.side[i].edge[o].simpleRunningLight(red, green, blue)
+                    time.Sleep(speed * time.Millisecond)
+                }
+            }
+        }
+    }()
 }
 

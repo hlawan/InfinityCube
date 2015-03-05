@@ -1,6 +1,7 @@
 bin/
 pkg/
 static/
+other/
 
 # Compiled source #
 ###################

@@ -12,4 +12,3 @@ func (my *side) setSide(red, green, blue uint8) {
 	}
 
 }
-
