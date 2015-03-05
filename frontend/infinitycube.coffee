@@ -4,6 +4,7 @@ window.onload = ->
   window.setInterval(update, 1000/2) #set updaterate to __hz
   $('#cube').css('margin', 1).css('width', 330).css('height', 430).svg({loadURL: 'fancycube.svg'}) #need 4 resizehandler
   loadMainRendererSwitch()
+  loadCubeRendererSelector()
 
 update = ->
   $.get('status', (data) ->
@@ -29,7 +30,6 @@ setColor = (field, color) ->
 
 
 loadMainRendererSwitch = ->
-	$ ->
 	  $('#MainSwitch').switchy()
 	  $('.MainSwitch').on 'click', ->
 	    $('#MainSwitch').val($(this).attr('MainSwitch')).change()
@@ -39,12 +39,20 @@ loadMainRendererSwitch = ->
 	    bgColor = '#ccb3dc'
 	    if $(this).val() == 'cube'
 	      bgColor = '#ed7ab0'
-	      console.log('Selected value is "' + $(this).val() + '"')
+	      displayCubeSelection()
 	    else if $(this).val() == 'side'
 	      bgColor = '#7fcbea'
+	      displaySideSelection()
 	    $('.switchy-bar').animate backgroundColor: bgColor
-	    # Display action in console
-	    log = 'Selected value is "' + $(this).val() + '"'
-	    $('#console').html(log).hide().fadeIn()
 	    return
-	  return
+
+
+loadCubeRendererSelector = ->
+	$('#CubeRendererSelector').selectBoxIt({ theme: "jqueryui" })
+ 
+
+displayCubeSelection = ->
+	$('#display').text("Look @ me...Im a CubeRenderSelectionTool")
+
+displaySideSelection = ->
+	$('#display').text("Look @ me...I will organize your sideRederers")
