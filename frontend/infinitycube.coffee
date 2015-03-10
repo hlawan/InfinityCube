@@ -4,9 +4,8 @@ window.onload = ->
   window.setInterval(update, 1000/2) #set updaterate to __hz
   $('#cube').css('margin', 1).css('width', 330).css('height', 430).svg({loadURL: 'fancycube.svg'}) #need 4 resizehandler
   loadMainRendererSwitch()
-  $.get('status', (data) ->
-  	loadCubeRendererSelector(data)
-  , 'json')
+  displayCubeSelection()
+
 
 update = ->
   $.get('status', (data) ->
@@ -50,14 +49,22 @@ loadMainRendererSwitch = ->
 
 
 loadCubeRendererSelector = (data) ->
-	$('select#CubeRendererSelector').selectBoxIt({
+	$('#SRScontainer').hide()
+	$('#CRScontainer').show()
+	CubeRendererSelector = $('select#CubeRendererSelector').selectBoxIt({
 		 populate: data['CubeRenderer']
 		 defaultText: "select CubeRenderer plz :)"
 		})
+
+hideCubeRendererSelector = ->
+	$('#CRScontainer').hide()
  
 
 displayCubeSelection = ->
-	$('#display').text("Look @ me...Im a CubeRenderSelectionTool")
+	$.get('status', (data) ->
+  		loadCubeRendererSelector(data)
+  	, 'json')
 
 displaySideSelection = ->
-	$('#display').text("Look @ me...I will organize your sideRederers")
+	$('#CRScontainer').hide()
+	$('#SRScontainer').show()
