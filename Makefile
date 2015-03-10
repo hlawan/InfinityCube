@@ -39,6 +39,10 @@ check-format:
 
 static:
 	mkdir -p static
+	
+
+images:
+	mkdir -p static/images
 
 static/jquery.js: static
 	test -e "$@" || wget "http://code.jquery.com/jquery-$(JQUERYVERSION).min.js" -O "$@"
@@ -47,11 +51,13 @@ static/%.js: frontend/%.coffee static
 	coffee --compile --output static "$<"
 
 SCRIPTS = static/jquery.js static/infinitycube.js
-STATIC  = frontend/*.html frontend/*.svg frontend/*.css frontend/*.js
+STATIC  = frontend/*.html frontend/*.svg frontend/*.css frontend/*.js 
+IMAGES = frontend/images/*.png 
 
 .PHONY: content
-content: static $(SCRIPTS)
+content: static $(SCRIPTS) images
 	cp --update $(STATIC) static
+	cp --update $(IMAGES) static/images
 
 .PHONY: serve
 serve: infinitycube content

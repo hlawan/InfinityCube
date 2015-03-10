@@ -6,6 +6,7 @@
     <title>InfinityCube</title>
     <link rel="stylesheet" type="text/css" media="screen" href="style.css" />
     <link rel="stylesheet" href="switchy.css"/>
+    <!--<link type="text/css" rel="stylesheet" href="http://gregfranko.com/jquery.selectBoxIt.js/css/jquery.selectBoxIt.css" />-->
     <link rel="stylesheet" type="text/css" href="jquery.selectBoxIt.css" />
     <link type="text/css" rel="stylesheet" href="jquery-ui.css" />
     <script src="jquery.js" type="text/javascript"></script>
@@ -39,11 +40,21 @@
               </div>
             </div>
             <div class="row">
-              <select id="CubeRendererSelector">
-                <option value="RGBiteration">RGBiteration</option>
-                <option value="simpleRunningLight">simpleRunningLight</option>
-              </select>    
+              <select id="CubeRendererSelector"></select>    
             </div>  
+            <div class="row">
+              <form>
+                  <fieldset data-role="controlgroup" data-type="horizontal">
+                      <legend>Horizontal:</legend>
+                      <input type="checkbox" name="checkbox-h-2a" id="checkbox-h-2a">
+                      <label for="checkbox-h-2a">One</label>
+                      <input type="checkbox" name="checkbox-h-2b" id="checkbox-h-2b">
+                      <label for="checkbox-h-2b">Two</label>
+                      <input type="checkbox" name="checkbox-h-2c" id="checkbox-h-2c">
+                      <label for="checkbox-h-2c">Three</label>
+                  </fieldset>
+              </form>
+            </div>
           </div>
         </div>
         <div class="center">

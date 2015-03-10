@@ -9,6 +9,7 @@ type Status struct {
 	LedR [NR_OF_SIDES][EDGES_PER_SIDE][EDGE_LENGTH]int
 	LedG [NR_OF_SIDES][EDGES_PER_SIDE][EDGE_LENGTH]int
 	LedB [NR_OF_SIDES][EDGES_PER_SIDE][EDGE_LENGTH]int
+    CubeRenderer []string
 }
 
 func NewStatus(c *Cube) (s *Status) {
@@ -22,6 +23,9 @@ func NewStatus(c *Cube) (s *Status) {
 			}
 		}
 	}
+    //idea: automatic gathering of all known methodes of Cube type in a string (reflect?)
+    s.CubeRenderer = []string{"RGBiteration", "simpleRunningLight", "and so on"}
+
     return
 }
 

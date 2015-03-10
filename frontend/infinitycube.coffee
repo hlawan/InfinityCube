@@ -4,7 +4,9 @@ window.onload = ->
   window.setInterval(update, 1000/2) #set updaterate to __hz
   $('#cube').css('margin', 1).css('width', 330).css('height', 430).svg({loadURL: 'fancycube.svg'}) #need 4 resizehandler
   loadMainRendererSwitch()
-  loadCubeRendererSelector()
+  $.get('status', (data) ->
+  	loadCubeRendererSelector(data)
+  , 'json')
 
 update = ->
   $.get('status', (data) ->
@@ -47,8 +49,11 @@ loadMainRendererSwitch = ->
 	    return
 
 
-loadCubeRendererSelector = ->
-	$('#CubeRendererSelector').selectBoxIt({ theme: "jqueryui" })
+loadCubeRendererSelector = (data) ->
+	$('select#CubeRendererSelector').selectBoxIt({
+		 populate: data['CubeRenderer']
+		 defaultText: "select CubeRenderer plz :)"
+		})
  
 
 displayCubeSelection = ->
