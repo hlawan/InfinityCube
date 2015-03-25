@@ -38,3 +38,5 @@ func (my *edge) simpleRunningLight(red, green, blue uint8) {
 	}()
 }
 
+//----------------------new stuff------------------//
+

@@ -42,6 +42,9 @@ func main() {
     cube.RGBiteration()
     cube.simpleRunningLight(255,0,255)
     //cube.side[2].edge[1].simpleRunningLight(0,255,0)
+
+
+
     fooType := reflect.TypeOf(Cube{})
     for i := 0; i < fooType.NumMethod(); i++ {
         method := fooType.Method(i)

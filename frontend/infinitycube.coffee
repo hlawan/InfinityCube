@@ -1,7 +1,7 @@
 $ = jQuery
 
 window.onload = ->
-  window.setInterval(update, 1000/2) #set updaterate to __hz
+  window.setInterval(update, 1000/30) #set updaterate to __hz
   $('#cube').css('margin', 1).css('width', 330).css('height', 430).svg({loadURL: 'fancycube.svg'}) #need 4 resizehandler
   loadMainRendererSwitch()
   displayCubeSelection()
@@ -52,9 +52,10 @@ loadCubeRendererSelector = (data) ->
 	$('#SRScontainer').hide()
 	$('#CRScontainer').show()
 	CubeRendererSelector = $('select#CubeRendererSelector').selectBoxIt({
-		 populate: data['CubeRenderer']
-		 defaultText: "select CubeRenderer plz :)"
-		})
+	 populate: data['CubeRenderer']
+	 defaultText: "select CubeRenderer plz :)"
+	})
+
 
 hideCubeRendererSelector = ->
 	$('#CRScontainer').hide()
