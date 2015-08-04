@@ -12,50 +12,62 @@ package main
 
 import (
 	"flag"
-    "log"
-    "net/http"
-  //  "time"
-    "fmt"
-    "reflect"
+	"log"
+	"net/http"
+	//  "time"
+	"fmt"
+	"net"
+	"os"
+	"reflect"
 )
 
 const DEBUG_LVL = 1
+
 /*
 0 no debug information
-1 general information 
+1 general information
 2 side information
 3 edge information
 4 led information
 */
 
 var (
-    serial_port    = flag.String("serial", "", "serial port")
-    unix_socket    = flag.String("unixconnect", "", "connect to unix socket")
-    listen_address = flag.String("listen", ":2500", "http service address")
-    static_path    = flag.String("static", "static", "path to the static content")
+	//serial_port    = flag.String("serial", "", "serial port")
+	serial_port    = flag.String("serial", "~/rpi_ws281x/so", "serial port")
+	unix_socket    = flag.String("unixconnect", "", "connect to unix socket")
+	listen_address = flag.String("listen", ":2500", "http service address")
+	static_path    = flag.String("static", "static", "path to the static content")
 )
 
 func main() {
 	var err error
 
-    cube := NewCube()
-    cube.RGBiteration()
-    cube.simpleRunningLight(255,0,255)
-    //cube.side[2].edge[1].simpleRunningLight(0,255,0)
+	cube := NewCube()
+	cube.RGBiteration()
+	cube.simpleRunningLight(255, 0, 255)
+	//cube.side[2].edge[1].simpleRunningLight(0,255,0)
 
+	fooType := reflect.TypeOf(Cube{})
+	for i := 0; i < fooType.NumMethod(); i++ {
+		method := fooType.Method(i)
+		fmt.Println(method.Name)
+	}
 
-
-    fooType := reflect.TypeOf(Cube{})
-    for i := 0; i < fooType.NumMethod(); i++ {
-        method := fooType.Method(i)
-        fmt.Println(method.Name)
-    }
+	flag.Parse()
+	if *serial_port != "" {
+		os.OpenFile(*serial_port, os.O_RDWR, 0)
+	} else {
+		net.Dial("unix", *unix_socket)
+	}
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	http.Handle("/status", cube)
-    http.Handle("/", http.FileServer(http.Dir(*static_path)))
+	http.Handle("/", http.FileServer(http.Dir(*static_path)))
 
-    err = http.ListenAndServe(*listen_address, nil)
-    if err != nil {
-        log.Fatalf("ListenAndServe failed: %v", err)
-    }
+	err = http.ListenAndServe(*listen_address, nil)
+	if err != nil {
+		log.Fatalf("ListenAndServe failed: %v", err)
+	}
 }
