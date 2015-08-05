@@ -53,7 +53,7 @@ func main() {
 	}
 	//--------------------------------------------------------
 	fmt.Println("Before socket stuff...")
-
+	startSocketComunication()
 	//--------------------------------------------------------
 	http.Handle("/status", cube)
 	http.Handle("/", http.FileServer(http.Dir(*static_path)))

@@ -1,12 +1,21 @@
 package main
 
 import (
+	"fmt"
+	"log"
 	"net"
 	"time"
 )
 
-func startSocketComunication(c *Cube) {
-	socketCon, _ := net.Dial("unix", "/tmp/so")
+func startSocketComunication() {
+	socketCon, err := net.Dial("unix", "/tmp/so")
+	if err != nil {
+		log.Fatalf("startSocketComunication failed %v", err)
+	} else {
+		if DEBUG_LVL >= 1 {
+			fmt.Println("dialed unix socket...")
+		}
+	}
 	for {
 		socketCon.Write([]byte("hi"))
 		time.Sleep(1e9)
