@@ -8,7 +8,7 @@ import (
 func startSocketComunication(c *Cube) {
 	socketCon, _ := net.Dial("unix", "/tmp/so")
 	for {
-		socketCon.Write([]byte("hi\n"))
+		socketCon.Write([]byte("hi"))
 		time.Sleep(1e9)
 	}
 }
