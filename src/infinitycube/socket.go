@@ -23,9 +23,12 @@ func startSocketComunication(myCube *Cube) {
 
 	buf := new(bytes.Buffer)
 	go func() {
-		binary.Write(buf, binary.LittleEndian, myCube.parseLEDstatus())
-		socketCon.Write(buf.Bytes())
-		time.Sleep(30 * time.Millisecond)
+		for {
+			binary.Write(buf, binary.LittleEndian, myCube.parseLEDstatus())
+			socketCon.Write(buf.Bytes())
+			time.Sleep(10 * time.Millisecond)
+			fmt.Println(myCube.parseLEDstatus())
+		}
 	}()
 }
 
