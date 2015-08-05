@@ -53,6 +53,7 @@ func main() {
 		method := fooType.Method(i)
 		fmt.Println(method.Name)
 	}
+	//--------------------------------------------------------
 	fmt.Println("Before socket stuff...")
 	
 	 c,err := net.Dial("unix", "/tmp/so")
@@ -60,7 +61,7 @@ func main() {
        		c.Write([]byte("hi\n"))
          	time.Sleep(1e9)
 	 }
-
+	//--------------------------------------------------------
 	http.Handle("/status", cube)
 	http.Handle("/", http.FileServer(http.Dir(*static_path)))
 
