@@ -14,11 +14,12 @@ import (
 	"flag"
 	"log"
 	"net/http"
-	//  "time"
+	//"time"
 	"fmt"
 	"net"
-	"os"
+	//"os"
 	"reflect"
+	"time"
 )
 
 const DEBUG_LVL = 1
@@ -33,8 +34,8 @@ const DEBUG_LVL = 1
 
 var (
 	//serial_port    = flag.String("serial", "", "serial port")
-	serial_port    = flag.String("serial", "~/rpi_ws281x/so", "serial port")
-	unix_socket    = flag.String("unixconnect", "", "connect to unix socket")
+	//serial_port    = flag.String("serial", "/tmp/so", "serial port")
+	//unix_socket    = flag.String("unixconnect", "", "connect to unix socket")
 	listen_address = flag.String("listen", ":2500", "http service address")
 	static_path    = flag.String("static", "static", "path to the static content")
 )
@@ -52,16 +53,13 @@ func main() {
 		method := fooType.Method(i)
 		fmt.Println(method.Name)
 	}
-
-	flag.Parse()
-	if *serial_port != "" {
-		os.OpenFile(*serial_port, os.O_RDWR, 0)
-	} else {
-		net.Dial("unix", *unix_socket)
-	}
-	if err != nil {
-		log.Fatal(err)
-	}
+	fmt.Println("Before socket stuff...")
+	
+	 c,err := net.Dial("unix", "/tmp/so")
+         for {
+       		c.Write([]byte("hi\n"))
+         	time.Sleep(1e9)
+	 }
 
 	http.Handle("/status", cube)
 	http.Handle("/", http.FileServer(http.Dir(*static_path)))
