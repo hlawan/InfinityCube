@@ -16,10 +16,8 @@ import (
 	"net/http"
 	//"time"
 	"fmt"
-	"net"
 	//"os"
 	"reflect"
-	"time"
 )
 
 const DEBUG_LVL = 1
@@ -55,12 +53,7 @@ func main() {
 	}
 	//--------------------------------------------------------
 	fmt.Println("Before socket stuff...")
-	
-	 c,err := net.Dial("unix", "/tmp/so")
-         for {
-       		c.Write([]byte("hi\n"))
-         	time.Sleep(1e9)
-	 }
+
 	//--------------------------------------------------------
 	http.Handle("/status", cube)
 	http.Handle("/", http.FileServer(http.Dir(*static_path)))
