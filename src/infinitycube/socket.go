@@ -10,7 +10,7 @@ import (
 )
 
 func startSocketComunication(myCube *Cube) {
-	fmt.Println(myCube.parseLEDstatus())
+	//fmt.Println(myCube.parseLEDstatus())
 	socketCon, err := net.Dial("unix", "/tmp/so")
 
 	if err != nil {
@@ -22,12 +22,15 @@ func startSocketComunication(myCube *Cube) {
 	}
 
 	buf := new(bytes.Buffer)
+	startBit := make([]byte, 1)
 	go func() {
 		for {
+        		socketCon.Read(startBit)
 			binary.Write(buf, binary.LittleEndian, myCube.parseLEDstatus())
+			time.Sleep(5000 * time.Millisecond)
 			socketCon.Write(buf.Bytes())
-			time.Sleep(10 * time.Millisecond)
-			fmt.Println(myCube.parseLEDstatus())
+			time.Sleep((1000 * time.Millisecond)/3)
+			//fmt.Println(myCube.parseLEDstatus())
 		}
 	}()
 }
