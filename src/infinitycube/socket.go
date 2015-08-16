@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"time"
+	//"time"
 )
 
 func startSocketComunication(myCube *Cube) {
@@ -22,15 +22,18 @@ func startSocketComunication(myCube *Cube) {
 	}
 
 	buf := new(bytes.Buffer)
-	startBit := make([]byte, 1)
+	startByte := make([]byte, 1)
 	go func() {
 		for {
-        		socketCon.Read(startBit)
-			binary.Write(buf, binary.LittleEndian, myCube.parseLEDstatus())
-			time.Sleep(5000 * time.Millisecond)
-			socketCon.Write(buf.Bytes())
-			time.Sleep((1000 * time.Millisecond)/3)
-			//fmt.Println(myCube.parseLEDstatus())
+			buf.Reset()
+			//fmt.Println("Before Read...")
+			n, _ := socketCon.Read(startByte)
+        		if(n == 1){
+				//fmt.Println("Before Write...")
+				binary.Write(buf, binary.LittleEndian, myCube.parseLEDstatus())
+				socketCon.Write(buf.Bytes())
+				//time.Sleep((1000 * time.Millisecond)/10)
+			}
 		}
 	}()
 }
@@ -39,7 +42,7 @@ func startSocketComunication(myCube *Cube) {
 *	single led. This arry is passed through the unix domain socket and used by the
 *	c code that outouts it to the led strip*/
 func (my *Cube) parseLEDstatus() (leds [3 * EDGE_LENGTH * EDGES_PER_SIDE * NR_OF_SIDES]byte) {
-	time.Sleep(500 * time.Millisecond)
+	//time.Sleep(500 * time.Millisecond)
 	for h := 0; h < ((3 * EDGE_LENGTH * EDGES_PER_SIDE * NR_OF_SIDES) - 2); h++ {
 		if h%3 == 0 {
 			for i := 0; i < NR_OF_SIDES; i++ {

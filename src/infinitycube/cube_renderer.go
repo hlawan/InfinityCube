@@ -24,7 +24,7 @@ func (my *Cube) RGBiteration() {
     				case 2:
         				for i := 0; i < NR_OF_SIDES; i++ {my.side[i].renderer(0,0,255)}
     			}
-    			time.Sleep(speed/3 * time.Millisecond)
+    			time.Sleep(speed * time.Millisecond)
         	}
         }
  	}()
