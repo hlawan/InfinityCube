@@ -51,10 +51,12 @@ func main() {
 		method := fooType.Method(i)
 		fmt.Println(method.Name)
 	}
+
 	//--------------------------------------------------------
 	fmt.Println("Before socket stuff...")
 	startSocketComunication(cube)
 	//--------------------------------------------------------
+
 	http.Handle("/status", cube)
 	http.Handle("/", http.FileServer(http.Dir(*static_path)))
 
