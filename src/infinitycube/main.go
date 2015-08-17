@@ -43,6 +43,7 @@ func main() {
 
 	cube := NewCube()
 	cube.RGBiteration()
+	cube.fade()
 	//cube.simpleRunningLight(255, 0, 255)
 	//cube.side[2].edge[1].simpleRunningLight(0,255,0)
 
