@@ -12,10 +12,10 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
-	//"time"
-	"fmt"
+	"time"
 	//"os"
 	"reflect"
 )
@@ -44,10 +44,10 @@ func main() {
 	cube := NewCube()
 	cube.side[0].setSide(100, 100, 100)
 	cube.side[1].setSide(255, 100, 100)
-	cube.side[0].setSide(100, 255, 100)
-	cube.side[0].setSide(100, 100, 255)
-	cube.side[0].setSide(255, 0, 0)
-	cube.side[0].setSide(0, 255,0)
+	cube.side[2].setSide(100, 255, 100)
+	cube.side[3].setSide(100, 100, 255)
+	cube.side[4].setSide(255, 0, 0)
+	cube.side[5].setSide(0, 255, 0)
 
 	//cube.fade()
 	//cube.simpleRunningLight(255, 0, 255)
@@ -63,6 +63,13 @@ func main() {
 	fmt.Println("Before socket stuff...")
 	startSocketComunication(cube)
 	//--------------------------------------------------------
+
+	go func() {
+		for {
+			fmt.Println(cube)
+			time.Sleep(time.Second)
+		}
+	}()
 
 	http.Handle("/status", cube)
 	http.Handle("/", http.FileServer(http.Dir(*static_path)))
