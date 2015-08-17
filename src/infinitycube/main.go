@@ -31,7 +31,7 @@ const DEBUG_LVL = 1
 */
 
 var (
-	//serial_port    = flag.String("serial", "", "serial port")
+	serial_port = flag.String("serial", "", "serial port")
 	//serial_port    = flag.String("serial", "/tmp/so", "serial port")
 	//unix_socket    = flag.String("unixconnect", "", "connect to unix socket")
 	listen_address = flag.String("listen", ":2500", "http service address")
@@ -48,7 +48,7 @@ func main() {
 	//cube.side[3].setSide(100, 100, 255)
 	//cube.side[4].setSide(255, 0, 0)
 	//cube.side[5].setSide(200, 130, 60)
-	
+
 	//cube.RGBiteration()
 	cube.fade()
 	cube.simpleRunningLight(50, 50, 50)
@@ -60,23 +60,18 @@ func main() {
 		fmt.Println(method.Name)
 	}
 
-	//--------------------------------------------------------
-	fmt.Println("Before socket stuff...")
-	startSocketComunication(cube)
-	//--------------------------------------------------------
+	flag.Parse()
+	if *serial_port != "" {
+		http.Handle("/status", cube)
+		http.Handle("/", http.FileServer(http.Dir(*static_path)))
 
-	/*go func() {
-		for {
-			cube.output()
-			time.Sleep(time.Second)
+		err = http.ListenAndServe(*listen_address, nil)
+		if err != nil {
+			log.Fatalf("ListenAndServe failed: %v", err)
 		}
-	}()*/
-
-	http.Handle("/status", cube)
-	http.Handle("/", http.FileServer(http.Dir(*static_path)))
-
-	err = http.ListenAndServe(*listen_address, nil)
-	if err != nil {
-		log.Fatalf("ListenAndServe failed: %v", err)
+	} else {
+		fmt.Println("Before socket stuff...")
+		startSocketComunication(cube)
 	}
+
 }
