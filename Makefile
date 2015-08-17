@@ -70,3 +70,9 @@ deploy: web content
 .PHONY: clean
 clean:
 	rm -rf -- pkg bin static
+
+.PHONY: cube
+cube: infinitycube
+	sudo rm -f /tmp/so
+	sudo ./src/rpi_ws281x/test&
+	sudo bin/infinitycube
