@@ -6,7 +6,7 @@ import (
 )
 
 func (my *Cube) RGBiteration() {
-	const speed = 1000 //effekt speed: RGB-cycle time in ms
+	const speed = 5000 //effekt speed: RGB-cycle time in ms
 
 	for i := 0; i < NR_OF_SIDES; i++ {
 		my.side[i].renderer = my.side[i].setSide
@@ -61,7 +61,7 @@ func (my *Cube) growingRunningLight(red, green, blue uint8) {
 }
 
 func (my *Cube) fade() {
-	const speed = 50
+	const speed = 10
 	bottomReached := false
 
 	go func() {
@@ -70,10 +70,10 @@ func (my *Cube) fade() {
 				for o := 0; o < EDGES_PER_SIDE; o++ {
 					for p := 0; p < EDGE_LENGTH; p++ {
 						if my.side[i].edge[o].led[p].Blue > 0 && bottomReached == false {
-							my.side[i].edge[o].led[p].Blue--
+							my.side[i].edge[o].led[p].Blue -= 3
 						} else {
 							bottomReached = true
-							my.side[i].edge[o].led[p].Blue++
+							my.side[i].edge[o].led[p].Blue += 3
 						}
 						if my.side[i].edge[o].led[p].Blue == 255 {
 							bottomReached = false
