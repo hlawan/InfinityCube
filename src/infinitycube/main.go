@@ -66,7 +66,7 @@ func main() {
 
 	go func() {
 		for {
-			fmt.Println(cube)
+			cube.output()
 			time.Sleep(time.Second)
 		}
 	}()

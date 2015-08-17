@@ -85,3 +85,15 @@ func (my *Cube) fade() {
 		}
 	}()
 }
+
+func (my *Cube) output() {
+	for i := 0; i < NR_OF_SIDES; i++ {
+		for o := 0; o < EDGES_PER_SIDE; o++ {
+			for p := 0; p < EDGE_LENGTH; p++ {
+				fmt.Println(my.side[i].edge[o].led[p].Red, " ",
+					my.side[i].edge[o].led[p].Green, " ",
+					my.side[i].edge[o].led[p].Blue, "|")
+			}
+		}
+	}
+}
