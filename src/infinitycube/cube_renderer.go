@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/lucasb-eyer/go-colorful"
 	"time"
 )
 
@@ -82,6 +83,30 @@ func (my *Cube) fade() {
 				}
 			}
 			time.Sleep(speed * time.Millisecond)
+		}
+	}()
+}
+
+func (my *Cube) rainbowFade() {
+	const speed = 50
+	color := colorful.Hcl(0, 0, 0)
+	var h float64
+
+	go func() {
+		for {
+			for h = 0; h < 360; h++ {
+				for i := 0; i < NR_OF_SIDES; i++ {
+					for o := 0; o < EDGES_PER_SIDE; o++ {
+						for p := 0; p < EDGE_LENGTH; p++ {
+							color = colorful.Hcl(h, 1, 1)
+							my.side[i].edge[o].led[p].Red = uint8(color.R * 255)
+							my.side[i].edge[o].led[p].Green = uint8(color.G * 255)
+							my.side[i].edge[o].led[p].Blue = uint8(color.B * 255)
+						}
+					}
+				}
+				time.Sleep(speed * time.Millisecond)
+			}
 		}
 	}()
 }

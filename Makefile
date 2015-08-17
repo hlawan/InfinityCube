@@ -27,6 +27,7 @@ all: infinitycube
 
 .PHONY: infinitycube
 infinitycube:
+	$(GO) get github.com/lucasb-eyer/go-colorful
 	$(GO) install infinitycube
 
 .PHONY: format
