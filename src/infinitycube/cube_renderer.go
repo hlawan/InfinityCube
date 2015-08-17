@@ -98,7 +98,7 @@ func (my *Cube) rainbowFade() {
 				for i := 0; i < NR_OF_SIDES; i++ {
 					for o := 0; o < EDGES_PER_SIDE; o++ {
 						for p := 0; p < EDGE_LENGTH; p++ {
-							color = colorful.Hcl(h, 1, 0.8).Clamped()
+							color = colorful.Hcl(h, 1, 0.3).Clamped()
 							my.side[i].edge[o].led[p].Red = uint8(color.R * 255)
 							my.side[i].edge[o].led[p].Green = uint8(color.G * 255)
 							my.side[i].edge[o].led[p].Blue = uint8(color.B * 255)
