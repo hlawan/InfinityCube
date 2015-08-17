@@ -18,11 +18,11 @@ func (my *Cube) RGBiteration() {
         	for i := 0; i < 3; i++ {
         		switch i {
    					case 0:
-        				for i := 0; i < NR_OF_SIDES; i++ {my.side[i].renderer(255,0,0)}
+        				for i := 0; i < NR_OF_SIDES; i++ {my.side[i].renderer(255,10,10)}
     				case 1:
-        				for i := 0; i < NR_OF_SIDES; i++ {my.side[i].renderer(0,255,0)}
+        				for i := 0; i < NR_OF_SIDES; i++ {my.side[i].renderer(10,255,10)}
     				case 2:
-        				for i := 0; i < NR_OF_SIDES; i++ {my.side[i].renderer(0,0,255)}
+        				for i := 0; i < NR_OF_SIDES; i++ {my.side[i].renderer(10,10,255)}
     			}
     			time.Sleep(speed * time.Millisecond)
         	}

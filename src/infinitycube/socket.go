@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net"
-	//"time"
+	"time"
 )
 
 func startSocketComunication(myCube *Cube) {
@@ -32,7 +32,8 @@ func startSocketComunication(myCube *Cube) {
 				//fmt.Println("Before Write...")
 				binary.Write(buf, binary.LittleEndian, myCube.parseLEDstatus())
 				socketCon.Write(buf.Bytes())
-				//time.Sleep((1000 * time.Millisecond)/10)
+				//limit to 30 frames per second
+				time.Sleep((1000 * time.Millisecond)/30)
 			}
 		}
 	}()
