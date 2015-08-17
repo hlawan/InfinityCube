@@ -61,17 +61,17 @@ func main() {
 	}
 
 	flag.Parse()
-	if *serial_port != "" {
-		http.Handle("/status", cube)
-		http.Handle("/", http.FileServer(http.Dir(*static_path)))
-
-		err = http.ListenAndServe(*listen_address, nil)
-		if err != nil {
-			log.Fatalf("ListenAndServe failed: %v", err)
-		}
-	} else {
+	if *serial_port == "cube" {
 		fmt.Println("Before socket stuff...")
 		startSocketComunication(cube)
+	}
+
+	http.Handle("/status", cube)
+	http.Handle("/", http.FileServer(http.Dir(*static_path)))
+
+	err = http.ListenAndServe(*listen_address, nil)
+	if err != nil {
+		log.Fatalf("ListenAndServe failed: %v", err)
 	}
 
 }

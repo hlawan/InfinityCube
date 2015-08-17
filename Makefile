@@ -26,7 +26,7 @@ export GOPATH
 all: infinitycube
 
 .PHONY: infinitycube
-infinitycube: 
+infinitycube:
 	$(GO) install infinitycube
 
 .PHONY: format
@@ -39,7 +39,7 @@ check-format:
 
 static:
 	mkdir -p static
-	
+
 
 images:
 	mkdir -p static/images
@@ -51,8 +51,8 @@ static/%.js: frontend/%.coffee static
 	coffee --compile --output static "$<"
 
 SCRIPTS = static/jquery.js static/infinitycube.js
-STATIC  = frontend/*.html frontend/*.svg frontend/*.css frontend/*.js 
-IMAGES = frontend/images/*.png 
+STATIC  = frontend/*.html frontend/*.svg frontend/*.css frontend/*.js
+IMAGES = frontend/images/*.png
 
 .PHONY: content
 content: static $(SCRIPTS) images
@@ -75,4 +75,4 @@ clean:
 cube: infinitycube
 	sudo rm -f /tmp/so
 	sudo ./src/rpi_ws281x/test&
-	sudo bin/infinitycube
+	sudo bin/infinitycube -serial cube
