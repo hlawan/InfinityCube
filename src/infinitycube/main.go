@@ -42,12 +42,12 @@ func main() {
 	var err error
 
 	cube := NewCube()
-	cube.side[0].renderer(100, 100, 100)
-	cube.side[1].renderer(00, 00, 00)
-	cube.side[2].renderer(00, 00, 00)
-	cube.side[3].renderer(00, 00, 00)
-	cube.side[4].renderer(00, 00, 00)
-	cube.side[5].renderer(00, 00, 00)
+	//cube.side[0].renderer(100, 100, 100)
+	//cube.side[1].renderer(00, 00, 00)
+	//cube.side[2].renderer(00, 00, 00)
+	//cube.side[3].renderer(00, 00, 00)
+	//cube.side[4].renderer(00, 00, 00)
+	//cube.side[5].renderer(00, 00, 00)
 
 	//cube.fade()
 	//cube.simpleRunningLight(255, 0, 255)
