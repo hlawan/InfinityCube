@@ -15,7 +15,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"time"
+	//"time"
 	//"os"
 	"reflect"
 )
@@ -42,15 +42,16 @@ func main() {
 	var err error
 
 	cube := NewCube()
-	cube.side[0].setSide(100, 100, 100)
-	cube.side[1].setSide(255, 100, 100)
-	cube.side[2].setSide(100, 255, 100)
-	cube.side[3].setSide(100, 100, 255)
-	cube.side[4].setSide(255, 0, 0)
-	cube.side[5].setSide(0, 255, 0)
-
-	//cube.fade()
-	//cube.simpleRunningLight(255, 0, 255)
+	//cube.side[0].setSide(100, 100, 100)
+	//cube.side[1].setSide(255, 100, 100)
+	//cube.side[2].setSide(100, 255, 100)
+	//cube.side[3].setSide(100, 100, 255)
+	//cube.side[4].setSide(255, 0, 0)
+	//cube.side[5].setSide(200, 130, 60)
+	
+	//cube.RGBiteration()
+	cube.fade()
+	cube.simpleRunningLight(50, 50, 50)
 	//cube.side[2].edge[1].simpleRunningLight(0,255,0)
 
 	fooType := reflect.TypeOf(Cube{})
@@ -64,12 +65,12 @@ func main() {
 	startSocketComunication(cube)
 	//--------------------------------------------------------
 
-	go func() {
+	/*go func() {
 		for {
 			cube.output()
 			time.Sleep(time.Second)
 		}
-	}()
+	}()*/
 
 	http.Handle("/status", cube)
 	http.Handle("/", http.FileServer(http.Dir(*static_path)))

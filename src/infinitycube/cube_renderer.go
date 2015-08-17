@@ -61,7 +61,7 @@ func (my *Cube) growingRunningLight(red, green, blue uint8) {
 }
 
 func (my *Cube) fade() {
-	const speed = 10
+	const speed = 50
 	bottomReached := false
 
 	go func() {
@@ -70,10 +70,10 @@ func (my *Cube) fade() {
 				for o := 0; o < EDGES_PER_SIDE; o++ {
 					for p := 0; p < EDGE_LENGTH; p++ {
 						if my.side[i].edge[o].led[p].Blue > 0 && bottomReached == false {
-							my.side[i].edge[o].led[p].Blue -= 3
+							my.side[i].edge[o].led[p].Blue -= 1
 						} else {
 							bottomReached = true
-							my.side[i].edge[o].led[p].Blue += 3
+							my.side[i].edge[o].led[p].Blue += 1
 						}
 						if my.side[i].edge[o].led[p].Blue == 255 {
 							bottomReached = false
@@ -88,12 +88,13 @@ func (my *Cube) fade() {
 
 func (my *Cube) output() {
 	for i := 0; i < NR_OF_SIDES; i++ {
-		for o := 0; o < EDGES_PER_SIDE; o++ {
+		for o := 0; o < 1; o++ {
 			for p := 0; p < EDGE_LENGTH; p++ {
-				fmt.Println(my.side[i].edge[o].led[p].Red, " ",
-					my.side[i].edge[o].led[p].Green, " ",
-					my.side[i].edge[o].led[p].Blue, "|")
+				fmt.Print(my.side[i].edge[o].led[p].Red/10, 
+					my.side[i].edge[o].led[p].Green/10,
+					my.side[i].edge[o].led[p].Blue/10, "|")
 			}
+			fmt.Println()
 		}
 	}
 }

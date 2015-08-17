@@ -242,12 +242,12 @@ int main(int argc, char *argv[])
    		getMatrixGOing(leds);
    		//matrix_render();
 
-		//int p;
-  		//for(p = 0; p < 3; p++){
-  		//	printf("%6x ", leds[p]);
-  		//}
-		if(loop%1000 == 0)
-  		printf(" loop: %d\n",loop);
+		/*int p;
+  		for(p = 0; p < 1008; p++){
+  			printf("%x ", buf[p]);
+  		}*/
+		//if(loop%1000 == 0)
+  		//printf(" loop: %d\n",loop);
 
    		//printf("First buffer Values are: 1: %6x 2: %6x 3: %6x\n", buf[0], buf[1], buf[2]);
    		//printf("-\n");
