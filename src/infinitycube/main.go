@@ -42,11 +42,11 @@ func main() {
 	var err error
 
 	cube := NewCube()
-	cube.side[0].setSide(100, 100, 100)
-	cube.side[1].setSide(255, 100, 100)
-	cube.side[2].setSide(100, 255, 100)
-	cube.side[3].setSide(100, 100, 255)
-	cube.side[4].setSide(255, 0, 0)
+	cube.side[0].setSide(255, 00, 00)
+	cube.side[1].setSide(00, 255, 00)
+	cube.side[2].setSide(00, 00, 255)
+	cube.side[3].setSide(255, 255, 00)
+	cube.side[4].setSide(255, 0, 255)
 	cube.side[5].setSide(255, 255, 255)
 
 	//cube.RGBiteration()
