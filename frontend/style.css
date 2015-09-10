@@ -73,9 +73,6 @@ p {
 #footer a {color:#fff;}
 #footer a:hover {text-decoration:none;}
 
-#canvas {
-	position: absolute;
-}
 .item {
   border: 1px solid black;
   background-color: #ddddff;
@@ -99,4 +96,37 @@ p {
   position: absolute;
   left: 100px;
   top: 250px;
+}
+
+#cube{
+	position: relative;
+	float: right;
+	right: 5%;
+}
+
+#container{
+	border: 2px solid black;
+	background-color: lightslategray;
+	width: 50%;
+	height:80%;
+	margin:35px
+}
+
+.window {
+    background-color: white;
+    border: 3px solid #346789;
+    color: black;
+    font-family: helvetica;
+    font-size: 0.8em;
+    height: 12em;
+    opacity: 0.8;
+    padding: 0.5em;
+    position: absolute;
+    width: 14em;
+    z-index: 20;
+    text-align:center;
+}
+
+.dragActive {
+    border: 3px solid #346789;
 }
