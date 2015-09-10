@@ -1,15 +1,16 @@
 $ = jQuery
 
 window.onload = ->
-  window.setInterval(update, 1000/30) #set updaterate to __hz
+  window.setInterval(update, 1000/5) #set updaterate to __hz
   $('#cube').css('margin', 1).css('width', 330).css('height', 430).svg({loadURL: 'fancycube.svg'}) #need 4 resizehandler
   loadMainRendererSwitch()
   displayCubeSelection()
+  initJsPlumb()
 
 
 update = ->
   $.get('status', (data) ->
-    updateCubeLED(data) 
+    updateCubeLED(data)
   , 'json')
 
 updateCubeLED = (data) ->
@@ -23,13 +24,13 @@ updateCubeLED = (data) ->
 				led  = (p).toString()
 				field = "#" + cube + side + edge + led #matching number format to svg path
 				#console.log(field)
-				setColor(field, '#' + color) 
+				setColor(field, '#' + color)
 
 setColor = (field, color) ->
 	#console.log("setColor called with field: ", field, " color: ", color)
 	$(field, $('#cube').svg('get').root()).css('fill', color)
 
-
+#not used anymore....back from the time there was that switchy thing
 loadMainRendererSwitch = ->
 	  $('#MainSwitch').switchy()
 	  $('.MainSwitch').on 'click', ->
@@ -59,7 +60,7 @@ loadCubeRendererSelector = (data) ->
 
 hideCubeRendererSelector = ->
 	$('#CRScontainer').hide()
- 
+
 
 displayCubeSelection = ->
 	$.get('status', (data) ->
@@ -69,3 +70,9 @@ displayCubeSelection = ->
 displaySideSelection = ->
 	$('#CRScontainer').hide()
 	$('#SRScontainer').show()
+
+initJsPlumb = ->
+  jsPlumb.ready ->
+    jsPlumb.makeSource $('.item'), connector: 'StateMachine'
+    jsPlumb.makeTarget $('.item'), anchor: 'Continuous'
+    return
