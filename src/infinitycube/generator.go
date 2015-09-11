@@ -20,6 +20,10 @@ type Led struct {
     CIELCH
 }
 
+func (led *Led) Color() colorful.Color {
+    return colorful.Hcl(float64(led.CIELCH.H), float64(led.CIELCH.C), float64(led.CIELCH.L))
+}
+
 func (led *Led) SetColor(color colorful.Color) {
     h, c, l := color.Hcl()
     led.CIELCH = CIELCH{float32(h), float32(c), float32(l)}
@@ -41,12 +45,10 @@ type Generator struct {
 
 
 func NewGenerator() *Generator {
-    g := &Generator{Length: EDGE_LENGTH, Direction:1}
-    color := colorful.FastHappyColor()
-    color = colorful.Color{0, 1, 0}
+    g := &Generator{Length: EDGE_LENGTH * 2, Direction:1}
     for i, _ := range g.Leds {
         if i % g.Length == 0 {
-            g.Leds[i].SetColor(color)
+            g.Leds[i].SetColor(colorful.FastHappyColor())
         } else {
             g.Leds[i].SetColor(colorful.Color{0, 0, 0})
         }
@@ -126,6 +128,37 @@ func (r *RandomTicker) Tick(d time.Duration, o interface{}) {
     r.Consumer.Tick(d, v < r.Threshold)
 }
 
+type DirtyBlurFilter struct {
+    Consumer
+    Leds [LEDS]Led
+}
+
+func idx(i, o int) int {
+    i += o
+    if i < 0 {
+        i += LEDS
+    }
+    if i >= LEDS {
+        i -= LEDS
+    }
+    return i
+}
+
+func (f *DirtyBlurFilter) Tick(d time.Duration, o interface{}) {
+    leds := o.([]Led)
+
+    for i, _ := range leds {
+        s := .02
+        c := leds[i].Color()
+        c = c.BlendLab(leds[idx(i, -2)].Color(), s/4)
+        c = c.BlendLab(leds[idx(i, -1)].Color(), s)
+        c = c.BlendLab(leds[idx(i,  1)].Color(), s)
+        c = c.BlendLab(leds[idx(i,  2)].Color(), s/4)
+        f.Leds[i].SetColor(c)
+    }
+    f.Consumer.Tick(d, f.Leds[:])
+}
+
 const (
     fps_target = 30
     fps_duration = time.Second / fps_target
@@ -134,7 +167,8 @@ const (
 func MakeWorld() (err error) {
     g := NewGenerator()
     r := &RandomTicker{Threshold: .05}
-    i := &IntervalTicker{Interval: 2 * time.Second / EDGE_LENGTH}
+    i := &IntervalTicker{Interval: 1 * time.Second / 2 / EDGE_LENGTH}
+    bf := &DirtyBlurFilter{}
     c, err := NewCubeX()
     if err != nil {
         fmt.Print(err)
@@ -143,7 +177,8 @@ func MakeWorld() (err error) {
 
     r.Consumer = g
     i.Consumer = g
-    g.Consumer = c
+    g.Consumer = bf
+    bf.Consumer = c
 
     starttime := time.Now()
     for {
