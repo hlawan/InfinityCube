@@ -66,6 +66,8 @@ func main() {
 		startSocketComunication(cube)
 	}
 
+    MakeWorld()
+
 	http.Handle("/status", cube)
 	http.Handle("/", http.FileServer(http.Dir(*static_path)))
 
@@ -73,5 +75,4 @@ func main() {
 	if err != nil {
 		log.Fatalf("ListenAndServe failed: %v", err)
 	}
-
 }

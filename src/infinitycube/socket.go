@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"encoding/binary"
 	"fmt"
 	"log"
@@ -21,18 +20,15 @@ func startSocketComunication(myCube *Cube) {
 		}
 	}
 
-	buf := new(bytes.Buffer)
 	startByte := make([]byte, 1)
 	go func() {
 		for {
-			buf.Reset()
 			//fmt.Println("Before Read...")
 			n, _ := socketCon.Read(startByte)
         		if(n == 1){
 				//fmt.Println("Before Write...")
-				binary.Write(buf, binary.LittleEndian, myCube.parseLEDstatus())
+				binary.Write(socketCon, binary.LittleEndian, myCube.parseLEDstatus())
 				//fmt.Println(myCube.parseLEDstatus())
-				socketCon.Write(buf.Bytes())
 				//limit to 30 frames per second
 				time.Sleep((1000 * time.Millisecond)/30)
 			}
