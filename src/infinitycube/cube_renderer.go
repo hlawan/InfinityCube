@@ -88,7 +88,7 @@ func (my *Cube) fade() {
 }
 
 func (my *Cube) rainbowFade() {
-	const speed = 50
+	const speed = 30
 	color := colorful.Hcl(0, 0, 0)
 	var h float64
 
@@ -102,7 +102,7 @@ func (my *Cube) rainbowFade() {
 							my.side[i].edge[o].led[p].Red = uint8(color.R * 255)
 							my.side[i].edge[o].led[p].Green = uint8(color.G * 255)
 							my.side[i].edge[o].led[p].Blue = uint8(color.B * 255)
-							h += 0.01
+							h += 0.001
 						}
 					}
 				}
