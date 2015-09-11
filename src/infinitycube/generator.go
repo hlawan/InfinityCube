@@ -3,6 +3,7 @@ package main
 
 import (
     "net"
+    "math/rand"
     "io"
     "fmt"
     "time"
@@ -19,6 +20,11 @@ type Led struct {
     CIELCH
 }
 
+func (led *Led) SetColor(color colorful.Color) {
+    h, c, l := color.Hcl()
+    led.CIELCH = CIELCH{float32(h), float32(c), float32(l)}
+}
+
 type Consumer interface {
     Tick(time.Duration, interface{})
 }
@@ -27,28 +33,54 @@ const LEDS = EDGE_LENGTH * EDGES_PER_SIDE * NR_OF_SIDES
 
 type Generator struct {
     Consumer
+    Offset int
     Length int
+    Direction int
     Leds [LEDS*2]Led
 }
 
 
 func NewGenerator() *Generator {
-    g := &Generator{Length: EDGE_LENGTH}
+    g := &Generator{Length: EDGE_LENGTH, Direction:1}
     color := colorful.FastHappyColor()
-    h, c, l := color.Hcl()
+    color = colorful.Color{0, 1, 0}
     for i, _ := range g.Leds {
-        g.Leds[i].CIELCH = CIELCH{float32(h), float32(c), float32(l)}
-        if i % g.Length != 0 {
-            g.Leds[i].CIELCH.L = 0
+        if i % g.Length == 0 {
+            g.Leds[i].SetColor(color)
+        } else {
+            g.Leds[i].SetColor(colorful.Color{0, 0, 0})
         }
     }
     return g
 }
 
 func (g *Generator) Tick(d time.Duration, o interface{}) {
-    duration := 10 * time.Second
-    offset := int(float32(d % duration) / float32(duration) * float32(g.Length))
-    g.Consumer.Tick(d, g.Leds[offset:offset+LEDS])
+    advance := o.(bool)
+    if advance {
+        g.Offset += g.Direction
+        if g.Offset < 0 {
+            g.Offset += g.Length
+        }
+        if g.Offset > g.Length {
+            g.Offset -= g.Length
+        }
+    }
+    g.Consumer.Tick(d, g.Leds[g.Offset:g.Offset+LEDS])
+}
+
+type IntervalTicker struct {
+    Consumer
+    Last time.Duration
+    Interval time.Duration
+}
+
+func (i *IntervalTicker) Tick(d time.Duration, o interface{}) {
+    fire := false
+    if d - i.Last > i.Interval {
+        fire = true
+        i.Last = d
+    }
+    i.Consumer.Tick(d, fire)
 }
 
 type CubeX struct {
@@ -84,25 +116,41 @@ func (c *CubeX) Tick(d time.Duration, o interface{}) {
     }
 }
 
+type RandomTicker struct {
+    Consumer
+    Threshold float32
+}
+
+func (r *RandomTicker) Tick(d time.Duration, o interface{}) {
+    v := rand.Float32()
+    r.Consumer.Tick(d, v < r.Threshold)
+}
 
 const (
-    fps_target = 60
+    fps_target = 30
     fps_duration = time.Second / fps_target
 )
 
 func MakeWorld() (err error) {
     g := NewGenerator()
+    r := &RandomTicker{Threshold: .05}
+    i := &IntervalTicker{Interval: 2 * time.Second / EDGE_LENGTH}
     c, err := NewCubeX()
     if err != nil {
         fmt.Print(err)
         return
     }
 
+    r.Consumer = g
+    i.Consumer = g
     g.Consumer = c
+
     starttime := time.Now()
     for {
         a := time.Now()
-        g.Tick(a.Sub(starttime), nil)
+
+        i.Tick(a.Sub(starttime), true)
+
         b := time.Now()
         elapsed := b.Sub(a)
         time.Sleep(fps_duration - elapsed)
