@@ -52,7 +52,7 @@ static/%.js: frontend/%.coffee static
 	coffee --compile --output static "$<"
 
 SCRIPTS = static/jquery.js static/infinitycube.js
-STATIC  = frontend/*.html frontend/*.svg frontend/*.css frontend/*.js
+STATIC  = frontend/*.html frontend/*.svg frontend/*.css frontend/*.js frontend/*.ico
 IMAGES = frontend/images/*.png
 
 .PHONY: content

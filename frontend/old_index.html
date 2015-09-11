@@ -22,43 +22,44 @@
   </head>
 
   <body>
-    <div id="header">
-			<div class="content">
-				<h1>InfinityCube</h1>
-				<p>Where No One Has Gone Before...</p>
-			</div>
-		</div> <!-- end header -->
-
-		<div id="wrapper">
-			<div id="outer1">
-					<h3>Left 150px</h3>
-          <p>Maybe someday i will be a little menu...</p>
-			</div>
-
-			<div id="outer3">
-				<div class="content">
-					<h3>Right 30%</h3>
-          <div class="svg" id="cube"></div>
-				</div>
-			</div> <!-- end outer3 -->
-
-			<div id="outer2">
-				<h3>Center</h3>
-        <p>And I will be a glorious battle...uuumm...Drag'n'Drop-Field</p>
-        <div id="canvas">
-            <div id="state1" class="item"></div>
-            <div id="state2" class="item"></div>
-            <div id="state3" class="item"></div>
+    <div class="table">
+      <div class="row">
+        <div class="left">
+          <div class="table">
+            <div class="row">
+              <div class="left" id="leftAlignRight">
+                <img src="RubikCube.svg" alt="RubikCube" class="MainSwitch" MainSwitch='cube' style="width:28px;height:28px">
+              </div>
+              <div class="center">
+                <select id="MainSwitch">
+                  <option value="cube">cube</option>
+                  <option value="side">side/edge</option>
+                </select>
+              </div>
+              <div class="right" id="rightAlignLeft">
+                <img src="RubikCubeSide.svg" alt="RubikCubeSide" class="MainSwitch" MainSwitch='side' style="width:28px;height:28px">
+              </div>
+            </div>
+            <div class="row" id="canvas">
+                <div id="state1" class="item"></div>
+                <div id="state2" class="item"></div>
+                <div id="state3" class="item"></div>
+            </div>
+          </div>
         </div>
-			</div> <!-- end outer2 -->
+        <div class="center">
 
-		</div><!-- end #wrapper -->
+              <div class="title" id="ÍnfinityCube">InfinityCube</div>
 
-		<div id="footer">
-			<div class="content">
-				<p>Visit Github for code</p>
-			</div>
-		</div> <!-- end footer -->
-
+        </div>
+        <div class="right">
+          <div class="table">
+            <div class="row">
+              <div class="svg" id="cube"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

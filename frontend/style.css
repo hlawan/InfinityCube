@@ -1,48 +1,102 @@
-body { 
-	background-color: black;
-	color: #FFCC00;
+body {
+	font-size:76%;
+	font-family:"trebuchet MS", verdana, arial, sans-serif;
+	background:#f0f0f0;
+	word-wrap:break-word;
 }
 
-.table{
-	display: table;
-    width: 100%;
+#header {
+	background:#a31e39;
+	}
+
+#outer1 {
+	float:left;
+	width:130px;
+	padding:10px;
+	background:#e0d0d0;
 }
 
-.row{
-    display: table-row;
-    text-align: center;
+#outer2 {
+	background:#e0e0e0;
+	margin-right:30%;
+	margin-left:150px;
+	padding:10px;
 }
 
-.right{
-    display: table-cell;
-    width: 40%;
+#outer3 {
+	float:right;
+	width:30%;
+	background:#c0c0c0;
 }
 
-#rightAlignLeft{
-   text-align: Left; 
+#outer1, #outer2, #outer3 {
+	padding-bottom:32767px;
+	margin-bottom:-32767px;
 }
 
-
-.center{
-    display: table-cell;
-    width: 20%;
+#wrapper {
+	overflow:hidden;
+	background:#c0c0c0;
 }
 
-.left{
-    display: table-cell;
-    width: 40%;
+#footer {
+	clear:both;
+	background:#455c5a;
 }
 
-#leftAlignRight{
-   text-align: right; 
+.content {
+	padding:10px;
 }
 
-.title {
-    font-size: 2em;
-    text-align: center;
-    font-weight: bold;
+h1 {
+	font-size:20px;
+	margin:0;
+	padding:10px 0;
+	color:#fff;
 }
 
-#SRScontainer {
-    text-align: left;
+h3 {
+	font-size:18px;
+	margin:0;
+	padding:8px 0;
+}
+
+p {
+	font-size:12px;
+	line-height:1.5em;
+	margin:0;
+	padding:5px 0;
+}
+
+#footer p,
+#header p {color:#fff;}
+#footer a {color:#fff;}
+#footer a:hover {text-decoration:none;}
+
+#canvas {
+	position: absolute;
+}
+.item {
+  border: 1px solid black;
+  background-color: #ddddff;
+  width: 100px;
+  height: 100px;
+}
+
+#state1 {
+  position: absolute;
+  left: 100px;
+  top: 100px;
+}
+
+#state2 {
+  position: absolute;
+  left: 250px;
+  top: 100px;
+}
+
+#state3 {
+  position: absolute;
+  left: 100px;
+  top: 250px;
 }
