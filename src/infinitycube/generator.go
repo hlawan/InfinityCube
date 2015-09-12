@@ -165,9 +165,10 @@ const (
 )
 
 func MakeWorld() (err error) {
-    g := NewGenerator()
-    r := &RandomTicker{Threshold: .05}
-    i := &IntervalTicker{Interval: 1 * time.Second / 2 / EDGE_LENGTH}
+    //g := NewGenerator()
+    //r := &RandomTicker{Threshold: .05}
+    //i := &IntervalTicker{Interval: 1 * time.Second / 2 / EDGE_LENGTH}
+    myRgbFader := NewRgbFader()
     bf := &DirtyBlurFilter{}
     c, err := NewCubeX()
     if err != nil {
@@ -175,16 +176,18 @@ func MakeWorld() (err error) {
         return
     }
 
-    r.Consumer = g
-    i.Consumer = g
-    g.Consumer = bf
+    //r.Consumer = g
+    //i.Consumer = g
+    myRgbFader.Consumer = bf
     bf.Consumer = c
 
     starttime := time.Now()
     for {
         a := time.Now()
 
-        i.Tick(a.Sub(starttime), true)
+        //i.Tick(a.Sub(starttime), true)
+        myRgbFader.Tick(starttime, nil)
+
 
         b := time.Now()
         elapsed := b.Sub(a)

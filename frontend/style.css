@@ -109,7 +109,8 @@ p {
 	background-color: lightslategray;
 	width: 50%;
 	height:80%;
-	margin:35px
+	margin:35px;
+	position: absolute;
 }
 
 .window {

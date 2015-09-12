@@ -48,25 +48,30 @@ initJsPlumb = ->
         length: 12
       }
     ] ]
+
   jsPlumb.connect {
     source: 'a'
     target: 'b'
   }, stateMachineConnector
+
   jsPlumb.connect {
     source: 'b'
     target: 'a'
   }, stateMachineConnector
+
   jsPlumb.draggable $('.window')
+
   jsPlumb.animate $('#b'), {
     'left': 50
     'top': 300
   }, duration: 'slow'
+
   jsPlumb.animate $('#a'), {
     'left': 250
     'top': 100
   }, duration: 'slow'
+  console.log("I happen")
   return
-
 
 #---------------------------------------------------------------------------
 #not used anymore....back from the time there was that switchy thing
