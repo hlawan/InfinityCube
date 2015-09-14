@@ -162,7 +162,7 @@ func MakeWorld() (err error) {
     //g := NewGenerator()
     //r := &RandomTicker{Threshold: .05}
     //i := &IntervalTicker{Interval: 1 * time.Second / 2 / EDGE_LENGTH}
-    myRgbFader := NewRgbFader()
+    myHsvFader := NewHsvFader()
     bf := &DirtyBlurFilter{}
     c, err := NewCubeX()
     if err != nil {
@@ -172,7 +172,7 @@ func MakeWorld() (err error) {
 
     //r.Consumer = g
     //i.Consumer = g
-    myRgbFader.Consumer = bf
+    myHsvFader.Consumer = bf
     bf.Consumer = c
 
     starttime := time.Now()
@@ -180,7 +180,7 @@ func MakeWorld() (err error) {
         a := time.Now()
 
         //i.Tick(a.Sub(starttime), true)
-        myRgbFader.Tick(starttime, nil)
+        myHsvFader.Tick(starttime, nil)
 
 
         b := time.Now()

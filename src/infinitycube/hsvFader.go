@@ -9,7 +9,7 @@ import (
 const H_MAX = 360
 const H_MIN = 0
 
-type RgbFader struct {
+type HsvFader struct {
 	Consumer
 	Length          int
 	ColorDifference float64
@@ -18,8 +18,8 @@ type RgbFader struct {
   loop            int
 }
 
-func NewRgbFader() *RgbFader {
-	r := &RgbFader{
+func NewHsvFader() *HsvFader {
+	r := &HsvFader{
 		Length:          LEDS,
 		ColorDifference: 0.5,
 		TimeFullFade:    10 * time.Second,
@@ -29,11 +29,11 @@ func NewRgbFader() *RgbFader {
 	for i, _ := range r.Leds {
 		r.Leds[i].Color = colorful.Color{255,0,0}
   }
-  if DEBUG_LVL >= 1 {fmt.Println("RgbFader initialized all leds")}
+  if DEBUG_LVL >= 1 {fmt.Println("HsvFader initialized all leds")}
 	return r
 }
 
-func (r *RgbFader) Tick(start time.Time, o interface{}) {
+func (r *HsvFader) Tick(start time.Time, o interface{}) {
   var  h, s float64
   // duration := time.Since(start)
 	// nrOfSteps := int((H_MAX - H_MIN) / r.ColorDifference)
