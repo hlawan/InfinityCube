@@ -10,23 +10,8 @@ import (
     "github.com/lucasb-eyer/go-colorful"
 )
 
-type CIELCH struct {
-    H float32
-    C float32
-    L float32
-}
-
 type Led struct {
-    CIELCH
-}
-
-func (led *Led) Color() colorful.Color {
-    return colorful.Hsv(float64(led.CIELCH.H), float64(led.CIELCH.C), float64(led.CIELCH.L)) //was Hcl
-}
-
-func (led *Led) SetColor(color colorful.Color) {
-    h, c, l := color.Hsv() //was Hcl
-    led.CIELCH = CIELCH{float32(h), float32(c), float32(l)}
+    Color colorful.Color
 }
 
 type Consumer interface {
@@ -48,9 +33,9 @@ func NewGenerator() *Generator {
     g := &Generator{Length: EDGE_LENGTH * 2, Direction:1}
     for i, _ := range g.Leds {
         if i % g.Length == 0 {
-            g.Leds[i].SetColor(colorful.FastHappyColor())
+            g.Leds[i].Color = colorful.FastHappyColor()
         } else {
-            g.Leds[i].SetColor(colorful.Color{0, 0, 0})
+            g.Leds[i].Color = colorful.Color{0, 0, 0}
         }
     }
     return g
@@ -103,11 +88,10 @@ func (c *CubeX) Tick(d time.Duration, o interface{}) {
     leds := o.([]Led)
 
     h := 0
-    for _, l := range leds {
-        color := colorful.Hcl(float64(l.CIELCH.H), float64(l.CIELCH.C), float64(l.CIELCH.L))
-        c.buffer[h+0] = uint8(255 * color.R)
-        c.buffer[h+1] = uint8(255 * color.G)
-        c.buffer[h+2] = uint8(255 * color.B)
+    for i, _ := range leds {
+        c.buffer[h+0] = uint8(255 * leds[i].Color.R)
+        c.buffer[h+1] = uint8(255 * leds[i].Color.G)
+        c.buffer[h+2] = uint8(255 * leds[i].Color.B)
         h += 3
     }
 
@@ -149,12 +133,12 @@ func (f *DirtyBlurFilter) Tick(d time.Duration, o interface{}) {
 
     for i, _ := range leds {
         s := .02
-        c := leds[i].Color()
-        c = c.BlendLab(leds[idx(i, -2)].Color(), s/4)
-        c = c.BlendLab(leds[idx(i, -1)].Color(), s)
-        c = c.BlendLab(leds[idx(i,  1)].Color(), s)
-        c = c.BlendLab(leds[idx(i,  2)].Color(), s/4)
-        f.Leds[i].SetColor(c)
+        c := leds[i].Color
+        c = c.BlendLab(leds[idx(i, -2)].Color, s/4)
+        c = c.BlendLab(leds[idx(i, -1)].Color, s)
+        c = c.BlendLab(leds[idx(i,  1)].Color, s)
+        c = c.BlendLab(leds[idx(i,  2)].Color, s/4)
+        f.Leds[i].Color = c
     }
     f.Consumer.Tick(d, f.Leds[:])
 }

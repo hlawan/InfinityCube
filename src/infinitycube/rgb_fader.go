@@ -21,21 +21,20 @@ type RgbFader struct {
 func NewRgbFader() *RgbFader {
 	r := &RgbFader{
 		Length:          LEDS,
-		ColorDifference: 0.1,
+		ColorDifference: 0.5,
 		TimeFullFade:    10 * time.Second,
     loop:            0,
 	}
-  color := colorful.FastHappyColor()
+
 	for i, _ := range r.Leds {
-		r.Leds[i].SetColor(color)
+		r.Leds[i].Color = colorful.Color{255,0,0}
   }
   if DEBUG_LVL >= 1 {fmt.Println("RgbFader initialized all leds")}
 	return r
 }
 
 func (r *RgbFader) Tick(start time.Time, o interface{}) {
-  var color colorful.Color
-  var  h, c, l float64
+  var  h, s float64
   // duration := time.Since(start)
 	// nrOfSteps := int((H_MAX - H_MIN) / r.ColorDifference)
 	// frequency := r.TimeFullFade / time.Duration(nrOfSteps)
@@ -46,14 +45,11 @@ func (r *RgbFader) Tick(start time.Time, o interface{}) {
 
 	if  true {
 		for i, _ := range r.Leds {
-      if r.Leds[i].CIELCH.H + float32(r.ColorDifference) >= H_MAX {
-       	r.Leds[i].CIELCH.H = H_MIN + (H_MAX - r.Leds[i].CIELCH.H)
-      }
-			color = r.Leds[i].Color()
-      h, c, l = color.Hsv()
-      color = colorful.Hsv(h + r.ColorDifference, c, l)
-      r.Leds[i].SetColor(color)
-
+      // if r.Leds[i].CIELCH.H + float32(r.ColorDifference) >= H_MAX {
+      //  	r.Leds[i].CIELCH.H = H_MIN + (H_MAX - r.Leds[i].CIELCH.H)
+      // }
+      h, s, _ = r.Leds[i].Color.Hsv()
+      r.Leds[i].Color = colorful.Hsv(h + r.ColorDifference, s, .8)
 		}
 	}
   r.loop ++
