@@ -45,14 +45,13 @@ func (r *RgbFader) Tick(start time.Time, o interface{}) {
 
 	if  true {
 		for i, _ := range r.Leds {
-      // if r.Leds[i].CIELCH.H + float32(r.ColorDifference) >= H_MAX {
-      //  	r.Leds[i].CIELCH.H = H_MIN + (H_MAX - r.Leds[i].CIELCH.H)
-      // }
       h, s, _ = r.Leds[i].Color.Hsv()
-      r.Leds[i].Color = colorful.Hsv(h + r.ColorDifference, s, .8)
+
+      r.Leds[i].Color = colorful.Hsv(h + r.ColorDifference, s, 1)
+      r.Leds[i].CheckColor()
 		}
 	}
   r.loop ++
-//  fmt.Println(r.Leds[1].CIELCH.H, " loop: ", r.loop)
+  fmt.Println(r.Leds[1].Color, " loop: ", r.loop)
   r.Consumer.Tick(time.Since(start), r.Leds[:])
 }
