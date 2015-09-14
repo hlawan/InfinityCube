@@ -154,7 +154,7 @@ func (f *DirtyBlurFilter) Tick(d time.Duration, o interface{}) {
 }
 
 const (
-    fps_target = 30
+    fps_target = 60
     fps_duration = time.Second / fps_target
 )
 
@@ -162,7 +162,7 @@ func MakeWorld() (err error) {
     //g := NewGenerator()
     //r := &RandomTicker{Threshold: .05}
     //i := &IntervalTicker{Interval: 1 * time.Second / 2 / EDGE_LENGTH}
-    myHsvFader := NewHsvFader()
+    myHsvFader := NewHsvFader(0, LEDS, 15)
     bf := &DirtyBlurFilter{}
     c, err := NewCubeX()
     if err != nil {
