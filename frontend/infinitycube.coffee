@@ -49,7 +49,7 @@ initJsPlumb = ->
       }
     ] ]
 
-  jsPlumb.connect {
+  jsPlumb.connect ->
     source: 'a'
     target: 'b'
   }, stateMachineConnector
@@ -70,7 +70,7 @@ initJsPlumb = ->
     'left': 250
     'top': 100
   }, duration: 'slow'
-  console.log("I happen")
+
   return
 
 #---------------------------------------------------------------------------
