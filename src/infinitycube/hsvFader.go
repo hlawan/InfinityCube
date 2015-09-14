@@ -5,9 +5,6 @@ import (
 	"time"
 )
 
-const H_MAX = 360 // maximum Hue value (Hsv)
-const H_MIN = 0 // minimum Hue value (Hsv)
-
 type HsvFader struct {
 	Consumer
   FirstLed        int

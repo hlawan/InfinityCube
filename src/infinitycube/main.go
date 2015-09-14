@@ -13,14 +13,22 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
-	"net/http"
-	//"time"
+	// "log"
+	// "net/http"
+	"time"
 	//"os"
-	"reflect"
 )
 
-const DEBUG_LVL = 1
+const (
+		DEBUG_LVL = 1
+    fps_target = 60
+    fps_duration = time.Second / fps_target
+		EDGE_LENGTH = 14 //in my setup there are always 14 leds in a row
+		EDGES_PER_SIDE = 4 //well for me its a square...so 4
+		NR_OF_SIDES = 6 //regular cube => 6 sides
+		H_MAX = 360 // maximum Hue value (Hsv)
+		H_MIN = 0 // minimum Hue value (Hsv)
+)
 
 /*
 0 no debug information
@@ -39,41 +47,81 @@ var (
 )
 
 func main() {
-	var err error
+	//var err error
+	//g := NewGenerator()
+  //r := &RandomTicker{Threshold: .05}
+  //i := &IntervalTicker{Interval: 1 * time.Second / 2 / EDGE_LENGTH}
+  myHsvFader := NewHsvFader(0, LEDS, 15)
+  bf := &DirtyBlurFilter{}
+  c, err := NewCubeX()
+  if err != nil {
+      fmt.Print(err)
+      return
+  }
 
-	cube := NewCube()
-	 cube.side[0].setSide(255, 00, 00)
-	 cube.side[1].setSide(00, 255, 00)
-	 cube.side[2].setSide(00, 00, 255)
-	 cube.side[3].setSide(255, 255, 00)
-	 cube.side[4].setSide(255, 0, 255)
-	 cube.side[5].setSide(255, 255, 255)
-	//cube.rainbowFade()
-	//cube.RGBiteration()
-	//cube.fade()
-	cube.simpleRunningLight(255, 50, 50)
-	//cube.side[2].edge[1].simpleRunningLight(0,255,0)
+  //r.Consumer = g
+  //i.Consumer = g
+  myHsvFader.Consumer = bf
+  bf.Consumer = c
 
-	fooType := reflect.TypeOf(Cube{})
-	for i := 0; i < fooType.NumMethod(); i++ {
-		method := fooType.Method(i)
-		fmt.Println(method.Name)
-	}
+  var elapsedTime, sleepingTime [200]time.Duration
+  var elapsed, slept time.Duration
+  var z time.Time
+  i := 0
+  starttime := time.Now()
+  for {
+    a := time.Now()
 
-	flag.Parse()
-	if *serial_port == "cube" {
-		fmt.Println("Before socket stuff...")
-		startSocketComunication(cube)
-	}
-	go func() {
-    MakeWorld()
-	}()
+    //i.Tick(a.Sub(starttime), true)
+    myHsvFader.Tick(starttime, nil)
 
-	http.Handle("/status", cube)
-	http.Handle("/", http.FileServer(http.Dir(*static_path)))
 
-	err = http.ListenAndServe(*listen_address, nil)
-	if err != nil {
-		log.Fatalf("ListenAndServe failed: %v", err)
-	}
+
+    b := time.Now()
+    elapsed = b.Sub(a)
+    time.Sleep(fps_duration - elapsed)
+
+    //-----------------------------------------------
+    //only needed for FPS calculation
+    if true {
+      z = time.Now()
+
+      sleepingTime[i] = fps_duration - elapsed
+      elapsedTime[i] = z.Sub(a)
+      if (i > 198) {
+        totalTime := 0 * time.Second
+        currentFps := 0 * time.Second
+        for p:= 1; p < 200; p++ {
+          slept += sleepingTime[p]
+          totalTime += elapsedTime[p]
+        }
+        slept /= 199
+        totalTime /= 199
+        currentFps = (1 * time.Second / totalTime)
+        sleepPercent := (100 * time.Millisecond / totalTime) * slept
+
+        if (DEBUG_LVL > 0) {
+          fmt.Println("-->loop time:", totalTime,
+                      "-->FPS:",currentFps.Nanoseconds(),
+                      "-->I slept for:", slept,
+                      " (", sleepPercent.Seconds() * 1000, "%)" )
+        }
+        i = 0
+      }
+      i++
+    }
+    //End of FPS calculation
+    //-----------------------------------------------
+  }
+
+  //  MakeWorld()
+
+
+	// http.Handle("/status", cube)
+	// http.Handle("/", http.FileServer(http.Dir(*static_path)))
+	//
+	// err = http.ListenAndServe(*listen_address, nil)
+	// if err != nil {
+	// 	log.Fatalf("ListenAndServe failed: %v", err)
+	// }
 }
