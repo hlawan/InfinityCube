@@ -89,9 +89,7 @@ func (c *CubeX) Tick(d time.Duration, o interface{}) {
 
     h := 0
     for i, _ := range leds {
-        c.buffer[h+0] = uint8(255 * leds[i].Color.R)
-        c.buffer[h+1] = uint8(255 * leds[i].Color.G)
-        c.buffer[h+2] = uint8(255 * leds[i].Color.B)
+        c.buffer[h+0], c.buffer[h+1], c.buffer[h+2] = leds[i].Color.RGB255()
         h += 3
     }
 
