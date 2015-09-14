@@ -21,11 +21,11 @@ type Led struct {
 }
 
 func (led *Led) Color() colorful.Color {
-    return colorful.Hcl(float64(led.CIELCH.H), float64(led.CIELCH.C), float64(led.CIELCH.L))
+    return colorful.Hsv(float64(led.CIELCH.H), float64(led.CIELCH.C), float64(led.CIELCH.L)) //was Hcl
 }
 
 func (led *Led) SetColor(color colorful.Color) {
-    h, c, l := color.Hcl()
+    h, c, l := color.Hsv() //was Hcl
     led.CIELCH = CIELCH{float32(h), float32(c), float32(l)}
 }
 
