@@ -54,7 +54,7 @@ func main() {
   //i := &IntervalTicker{Interval: 1 * time.Second / 2 / EDGE_LENGTH}
   myHsvFader := NewHsvFader(0, LEDS, 15)
   bf := &DirtyBlurFilter{}
-  c, err := NewCubeX()
+  c, err := NewCube()
   if err != nil {
       fmt.Print(err)
       return
