@@ -49,7 +49,7 @@ initJsPlumb = ->
       }
     ] ]
 
-  jsPlumb.connect ->
+  jsPlumb.connect {
     source: 'a'
     target: 'b'
   }, stateMachineConnector

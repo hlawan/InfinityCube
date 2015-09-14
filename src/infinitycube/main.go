@@ -26,6 +26,7 @@ const (
 		EDGE_LENGTH = 14 //in my setup there are always 14 leds in a row
 		EDGES_PER_SIDE = 4 //well for me its a square...so 4
 		NR_OF_SIDES = 6 //regular cube => 6 sides
+		LEDS = EDGE_LENGTH * EDGES_PER_SIDE * NR_OF_SIDES
 		H_MAX = 360 // maximum Hue value (Hsv)
 		H_MIN = 0 // minimum Hue value (Hsv)
 )
