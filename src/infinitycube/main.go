@@ -49,10 +49,10 @@ var (
 
 func main() {
 	//var err error
-	//g := NewGenerator()
-  //r := &RandomTicker{Threshold: .05}
-  //i := &IntervalTicker{Interval: 1 * time.Second / 2 / EDGE_LENGTH}
-  myHsvFader := NewHsvFader(0, LEDS, 15)
+	g := NewRunningLight()
+  r := &RandomTicker{Threshold: .05}
+  i := &IntervalTicker{Interval: 1 * time.Second / 2 / EDGE_LENGTH}
+  //myHsvFader := NewHsvFader(0, LEDS, 15)
   bf := &DirtyBlurFilter{}
   c, err := NewCube()
   if err != nil {
@@ -60,21 +60,22 @@ func main() {
       return
   }
 
-  //r.Consumer = g
-  //i.Consumer = g
-  myHsvFader.Consumer = bf
+  r.Consumer = g
+  i.Consumer = g
+  g.Consumer = bf
+	//myHsvFader.Consumer = bf
   bf.Consumer = c
 
   var elapsedTime, sleepingTime [200]time.Duration
   var elapsed, slept time.Duration
   var z time.Time
-  i := 0
+  o := 0
   starttime := time.Now()
   for {
     a := time.Now()
 
-    //i.Tick(a.Sub(starttime), true)
-    myHsvFader.Tick(starttime, nil)
+    i.Tick(a.Sub(starttime), true)
+    //myHsvFader.Tick(starttime, nil)
 
 
 
@@ -87,9 +88,9 @@ func main() {
     if true {
       z = time.Now()
 
-      sleepingTime[i] = fps_duration - elapsed
-      elapsedTime[i] = z.Sub(a)
-      if (i > 198) {
+      sleepingTime[o] = fps_duration - elapsed
+      elapsedTime[o] = z.Sub(a)
+      if (o > 198) {
         totalTime := 0 * time.Second
         currentFps := 0 * time.Second
         for p:= 1; p < 200; p++ {
@@ -107,9 +108,9 @@ func main() {
                       "-->I slept for:", slept,
                       " (", sleepPercent.Seconds() * 1000, "%)" )
         }
-        i = 0
+        o = 0
       }
-      i++
+      o++
     }
     //End of FPS calculation
     //-----------------------------------------------

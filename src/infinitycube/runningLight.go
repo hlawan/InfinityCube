@@ -11,7 +11,7 @@ type Consumer interface {
     Tick(time.Duration, interface{})
 }
 
-type Generator struct {
+type RunningLight struct {
     Consumer
     Offset int
     Length int
@@ -20,8 +20,8 @@ type Generator struct {
 }
 
 
-func NewGenerator() *Generator {
-    g := &Generator{Length: EDGE_LENGTH * 2, Direction:1}
+func NewRunningLight() *RunningLight {
+    g := &RunningLight{Length: EDGE_LENGTH * 2, Direction:1}
     for i, _ := range g.Leds {
         if i % g.Length == 0 {
             g.Leds[i].Color = colorful.FastHappyColor()
@@ -32,7 +32,7 @@ func NewGenerator() *Generator {
     return g
 }
 
-func (g *Generator) Tick(d time.Duration, o interface{}) {
+func (g *RunningLight) Tick(d time.Duration, o interface{}) {
     advance := o.(bool)
     if advance {
         g.Offset += g.Direction
