@@ -159,32 +159,69 @@ const (
 )
 
 func MakeWorld() (err error) {
-    //g := NewGenerator()
-    //r := &RandomTicker{Threshold: .05}
-    //i := &IntervalTicker{Interval: 1 * time.Second / 2 / EDGE_LENGTH}
-    myHsvFader := NewHsvFader(0, LEDS, 15)
-    bf := &DirtyBlurFilter{}
-    c, err := NewCubeX()
-    if err != nil {
-        fmt.Print(err)
-        return
+  //g := NewGenerator()
+  //r := &RandomTicker{Threshold: .05}
+  //i := &IntervalTicker{Interval: 1 * time.Second / 2 / EDGE_LENGTH}
+  myHsvFader := NewHsvFader(0, LEDS, 15)
+  bf := &DirtyBlurFilter{}
+  c, err := NewCubeX()
+  if err != nil {
+      fmt.Print(err)
+      return
+  }
+
+  //r.Consumer = g
+  //i.Consumer = g
+  myHsvFader.Consumer = bf
+  bf.Consumer = c
+
+  var elapsedTime, sleepingTime [200]time.Duration
+  var elapsed, slept time.Duration
+  var z time.Time
+  i := 0
+  starttime := time.Now()
+  for {
+    a := time.Now()
+
+    //i.Tick(a.Sub(starttime), true)
+    myHsvFader.Tick(starttime, nil)
+
+
+
+    b := time.Now()
+    elapsed = b.Sub(a)
+    time.Sleep(fps_duration - elapsed)
+
+    //-----------------------------------------------
+    //only needed for FPS calculation
+    if true {
+      z = time.Now()
+
+      sleepingTime[i] = fps_duration - elapsed
+      elapsedTime[i] = z.Sub(a)
+      if (i > 198) {
+        totalTime := 0 * time.Second
+        currentFps := 0 * time.Second
+        for p:= 1; p < 200; p++ {
+          slept += sleepingTime[p]
+          totalTime += elapsedTime[p]
+        }
+        slept /= 199
+        totalTime /= 199
+        currentFps = (1 * time.Second / totalTime)
+        sleepPercent := (100 * time.Millisecond / totalTime) * slept
+
+        if (DEBUG_LVL > 0) {
+          fmt.Println("-->loop time:", totalTime,
+                      "-->FPS:",currentFps.Nanoseconds(),
+                      "-->I slept for:", slept,
+                      " (", sleepPercent.Seconds() * 1000, "%)" )
+        }
+        i = 0
+      }
+      i++
     }
-
-    //r.Consumer = g
-    //i.Consumer = g
-    myHsvFader.Consumer = bf
-    bf.Consumer = c
-
-    starttime := time.Now()
-    for {
-        a := time.Now()
-
-        //i.Tick(a.Sub(starttime), true)
-        myHsvFader.Tick(starttime, nil)
-
-
-        b := time.Now()
-        elapsed := b.Sub(a)
-        time.Sleep(fps_duration - elapsed)
-    }
+    //End of FPS calculation
+    //-----------------------------------------------
+  }
 }
