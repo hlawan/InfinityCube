@@ -17,6 +17,7 @@ import (
 	// "net/http"
 	"time"
 	//"os"
+    "github.com/lucasb-eyer/go-colorful"
 )
 
 const (
@@ -49,7 +50,7 @@ var (
 
 func main() {
 	//var err error
-	g := NewRunningLight()
+	g := NewRunningLight(colorful.Color{0, 1, 0}, 5, 0.02)
   r := &RandomTicker{Threshold: .05}
   i := &IntervalTicker{Interval: 1 * time.Second / 2 / EDGE_LENGTH}
   //myHsvFader := NewHsvFader(0, LEDS, 15)
@@ -64,7 +65,8 @@ func main() {
   i.Consumer = g
   g.Consumer = bf
 	//myHsvFader.Consumer = bf
-  bf.Consumer = c
+    g.Consumer = c
+  //bf.Consumer = c
 
   var elapsedTime, sleepingTime [200]time.Duration
   var elapsed, slept time.Duration

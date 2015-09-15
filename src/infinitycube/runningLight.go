@@ -3,6 +3,7 @@ package main
 import (
     "math/rand"
     //"fmt"
+    "math"
     "time"
     "github.com/lucasb-eyer/go-colorful"
 )
@@ -13,6 +14,63 @@ type Consumer interface {
 
 type RunningLight struct {
     Consumer
+    colorful.Color
+    Position float64
+    Delta float64
+    Length int
+    Leds [LEDS]Led
+}
+
+func NewRunningLight(color colorful.Color, length int, delta float64) *RunningLight {
+    r := &RunningLight{
+        Color: color,
+        Length: length,
+        Delta: delta,
+    }
+    return r
+}
+
+var BLACK = colorful.Color{0, 0, 0}
+
+func max(a, b float64) float64 {
+    if a < b {
+        return b
+    }
+    return a
+}
+
+func min(a, b float64) float64 {
+    if a < b {
+        return a
+    }
+    return b
+}
+
+func dist(a, b float64) float64 {
+    return math.Abs(a-b)
+}
+
+func (r *RunningLight) Tick(d time.Duration, o interface{}) {
+    advance := o.(bool)
+
+    if advance {
+        r.Position += r.Delta
+        if r.Position > 1 {
+            r.Position -= 1
+        }
+
+        pos := r.Position * float64(r.Length)
+        for i, _ := range r.Leds {
+            j := i % r.Length
+            r.Leds[i].Color = BLACK.BlendRgb(r.Color, 1 - min(1, dist(pos, float64(j))))
+        }
+    }
+
+    r.Consumer.Tick(d, r.Leds[:])
+}
+
+type BinaryRunningLight struct {
+    Consumer
     Offset int
     Length int
     Direction int
@@ -20,8 +78,8 @@ type RunningLight struct {
 }
 
 
-func NewRunningLight() *RunningLight {
-    g := &RunningLight{Length: EDGE_LENGTH * 2, Direction:1}
+func NewBinaryRunningLight() *BinaryRunningLight {
+    g := &BinaryRunningLight{Length: EDGE_LENGTH * 2, Direction:1}
     for i, _ := range g.Leds {
         if i % g.Length == 0 {
             g.Leds[i].Color = colorful.FastHappyColor()
@@ -32,7 +90,7 @@ func NewRunningLight() *RunningLight {
     return g
 }
 
-func (g *RunningLight) Tick(d time.Duration, o interface{}) {
+func (g *BinaryRunningLight) Tick(d time.Duration, o interface{}) {
     advance := o.(bool)
     if advance {
         g.Offset += g.Direction
