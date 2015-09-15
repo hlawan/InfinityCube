@@ -11,8 +11,8 @@ type Cube struct {
     buffer [3 * EDGE_LENGTH * EDGES_PER_SIDE * NR_OF_SIDES]byte
 }
 
-func NewCube() (c *Cube, err error) {
-	socketCon, err := net.Dial("tcp", "192.168.1.222:12345")
+func NewCube(addr string) (c *Cube, err error) {
+	socketCon, err := net.Dial("tcp", addr)
 	if err != nil {
 		return
     }

@@ -41,6 +41,7 @@ const (
 */
 
 var (
+    cube_address = flag.String("cube", "192.168.1.222:12345", "connect to cube backend using this address")
 	serial_port = flag.String("serial", "", "serial port")
 	//serial_port    = flag.String("serial", "/tmp/so", "serial port")
 	//unix_socket    = flag.String("unixconnect", "", "connect to unix socket")
@@ -49,13 +50,14 @@ var (
 )
 
 func main() {
+    flag.Parse()
 	//var err error
 	g := NewRunningLight(colorful.Color{0, 1, 0}, 5, 0.02)
   r := &RandomTicker{Threshold: .05}
   i := &IntervalTicker{Interval: 1 * time.Second / 2 / EDGE_LENGTH}
   //myHsvFader := NewHsvFader(0, LEDS, 15)
   bf := &DirtyBlurFilter{}
-  c, err := NewCube()
+  c, err := NewCube(*cube_address)
   if err != nil {
       fmt.Print(err)
       return
