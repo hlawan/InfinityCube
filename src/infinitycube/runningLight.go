@@ -9,6 +9,7 @@ import (
 
 type Consumer interface {
     Tick(time.Duration, interface{})
+    AddPreCube([LEDS]Led, float64, float64)
 }
 
 type RunningLight struct {
