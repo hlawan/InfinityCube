@@ -49,10 +49,10 @@ var (
 
 func main() {
 	//var err error
-	//g := NewRunningLight()
+	g := NewRunningLight(2 * EDGE_LENGTH, 1, 1, 0)
   //r := &RandomTicker{Threshold: .05}
-  //i := &IntervalTicker{Interval: 1 * time.Second / 2 / EDGE_LENGTH}
-  myHsvFader := NewHsvFader(0, LEDS, 10)
+  	i := &IntervalTicker{Interval: 1 * time.Second / 2 / EDGE_LENGTH}
+  myHsvFader := NewHsvFader(0, LEDS, 10, .1, 0)
   //bf := &DirtyBlurFilter{}
   c, err := NewCube()
   if err != nil {
@@ -61,8 +61,8 @@ func main() {
   }
 
   //r.Consumer = g
-  //i.Consumer = g
-  //g.Consumer = bf
+	i.Consumer = g
+    g.Consumer = c
 	myHsvFader.Consumer = c
   //bf.Consumer = c
 
@@ -75,18 +75,18 @@ func main() {
     a := time.Now()
 	c.resetPreCubes()
 
-    //i.Tick(a.Sub(starttime), true)
-    myHsvFader.Tick(starttime, nil)
+	i.Tick(a.Sub(starttime), true)
+	myHsvFader.Tick(starttime, nil)
 
 
-
+	c.renderCube()
     b := time.Now()
     elapsed = b.Sub(a)
     time.Sleep(fps_duration - elapsed)
 
     //-----------------------------------------------
     //only needed for FPS calculation
-    if true {
+    if false {
       z = time.Now()
 
       sleepingTime[o] = fps_duration - elapsed

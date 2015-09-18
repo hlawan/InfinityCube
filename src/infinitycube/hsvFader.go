@@ -11,11 +11,19 @@ type HsvFader struct {
 	Length          int  //Nr of Leds
 	ColorDifference float64
 	TimeFullFade    int  //in Seconds
+	ColorOpacity	float64
+	BlackOpacity	float64
 	Leds            [LEDS]Led
 }
 
-func NewHsvFader(firstLed, length, timeFullFade int) *HsvFader {
-	r := &HsvFader{FirstLed: firstLed, Length: length, TimeFullFade: timeFullFade}
+func NewHsvFader(firstLed, length, timeFullFade int, colorOpacity, blackOpacity float64) *HsvFader {
+	r := &HsvFader{
+		FirstLed: firstLed,
+		Length: length,
+		TimeFullFade: timeFullFade,
+		ColorOpacity: colorOpacity,
+		BlackOpacity: blackOpacity}
+
 	for i := r.FirstLed; i < (r.Length + r.FirstLed); i++ {
 		r.Leds[i].Color = colorful.Color{0,255,0}
   }
@@ -30,5 +38,6 @@ func (r *HsvFader) Tick(start time.Time, o interface{}) {
     r.Leds[i].Color = colorful.Hsv(h + r.ColorDifference, 1, 1)
     r.Leds[i].CheckColor()
 	}
-  r.Consumer.Tick(time.Since(start), r.Leds[:])
+  //r.Consumer.Tick(time.Since(start), r.Leds[:])
+	r.Consumer.AddPreCube(r.Leds, r.ColorOpacity, r.BlackOpacity)
 }

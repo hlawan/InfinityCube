@@ -17,12 +17,18 @@ type RunningLight struct {
     Offset int
     Length int
     Direction int
+    ColorOpacity	float64
+    BlackOpacity	float64
     Leds [LEDS*2]Led
 }
 
 
-func NewRunningLight() *RunningLight {
-    g := &RunningLight{Length: EDGE_LENGTH * 2, Direction:1}
+func NewRunningLight(length, direction int, colorOpacity, blackOpacity  float64) *RunningLight {
+    g := &RunningLight {
+        Length: length,
+        Direction:direction,
+        ColorOpacity: colorOpacity,
+        BlackOpacity: blackOpacity}
     for i, _ := range g.Leds {
         if i % g.Length == 0 {
             g.Leds[i].Color = colorful.FastHappyColor()
@@ -44,7 +50,13 @@ func (g *RunningLight) Tick(d time.Duration, o interface{}) {
             g.Offset -= g.Length
         }
     }
-    g.Consumer.Tick(d, g.Leds[g.Offset:g.Offset+LEDS])
+
+    var cube [LEDS]Led
+    for i, v := range g.Leds[g.Offset:g.Offset+LEDS] {
+        cube[i] = v
+    }
+    //g.Consumer.Tick(d, g.Leds[g.Offset:g.Offset+LEDS])
+    g.Consumer.AddPreCube(cube, g.ColorOpacity, g.BlackOpacity)
 }
 
 type IntervalTicker struct {
