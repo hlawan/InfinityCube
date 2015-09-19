@@ -17,6 +17,7 @@ import (
 	// "net/http"
 	"time"
 	//"os"
+    "github.com/lucasb-eyer/go-colorful"
 )
 
 const (
@@ -40,20 +41,25 @@ const (
 */
 
 var (
+    cube_address = flag.String("cube", "192.168.1.222:12345", "connect to cube backend using this address")
 	serial_port = flag.String("serial", "", "serial port")
 	listen_address = flag.String("listen", ":2500", "http service address")
 	static_path    = flag.String("static", "static", "path to the static content")
 )
 
 func main() {
-//initializing all needed generators, cubes, filters
-
-	g := NewRunningLight(2 * EDGE_LENGTH, 1, 1, 0)
-	//r := &RandomTicker{Threshold: .05}
-	i := &IntervalTicker{Interval: 1 * time.Second / 2 / EDGE_LENGTH}
+	flag.Parse()
+//initializing generators, cubes, filters
+	green := colorful.Color{0, 1, 0}
+	rl := NewRunningLight(green, 5, 0.02, 1, 0)
+	brl := NewBinaryRunningLight(2 * EDGE_LENGTH, 1, 1, 0)
 	myHsvFader := NewHsvFader(0, LEDS, 10, .1, 0)
+	//r := &RandomTicker{Threshold: .05}
+	i0 := &IntervalTicker{Interval: 1 * time.Second / 2 / EDGE_LENGTH}
+	i1 := &IntervalTicker{Interval: 1 * time.Second / 2 / EDGE_LENGTH}
 	//bf := &DirtyBlurFilter{}
-	c, err := NewCube()
+
+	c, err := NewCube(*cube_address)
 	if err != nil {
     	fmt.Print(err)
     	return
@@ -62,8 +68,10 @@ func main() {
 //combining all parts as liked
 
 	//r.Consumer = g
-	i.Consumer = g
-    g.Consumer = c
+	i0.Consumer = brl
+    brl.Consumer = c
+	i1.Consumer = rl
+	rl.Consumer = c
 	myHsvFader.Consumer = c
 	//bf.Consumer = c
 
@@ -78,7 +86,8 @@ func main() {
     	a := time.Now()
 		c.resetPreCubes()
 
-		i.Tick(a.Sub(starttime), true)
+		i0.Tick(a.Sub(starttime), true)
+		i1.Tick(a.Sub(starttime), true)
 		myHsvFader.Tick(starttime, nil)
 
 		c.renderCube()
