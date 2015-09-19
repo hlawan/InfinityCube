@@ -22,7 +22,6 @@ type RunningLight struct {
     Leds [LEDS*2]Led
 }
 
-
 func NewRunningLight(length, direction int, colorOpacity, blackOpacity  float64) *RunningLight {
     g := &RunningLight {
         Length: length,

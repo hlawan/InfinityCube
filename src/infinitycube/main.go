@@ -20,15 +20,15 @@ import (
 )
 
 const (
-		DEBUG_LVL = 1
+	DEBUG_LVL = 1
     fps_target = 60
     fps_duration = time.Second / fps_target
-		EDGE_LENGTH = 14 //in my setup there are always 14 leds in a row
-		EDGES_PER_SIDE = 4 //well for me its a square...so 4
-		NR_OF_SIDES = 6 //regular cube => 6 sides
-		LEDS = EDGE_LENGTH * EDGES_PER_SIDE * NR_OF_SIDES
-		H_MAX = 360 // maximum Hue value (Hsv)
-		H_MIN = 0 // minimum Hue value (Hsv)
+	EDGE_LENGTH = 14 //in my setup there are always 14 leds in a row
+	EDGES_PER_SIDE = 4 //well for me its a square...so 4
+	NR_OF_SIDES = 6 //regular cube => 6 sides
+	LEDS = EDGE_LENGTH * EDGES_PER_SIDE * NR_OF_SIDES
+	H_MAX = 360 // maximum Hue value (Hsv)
+	H_MIN = 0 // minimum Hue value (Hsv)
 )
 
 /*
@@ -41,90 +41,78 @@ const (
 
 var (
 	serial_port = flag.String("serial", "", "serial port")
-	//serial_port    = flag.String("serial", "/tmp/so", "serial port")
-	//unix_socket    = flag.String("unixconnect", "", "connect to unix socket")
 	listen_address = flag.String("listen", ":2500", "http service address")
 	static_path    = flag.String("static", "static", "path to the static content")
 )
 
 func main() {
-	//var err error
-	g := NewRunningLight(2 * EDGE_LENGTH, 1, 1, 0)
-  //r := &RandomTicker{Threshold: .05}
-  	i := &IntervalTicker{Interval: 1 * time.Second / 2 / EDGE_LENGTH}
-  myHsvFader := NewHsvFader(0, LEDS, 10, .1, 0)
-  //bf := &DirtyBlurFilter{}
-  c, err := NewCube()
-  if err != nil {
-      fmt.Print(err)
-      return
-  }
+//initializing all needed generators, cubes, filters
 
-  //r.Consumer = g
+	g := NewRunningLight(2 * EDGE_LENGTH, 1, 1, 0)
+	//r := &RandomTicker{Threshold: .05}
+	i := &IntervalTicker{Interval: 1 * time.Second / 2 / EDGE_LENGTH}
+	myHsvFader := NewHsvFader(0, LEDS, 10, .1, 0)
+	//bf := &DirtyBlurFilter{}
+	c, err := NewCube()
+	if err != nil {
+    	fmt.Print(err)
+    	return
+	}
+
+//combining all parts as liked
+
+	//r.Consumer = g
 	i.Consumer = g
     g.Consumer = c
 	myHsvFader.Consumer = c
-  //bf.Consumer = c
+	//bf.Consumer = c
 
-  var elapsedTime, sleepingTime [200]time.Duration
-  var elapsed, slept time.Duration
-  var z time.Time
-  o := 0
-  starttime := time.Now()
-  for {
-    a := time.Now()
-	c.resetPreCubes()
+//main loop
 
-	i.Tick(a.Sub(starttime), true)
-	myHsvFader.Tick(starttime, nil)
+	var elapsedTime, sleepingTime [200]time.Duration
+	var elapsed, slept time.Duration
+	var z time.Time
+	o := 0
+	starttime := time.Now()
+	for {
+    	a := time.Now()
+		c.resetPreCubes()
 
+		i.Tick(a.Sub(starttime), true)
+		myHsvFader.Tick(starttime, nil)
 
-	c.renderCube()
-    b := time.Now()
-    elapsed = b.Sub(a)
-    time.Sleep(fps_duration - elapsed)
-
-    //-----------------------------------------------
-    //only needed for FPS calculation
-    if false {
-      z = time.Now()
-
-      sleepingTime[o] = fps_duration - elapsed
-      elapsedTime[o] = z.Sub(a)
-      if (o > 198) {
-        totalTime := 0 * time.Second
-        currentFps := 0 * time.Second
-        for p:= 1; p < 200; p++ {
-          slept += sleepingTime[p]
-          totalTime += elapsedTime[p]
-        }
-        slept /= 199
-        totalTime /= 199
-        currentFps = (1 * time.Second / totalTime)
-        sleepPercent := (100 * time.Millisecond / totalTime) * slept
-
-        if (DEBUG_LVL > 0) {
-          fmt.Println("-->loop time:", totalTime,
-                      "-->FPS:",currentFps.Nanoseconds(),
-                      "-->I slept for:", slept,
-                      " (", sleepPercent.Seconds() * 1000, "%)" )
-        }
-        o = 0
-      }
-      o++
-    }
-    //End of FPS calculation
-    //-----------------------------------------------
-  }
-
-  //  MakeWorld()
+		c.renderCube()
+    	b := time.Now()
+    	elapsed = b.Sub(a)
+    	time.Sleep(fps_duration - elapsed)
 
 
-	// http.Handle("/status", cube)
-	// http.Handle("/", http.FileServer(http.Dir(*static_path)))
-	//
-	// err = http.ListenAndServe(*listen_address, nil)
-	// if err != nil {
-	// 	log.Fatalf("ListenAndServe failed: %v", err)
-	// }
+//only needed for FPS calculation
+    	if false {
+    		z = time.Now()
+    		sleepingTime[o] = fps_duration - elapsed
+    		elapsedTime[o] = z.Sub(a)
+    		if (o > 198) {
+        		totalTime := 0 * time.Second
+        		currentFps := 0 * time.Second
+        		for p:= 1; p < 200; p++ {
+        			slept += sleepingTime[p]
+        			totalTime += elapsedTime[p]
+        		}
+        		slept /= 199
+        		totalTime /= 199
+        		currentFps = (1 * time.Second / totalTime)
+        		sleepPercent := (100 * time.Millisecond / totalTime) * slept
+
+        		if (DEBUG_LVL > 0) {
+        			fmt.Println("-->loop time:", totalTime,
+                    			"-->FPS:",currentFps.Nanoseconds(),
+                    			"-->I slept for:", slept,
+                				" (", sleepPercent.Seconds() * 1000, "%)" )
+        		}
+        		o = 0
+    		}
+    		o++
+    	}
+	}
 }
