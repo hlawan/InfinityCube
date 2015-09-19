@@ -51,12 +51,12 @@ func main() {
 	flag.Parse()
 //initializing generators, cubes, filters
 	green := colorful.Color{0, 1, 0}
-	rl := NewRunningLight(green, 5, 0.02, 1, 0)
+	rl := NewRunningLight(green, 4 * EDGE_LENGTH, 0.01, 1, 0)
 	brl := NewBinaryRunningLight(2 * EDGE_LENGTH, 1, 1, 0)
-	myHsvFader := NewHsvFader(0, LEDS, 10, .1, 0)
+	myHsvFader := NewHsvFader(0, LEDS, 11, .1, 0)
 	//r := &RandomTicker{Threshold: .05}
 	i0 := &IntervalTicker{Interval: 1 * time.Second / 2 / EDGE_LENGTH}
-	i1 := &IntervalTicker{Interval: 1 * time.Second / 2 / EDGE_LENGTH}
+	i1 := &IntervalTicker{Interval: 2 * time.Second / 2 / EDGE_LENGTH}
 	//bf := &DirtyBlurFilter{}
 
 	c, err := NewCube(*cube_address)
@@ -87,8 +87,8 @@ func main() {
 		c.resetPreCubes()
 
 		i0.Tick(a.Sub(starttime), true)
-		i1.Tick(a.Sub(starttime), true)
 		myHsvFader.Tick(starttime, nil)
+		i1.Tick(a.Sub(starttime), true)
 
 		c.renderCube()
     	b := time.Now()
