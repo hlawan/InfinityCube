@@ -12,7 +12,7 @@ type Consumer interface {
     Tick(time.Duration, interface{})
     AddPreCube([LEDS]Led, float64, float64)
 }
-
+//-----------------------------------------------------------------------------
 type RunningLight struct {
     Consumer
     colorful.Color
@@ -74,7 +74,7 @@ func (r *RunningLight) Tick(d time.Duration, o interface{}) {
     //r.Consumer.Tick(d, r.Leds[:])
     r.Consumer.AddPreCube(r.Leds, r.ColorOpacity, r.BlackOpacity)
 }
-
+//-----------------------------------------------------------------------------
 type BinaryRunningLight struct {
     Consumer
     Offset int
@@ -94,7 +94,7 @@ func NewBinaryRunningLight(length, direction int, colorOpacity, blackOpacity  fl
     }
     for i, _ := range g.Leds {
         if i % g.Length == 0 {
-            g.Leds[i].Color = colorful.FastHappyColor()
+            g.Leds[i].Color = colorful.Color{1, 0.4, 0}
         } else {
             g.Leds[i].Color = colorful.Color{0, 0, 0}
         }
@@ -121,7 +121,52 @@ func (g *BinaryRunningLight) Tick(d time.Duration, o interface{}) {
     //g.Consumer.Tick(d, g.Leds[g.Offset:g.Offset+LEDS])
     g.Consumer.AddPreCube(cube, g.ColorOpacity, g.BlackOpacity)
 }
+//-----------------------------------------------------------------------------
+type GausRunningLight struct {
+    Consumer
+    colorful.Color
+    Position float64
+    Delta float64
+    Length int
+    Interval float64
+    ColorOpacity	float64
+    BlackOpacity	float64
+    Leds [LEDS]Led
+}
 
+func NewGausRunningLight(color colorful.Color, length int, interval, colorOpacity, blackOpacity float64) *GausRunningLight {
+    r := &GausRunningLight{
+        Color: color,
+        Length: length,
+        Interval: interval,
+        ColorOpacity: colorOpacity,
+        BlackOpacity: blackOpacity,
+    }
+    r.Delta = (float64(1) / float64(r.Interval * fps_target))
+    return r
+}
+
+func (r *GausRunningLight) Tick(d time.Duration, o interface{}) {
+    advance := o.(bool)
+
+    if advance {
+        r.Position += r.Delta
+        if r.Position > 1 {
+            r.Position -= 1
+        }
+        pos := r.Position * float64(r.Length)
+        for i, _ := range r.Leds {
+            j := i % r.Length
+            distance:= dist(pos, float64(j))
+            gaus := (1/(math.Sqrt(math.Pi/3)))*math.Exp(-(1)*math.Pow(distance, float64(2)))
+            r.Leds[i].Color = BLACK.BlendRgb(r.Color, gaus)
+        }
+    }
+
+    //r.Consumer.Tick(d, r.Leds[:])
+    r.Consumer.AddPreCube(r.Leds, r.ColorOpacity, r.BlackOpacity)
+}
+//-----------------------------------------------------------------------------
 type IntervalTicker struct {
     Consumer
     Last time.Duration

@@ -34,9 +34,9 @@ func NewHsvFader(firstLed, length, timeFullFade int, colorOpacity, blackOpacity 
 func (r *HsvFader) Tick(start time.Time, o interface{}) {
 	var h float64
 	for i := r.FirstLed; i < (r.Length + r.FirstLed); i++ {
-    h, _, _ = r.Leds[i].Color.Hsv()
-    r.Leds[i].Color = colorful.Hsv(h + r.ColorDifference, 1, 1)
-    r.Leds[i].CheckColor()
+    	h, _, _ = r.Leds[i].Color.Hsv()
+    	r.Leds[i].Color = colorful.Hsv(h + r.ColorDifference, 1, 1)
+    	r.Leds[i].CheckColor()
 	}
   	//r.Consumer.Tick(time.Since(start), r.Leds[:])
 	r.Consumer.AddPreCube(r.Leds, r.ColorOpacity, r.BlackOpacity)

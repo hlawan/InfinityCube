@@ -22,7 +22,7 @@ import (
 
 const (
 	DEBUG_LVL = 1
-    fps_target = 60
+    fps_target = 90
     fps_duration = time.Second / fps_target
 	EDGE_LENGTH = 14 //in my setup there are always 14 leds in a row
 	EDGES_PER_SIDE = 4 //well for me its a square...so 4
@@ -50,13 +50,24 @@ var (
 func main() {
 	flag.Parse()
 //initializing generators, cubes, filters
-	green := colorful.Color{0, 1, 0}
-	rl := NewRunningLight(green, 4 * EDGE_LENGTH, 0.01, 1, 0)
-	brl := NewBinaryRunningLight(2 * EDGE_LENGTH, 1, 1, 0)
-	myHsvFader := NewHsvFader(0, LEDS, 11, .1, 0)
+	blue := colorful.Color{1, 1, 1}
+	violett := colorful.Color{.5, 0, .5}
+	redish := colorful.Color{.8, .1, .3}
+	red :=  colorful.Color{.3, 0, 0}
+
+	//brl := NewBinaryRunningLight(2 * EDGE_LENGTH, 1, .5, 0)
+	myHsvFader := NewHsvFader(0, LEDS, 900, .95, 0)
+	rl := NewRunningLight(violett, 2 * EDGE_LENGTH, 0.001, .5, 0)
+	grl1:= NewGausRunningLight(blue, 1 * EDGE_LENGTH, 10, .5, 0)
+	grl2:= NewGausRunningLight(violett, 2 * EDGE_LENGTH, 20, .5, 0)
+	grl3:= NewGausRunningLight(redish, 3 * EDGE_LENGTH, 35, .5, 0)
+	grl4:= NewGausRunningLight(red, 2 * EDGE_LENGTH, 10, .5, 0)
+	grl5:= NewGausRunningLight(violett, 4 * EDGE_LENGTH, 20, .5, 0)
+	grl6:= NewGausRunningLight(redish, 4 * EDGE_LENGTH, 30, .5, 0)
+
 	//r := &RandomTicker{Threshold: .05}
-	i0 := &IntervalTicker{Interval: 1 * time.Second / 2 / EDGE_LENGTH}
-	i1 := &IntervalTicker{Interval: 2 * time.Second / 2 / EDGE_LENGTH}
+	i0 := &IntervalTicker{Interval: 500 * time.Microsecond / 2 / EDGE_LENGTH}
+
 	//bf := &DirtyBlurFilter{}
 
 	c, err := NewCube(*cube_address)
@@ -68,11 +79,17 @@ func main() {
 //combining all parts as liked
 
 	//r.Consumer = g
-	i0.Consumer = brl
-    brl.Consumer = c
-	i1.Consumer = rl
+	//i0.Consumer = brl
+    //brl.Consumer = c
+	i0.Consumer = rl
 	rl.Consumer = c
 	myHsvFader.Consumer = c
+	grl1.Consumer = c
+	grl2.Consumer = c
+	grl3.Consumer = c
+	grl4.Consumer = c
+	grl5.Consumer = c
+	grl6.Consumer = c
 	//bf.Consumer = c
 
 //main loop
@@ -86,9 +103,17 @@ func main() {
     	a := time.Now()
 		c.resetPreCubes()
 
-		i0.Tick(a.Sub(starttime), true)
+		//i0.Tick(a.Sub(starttime), true)
 		myHsvFader.Tick(starttime, nil)
-		i1.Tick(a.Sub(starttime), true)
+	//	i1.Tick(a.Sub(starttime), true)
+	//	i2.Tick(a.Sub(starttime), true)
+		grl1.Tick(a.Sub(starttime), true)
+		grl2.Tick(a.Sub(starttime), true)
+		grl3.Tick(a.Sub(starttime), true)
+		grl4.Tick(a.Sub(starttime), true)
+		grl5.Tick(a.Sub(starttime), true)
+		grl6.Tick(a.Sub(starttime), true)
+
 
 		c.renderCube()
     	b := time.Now()
@@ -97,7 +122,7 @@ func main() {
 
 
 //only needed for FPS calculation
-    	if false {
+    	if true {
     		z = time.Now()
     		sleepingTime[o] = fps_duration - elapsed
     		elapsedTime[o] = z.Sub(a)
