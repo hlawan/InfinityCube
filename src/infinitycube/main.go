@@ -48,6 +48,8 @@ var (
 )
 
 func main() {
+	getCrazy()
+	
 	flag.Parse()
 //initializing generators, cubes, filters
 	blue := colorful.Color{1, 1, 1}
@@ -56,14 +58,14 @@ func main() {
 	red :=  colorful.Color{.3, 0, 0}
 
 	//brl := NewBinaryRunningLight(2 * EDGE_LENGTH, 1, .5, 0)
-	myHsvFader := NewHsvFader(0, LEDS, 900, .95, 0)
+	myHsvFader := NewHsvFader(0, LEDS, 900, .10, 0)
 	rl := NewRunningLight(violett, 2 * EDGE_LENGTH, 0.001, .5, 0)
-	grl1:= NewGausRunningLight(blue, 1 * EDGE_LENGTH, 10, .5, 0)
-	grl2:= NewGausRunningLight(violett, 2 * EDGE_LENGTH, 20, .5, 0)
-	grl3:= NewGausRunningLight(redish, 3 * EDGE_LENGTH, 35, .5, 0)
-	grl4:= NewGausRunningLight(red, 2 * EDGE_LENGTH, 10, .5, 0)
-	grl5:= NewGausRunningLight(violett, 4 * EDGE_LENGTH, 20, .5, 0)
-	grl6:= NewGausRunningLight(redish, 4 * EDGE_LENGTH, 30, .5, 0)
+	grl1:= NewGausRunningLight(blue, 1 * EDGE_LENGTH, 2, .5, 0)
+	grl2:= NewGausRunningLight(violett, 2 * EDGE_LENGTH, 5, .5, 0)
+	grl3:= NewGausRunningLight(redish, 3 * EDGE_LENGTH, 3, .5, 0)
+	grl4:= NewGausRunningLight(red, 2 * EDGE_LENGTH, 1, .5, 0)
+	grl5:= NewGausRunningLight(violett, 4 * EDGE_LENGTH, 10, .5, 0)
+	grl6:= NewGausRunningLight(redish, 4 * EDGE_LENGTH, 10, .5, 0)
 
 	//r := &RandomTicker{Threshold: .05}
 	i0 := &IntervalTicker{Interval: 500 * time.Microsecond / 2 / EDGE_LENGTH}

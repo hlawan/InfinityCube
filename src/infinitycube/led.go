@@ -7,6 +7,8 @@ import (
 
 type Led struct {
     Color colorful.Color
+    //opacity (toDo)
+    //position (maybe nice to say something like "light up all corners...")
 }
 
 func (l *Led) CheckColor() {
