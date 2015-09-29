@@ -16,7 +16,7 @@ type SAMPLE float32
 type paTestData struct{
     frameIndex int
     maxFrameIndex int
-    recordedSamples *[]SAMPLE
+    recordedSamples []SAMPLE
     }
 
 func getCrazy(){
@@ -27,7 +27,7 @@ func getCrazy(){
 
     var stream portaudio.StreamParameters
     var data paTestData
-    var totalFrames, numSamples, numBytes int
+    var totalFrames, numSamples int
     var max, val SAMPLE
     var average float64
 
@@ -35,8 +35,8 @@ func getCrazy(){
     data.maxFrameIndex = totalFrames
     data.frameIndex = 0
     numSamples = totalFrames * NUM_CHANNELS
-    buff := make([]SAMPLE, numSamples)
-    data.recordedSamples = &buff
+    data.recordedSamples = make([]SAMPLE, numSamples)
+
     for i := 0; i < numSamples; i++ {
         data.recordedSamples[i] = 0
     }
