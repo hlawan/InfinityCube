@@ -50,23 +50,23 @@ var (
 func main() {
 	flag.Parse()
 //initializing generators, cubes, filters
-	blue := colorful.Color{1, 1, 1}
+//	blue := colorful.Color{1, 1, 1}
 	violett := colorful.Color{.5, 0, .5}
-	redish := colorful.Color{.8, .1, .3}
-	red :=  colorful.Color{.3, 0, 0}
+//	redish := colorful.Color{.8, .1, .3}
+//	red :=  colorful.Color{.3, 0, 0}
 
 	//brl := NewBinaryRunningLight(2 * EDGE_LENGTH, 1, .5, 0)
-	myHsvFader := NewHsvFader(0, LEDS, 900, .95, 0)
+	myHsvFader := NewHsvFader(0, LEDS, 20, .70, 0)
 	rl := NewRunningLight(violett, 2 * EDGE_LENGTH, 0.001, .5, 0)
-	grl1:= NewGausRunningLight(blue, 1 * EDGE_LENGTH, 10, .5, 0)
-	grl2:= NewGausRunningLight(violett, 2 * EDGE_LENGTH, 20, .5, 0)
-	grl3:= NewGausRunningLight(redish, 3 * EDGE_LENGTH, 35, .5, 0)
-	grl4:= NewGausRunningLight(red, 2 * EDGE_LENGTH, 10, .5, 0)
-	grl5:= NewGausRunningLight(violett, 4 * EDGE_LENGTH, 20, .5, 0)
-	grl6:= NewGausRunningLight(redish, 4 * EDGE_LENGTH, 30, .5, 0)
+	//grl1:= NewGausRunningLight(violett, 2 * EDGE_LENGTH, 10, .5, 0)
+	// grl2:= NewGausRunningLight(violett, 2 * EDGE_LENGTH, 20, .5, 0)
+	// grl3:= NewGausRunningLight(redish, 3 * EDGE_LENGTH, 35, .5, 0)
+	// grl4:= NewGausRunningLight(red, 2 * EDGE_LENGTH, 10, .5, 0)
+	// grl5:= NewGausRunningLight(violett, 4 * EDGE_LENGTH, 20, .5, 0)
+	// grl6:= NewGausRunningLight(redish, 4 * EDGE_LENGTH, 30, .5, 0)
 
 	//r := &RandomTicker{Threshold: .05}
-	i0 := &IntervalTicker{Interval: 500 * time.Microsecond / 2 / EDGE_LENGTH}
+	i0 := &IntervalTicker{Interval: 10 * time.Microsecond / 2 / EDGE_LENGTH}
 
 	//bf := &DirtyBlurFilter{}
 
@@ -79,17 +79,17 @@ func main() {
 //combining all parts as liked
 
 	//r.Consumer = g
-	//i0.Consumer = brl
-    //brl.Consumer = c
+	// i0.Consumer = brl
+    // brl.Consumer = c
 	i0.Consumer = rl
 	rl.Consumer = c
 	myHsvFader.Consumer = c
-	grl1.Consumer = c
-	grl2.Consumer = c
-	grl3.Consumer = c
-	grl4.Consumer = c
-	grl5.Consumer = c
-	grl6.Consumer = c
+	//grl1.Consumer = c
+	// grl2.Consumer = c
+	// grl3.Consumer = c
+	// grl4.Consumer = c
+	// grl5.Consumer = c
+	// grl6.Consumer = c
 	//bf.Consumer = c
 
 //main loop
@@ -103,16 +103,16 @@ func main() {
     	a := time.Now()
 		c.resetPreCubes()
 
-		//i0.Tick(a.Sub(starttime), true)
-		myHsvFader.Tick(starttime, nil)
+		i0.Tick(a.Sub(starttime), true)
+	//	myHsvFader.Tick(starttime, nil)
 	//	i1.Tick(a.Sub(starttime), true)
 	//	i2.Tick(a.Sub(starttime), true)
-		grl1.Tick(a.Sub(starttime), true)
-		grl2.Tick(a.Sub(starttime), true)
-		grl3.Tick(a.Sub(starttime), true)
-		grl4.Tick(a.Sub(starttime), true)
-		grl5.Tick(a.Sub(starttime), true)
-		grl6.Tick(a.Sub(starttime), true)
+		//grl1.Tick(a.Sub(starttime), true)
+		// grl2.Tick(a.Sub(starttime), true)
+		// grl3.Tick(a.Sub(starttime), true)
+		// grl4.Tick(a.Sub(starttime), true)
+		// grl5.Tick(a.Sub(starttime), true)
+		// grl6.Tick(a.Sub(starttime), true)
 
 
 		c.renderCube()
