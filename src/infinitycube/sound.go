@@ -30,6 +30,10 @@ func getCrazy(){
     data.frameIndex = 0
     numSamples = totalFrames * NUM_CHANNELS
     data.recordedSamples = make([]SAMPLE, numSamples)
+    if data.recordedSamples == nil {
+        fmt.Println("recorded samples received nullpointer")
+        return
+    }
     for i := 0; i < numSamples; i++ { //not necessary?
         data.recordedSamples[i] = 0
     }
