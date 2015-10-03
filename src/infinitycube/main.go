@@ -42,15 +42,14 @@ const (
 
 var (
     cube_address = flag.String("cube", "192.168.1.222:12345", "connect to cube backend using this address")
-	serial_port = flag.String("serial", "", "serial port")
+	serial_port = flag.String("serial", "/dev/zero", "serial port")
 	listen_address = flag.String("listen", ":2500", "http service address")
 	static_path    = flag.String("static", "static", "path to the static content")
 )
 
 func main() {
-	getCrazy()
-	
 	flag.Parse()
+	getCrazy()
 //initializing generators, cubes, filters
 	blue := colorful.Color{1, 1, 1}
 	violett := colorful.Color{.5, 0, .5}

@@ -8,10 +8,10 @@ const (
     SAMPLE_RATE = 44100
     FRAMES_PER_BUFFER = 512
     NUM_SECONDS = 5
-    NUM_CHANNELS = 2
+    NUM_CHANNELS = 1
 )
 
-type SAMPLE float32
+type SAMPLE int32
 
 type paTestData struct{
     frameIndex int
@@ -20,43 +20,45 @@ type paTestData struct{
     }
 
 func getCrazy(){
-    err := portaudio.Initialize()
-    if err != nil {
-        fmt.Println(err)
-    }
-
-    var stream portaudio.StreamParameters
+    var err error
+    var streamParameter portaudio.StreamParameters
     var data paTestData
     var totalFrames, numSamples int
-    var max, val SAMPLE
-    var average float64
 
     totalFrames = NUM_SECONDS * SAMPLE_RATE
     data.maxFrameIndex = totalFrames
     data.frameIndex = 0
     numSamples = totalFrames * NUM_CHANNELS
     data.recordedSamples = make([]SAMPLE, numSamples)
-
-    for i := 0; i < numSamples; i++ {
+    for i := 0; i < numSamples; i++ { //not necessary?
         data.recordedSamples[i] = 0
     }
 
-    stream.Input.Device, err = portaudio.DefaultInputDevice()
+    portaudio.Initialize()
+    streamParameter.Input.Device, err = portaudio.DefaultInputDevice()
     if err != nil {
         fmt.Println(err)
     }
-    stream.Output.Device, err = portaudio.DefaultOutputDevice()
+    streamParameter.Input.Channels = NUM_CHANNELS //mono
+    streamParameter.Input.Latency = streamParameter.Input.Device.DefaultLowInputLatency //not necessary?
+    streamParameter.Output.Device = nil  //input only
+    streamParameter.SampleRate = SAMPLE_RATE
+    streamParameter.FramesPerBuffer = FRAMES_PER_BUFFER
+    fmt.Println("Input Device is:", streamParameter.Input.Device)
+
+    stream, err := portaudio.OpenStream(streamParameter, data.RecordCallback)
     if err != nil {
         fmt.Println(err)
     }
-    stream.SampleRate = SAMPLE_RATE
-    stream.FramesPerBuffer = FRAMES_PER_BUFFER
-
-    fmt.Println("Default Audio Device is:")
-    fmt.Println(portaudio.DefaultInputDevice())
-    fmt.Println("Sound stuff done")
-
-
-
+    err = stream.Start()
+    if err != nil {
+        fmt.Println(err)
+    }
+    fmt.Println("Now recording")
+    StartWebServer(&data)
     portaudio.Terminate()
+}
+
+func (pa *paTestData) RecordCallback(buffer []SAMPLE){
+    pa.recordedSamples = buffer
 }
