@@ -29,6 +29,7 @@ all: infinitycube
 infinitycube:
 	$(GO) get github.com/lucasb-eyer/go-colorful
 	$(GO) get github.com/gordonklaus/portaudio
+	$(GO) get github.com/mjibson/go-dsp/spectral
 	$(GO) install infinitycube
 
 .PHONY: format

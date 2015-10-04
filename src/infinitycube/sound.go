@@ -2,67 +2,84 @@ package main
 
 import (
     "github.com/gordonklaus/portaudio"
+    "github.com/mjibson/go-dsp/spectral"
     "fmt"
+    "time"
 )
 const (
     SAMPLE_RATE = 44100
     FRAMES_PER_BUFFER = 512
-    NUM_SECONDS = 5
     NUM_CHANNELS = 1
+    X = 1
 )
 
-type SAMPLE int32
+type SAMPLE float32
 
 type paTestData struct{
     frameIndex int
     maxFrameIndex int
+    buffer64 []float64
     recordedSamples []SAMPLE
+    spektralDensity []float64
+    freqs []float64
     }
+
+func NewPaTestData() (*paTestData) {
+    d := &paTestData{}
+    d.buffer64 = make([]float64, FRAMES_PER_BUFFER)
+    d.recordedSamples = make([]SAMPLE, FRAMES_PER_BUFFER * X)
+    d.spektralDensity = make([]float64, FRAMES_PER_BUFFER / 2 + 1 * X)
+    d.freqs = make([]float64, FRAMES_PER_BUFFER / 2 + 1 * X)
+    d.maxFrameIndex = FRAMES_PER_BUFFER
+    d.frameIndex = 0
+    return d
+}
 
 func getCrazy(){
     var err error
     var streamParameter portaudio.StreamParameters
-    var data paTestData
-    var totalFrames, numSamples int
 
-    totalFrames = NUM_SECONDS * SAMPLE_RATE
-    data.maxFrameIndex = totalFrames
-    data.frameIndex = 0
-    numSamples = totalFrames * NUM_CHANNELS
-    data.recordedSamples = make([]SAMPLE, numSamples)
-    if data.recordedSamples == nil {
-        fmt.Println("recorded samples received nullpointer")
-        return
-    }
-    for i := 0; i < numSamples; i++ { //not necessary?
-        data.recordedSamples[i] = 0
-    }
-
+    data := NewPaTestData()
+    data.frameIndex = 0 //prevent "not used" error
     portaudio.Initialize()
+
     streamParameter.Input.Device, err = portaudio.DefaultInputDevice()
-    if err != nil {
-        fmt.Println(err)
-    }
+    CheckErr(err)
     streamParameter.Input.Channels = NUM_CHANNELS //mono
     streamParameter.Input.Latency = streamParameter.Input.Device.DefaultLowInputLatency //not necessary?
     streamParameter.Output.Device = nil  //input only
     streamParameter.SampleRate = SAMPLE_RATE
     streamParameter.FramesPerBuffer = FRAMES_PER_BUFFER
+
     fmt.Println("Input Device is:", streamParameter.Input.Device)
 
     stream, err := portaudio.OpenStream(streamParameter, data.RecordCallback)
-    if err != nil {
-        fmt.Println(err)
-    }
+    CheckErr(err)
     err = stream.Start()
-    if err != nil {
-        fmt.Println(err)
-    }
+    CheckErr(err)
     fmt.Println("Now recording")
-    StartWebServer(&data)
+    time.Sleep(500 * time.Millisecond) //I dont know why this would be neccessary but it somehow is...
+    StartWebServer(data)
+
     portaudio.Terminate()
 }
 
+func testCallback(buffer []SAMPLE){
+    fmt.Println("CallbackFkt happens")
+    return
+}
+
 func (pa *paTestData) RecordCallback(buffer []SAMPLE){
+    pwelchOptions := spectral.PwelchOptions{NFFT: FRAMES_PER_BUFFER}
     pa.recordedSamples = buffer
+    for i := 0; i < len(buffer) - 1; i++ {
+        pa.buffer64[i] = float64(buffer[i])
+    }
+    pa.spektralDensity, pa.freqs = spectral.Pwelch(pa.buffer64, SAMPLE_RATE, &pwelchOptions)
+}
+
+func CheckErr(err error) {
+    if err != nil {
+        fmt.Println(err)
+    }
 }

@@ -10,50 +10,54 @@ import (
 )
 
 // /*Status gathers all the information that is passed on to the webserver.
-// *  The color infomation have to be transformed into int arrays because the
-// *  coffeescript didn't like my Cube struct.*/
+
 type Status struct {
     io.ReadWriter
     SoundSignal []SAMPLE
+	SpectralDensity []float64
+	Freqs []float64
 }
-//
-// /*NewStatus parses the color information from the Cube struct to the int array
-// *  and collects all the other information.*/
+
 func NewStatus(data *paTestData, h io.ReadWriter) (s *Status) {
 	s = &Status{ReadWriter: h}
     s.SoundSignal = data.recordedSamples
+	fmt.Println(len(data.spektralDensity), len(data.freqs))
+	s.SpectralDensity = make([]float64, len(data.spektralDensity))
+	s.Freqs = make([]float64, len(data.freqs))
     return s
 }
-// 	//idea: automatic gathering of all known methodes of Cube type in a string (reflect?)
-// 	s.CubeRenderer = []string{"RGBiteration", "simpleRunningLight", "and so on"}
-// 	return
-// }
-//
+
 func (s *Status) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	//fmt.Println("beginnign of serveHTTP")
 	w.Header().Add("Content-Type", "text/json")
 	json.NewEncoder(w).Encode(s)
+	//fmt.Println("end of serveHTTP")
 }
 
-func (s *Status) UpdateStatus(data *paTestData){
-    for{
-        s.SoundSignal = data.recordedSamples
-        time.Sleep(100 * time.Millisecond)
+func (s *Status) UpdateStatus(data *paTestData) {
+    for {
+    	s.SoundSignal = data.recordedSamples
+		for i := 0; i < len(data.freqs); i++ {
+			s.SpectralDensity[i] = data.spektralDensity[i]
+			s.Freqs[i] = data.freqs[i]
+		}
+        time.Sleep(23 * time.Millisecond)
     }
 }
 
 func StartWebServer(data *paTestData) {
     var h io.ReadWriter
     var err error
+	h, err = os.OpenFile(*serial_port, os.O_RDWR, 0)
+	if err != nil {
+		fmt.Print("there seems to be an error: ", err)
+		return
+	}
     s := NewStatus(data, h)
     go s.UpdateStatus(data)
-    h, err = os.OpenFile(*serial_port, os.O_RDWR, 0)
-    if err != nil {
-        fmt.Print("there seems to be an error: ", err)
-        return
-    }
+
     http.Handle("/status", s)
     http.Handle("/", http.FileServer(http.Dir(*static_path)))
-
     err = http.ListenAndServe(*listen_address, nil)
     if err != nil {
         fmt.Print(err)
