@@ -10,12 +10,11 @@ const (
     SAMPLE_RATE = 44100
     FRAMES_PER_BUFFER = 512
     NUM_CHANNELS = 1
-    X = 1
 )
 
 type SAMPLE float32
 
-type paTestData struct{
+type paTestData struct {
     frameIndex int
     maxFrameIndex int
     buffer64 []float64
@@ -27,15 +26,15 @@ type paTestData struct{
 func NewPaTestData() (*paTestData) {
     d := &paTestData{}
     d.buffer64 = make([]float64, FRAMES_PER_BUFFER)
-    d.recordedSamples = make([]SAMPLE, FRAMES_PER_BUFFER * X)
-    d.spektralDensity = make([]float64, FRAMES_PER_BUFFER / 2 + 1 * X)
-    d.freqs = make([]float64, FRAMES_PER_BUFFER / 2 + 1 * X)
+    d.recordedSamples = make([]SAMPLE, FRAMES_PER_BUFFER)
+    d.spektralDensity = make([]float64, FRAMES_PER_BUFFER / 2 + 1)
+    d.freqs = make([]float64, FRAMES_PER_BUFFER / 2 + 1)
     d.maxFrameIndex = FRAMES_PER_BUFFER
     d.frameIndex = 0
     return d
 }
 
-func getCrazy(){
+func StartSoundTracking() (*paTestData){
     var err error
     var streamParameter portaudio.StreamParameters
 
@@ -59,17 +58,11 @@ func getCrazy(){
     CheckErr(err)
     fmt.Println("Now recording")
     time.Sleep(500 * time.Millisecond) //I dont know why this would be neccessary but it somehow is...
-    StartWebServer(data)
-
-    portaudio.Terminate()
+    return data
 }
 
-func testCallback(buffer []SAMPLE){
-    fmt.Println("CallbackFkt happens")
-    return
-}
 
-func (pa *paTestData) RecordCallback(buffer []SAMPLE){
+func (pa *paTestData) RecordCallback(buffer []SAMPLE) {
     pwelchOptions := spectral.PwelchOptions{NFFT: FRAMES_PER_BUFFER}
     pa.recordedSamples = buffer
     for i := 0; i < len(buffer) - 1; i++ {
