@@ -51,6 +51,7 @@ func main() {
 	flag.Parse()
 	data := StartSoundTracking()
 	StartWebServer(data)
+
 //initializing generators, cubes, filters
 	//brl := NewBinaryRunningLight(2 * EDGE_LENGTH, 1, .5, 0)
 	myHsvFader := NewHsvFader(0, LEDS, 900, .10, 0)
@@ -103,7 +104,7 @@ func main() {
 
 
 //only needed for FPS calculation
-    	if true {
+    	if false {
     		z = time.Now()
     		sleepingTime[o] = fps_duration - elapsed
     		elapsedTime[o] = z.Sub(a)

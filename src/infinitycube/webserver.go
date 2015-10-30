@@ -19,6 +19,8 @@ type Status struct {
 }
 
 func NewStatus(data *paTestData, h io.ReadWriter) (s *Status) {
+	data.Lock()
+	defer data.Unlock()
 	s = &Status{ReadWriter: h}
     s.SoundSignal = data.recordedSamples
 	fmt.Println(len(data.spektralDensity), len(data.freqs))
@@ -36,11 +38,13 @@ func (s *Status) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 func (s *Status) UpdateStatus(data *paTestData) {
     for {
+		data.Lock()
     	s.SoundSignal = data.recordedSamples
 		for i := 0; i < len(data.freqs); i++ {
 			s.SpectralDensity[i] = data.spektralDensity[i]
 			s.Freqs[i] = data.freqs[i]
 		}
+		data.Unlock()
         time.Sleep(23 * time.Millisecond)
     }
 }
@@ -58,8 +62,11 @@ func StartWebServer(data *paTestData) {
 
     http.Handle("/status", s)
     http.Handle("/", http.FileServer(http.Dir(*static_path)))
-    err = http.ListenAndServe(*listen_address, nil)
-    if err != nil {
-        fmt.Print(err)
-    }
+	go func(){
+    	err = http.ListenAndServe(*listen_address, nil)
+    	if err != nil {
+        	fmt.Print(err)
+    	}
+	}()
+	return
 }

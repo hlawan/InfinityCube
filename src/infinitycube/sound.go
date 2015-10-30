@@ -5,23 +5,24 @@ import (
     "github.com/mjibson/go-dsp/spectral"
     "fmt"
     "time"
+    "sync"
 )
 const (
     SAMPLE_RATE = 44100
-    FRAMES_PER_BUFFER = 512
+    FRAMES_PER_BUFFER = 256
     NUM_CHANNELS = 1
 )
 
 type SAMPLE float32
 
 type paTestData struct {
-    frameIndex int
-    maxFrameIndex int
+    sync.Mutex
     buffer64 []float64
     recordedSamples []SAMPLE
     spektralDensity []float64
     freqs []float64
     }
+
 
 func NewPaTestData() (*paTestData) {
     d := &paTestData{}
@@ -29,8 +30,6 @@ func NewPaTestData() (*paTestData) {
     d.recordedSamples = make([]SAMPLE, FRAMES_PER_BUFFER)
     d.spektralDensity = make([]float64, FRAMES_PER_BUFFER / 2 + 1)
     d.freqs = make([]float64, FRAMES_PER_BUFFER / 2 + 1)
-    d.maxFrameIndex = FRAMES_PER_BUFFER
-    d.frameIndex = 0
     return d
 }
 
@@ -39,7 +38,6 @@ func StartSoundTracking() (*paTestData){
     var streamParameter portaudio.StreamParameters
 
     data := NewPaTestData()
-    data.frameIndex = 0 //prevent "not used" error
     portaudio.Initialize()
 
     streamParameter.Input.Device, err = portaudio.DefaultInputDevice()
@@ -63,6 +61,8 @@ func StartSoundTracking() (*paTestData){
 
 
 func (pa *paTestData) RecordCallback(buffer []SAMPLE) {
+    pa.Lock()
+    defer pa.Unlock()
     pwelchOptions := spectral.PwelchOptions{NFFT: FRAMES_PER_BUFFER}
     pa.recordedSamples = buffer
     for i := 0; i < len(buffer) - 1; i++ {
