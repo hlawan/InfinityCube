@@ -18,7 +18,7 @@ type Status struct {
 	Freqs []float64
 }
 
-func NewStatus(data *paTestData, h io.ReadWriter) (s *Status) {
+func NewStatus(data *processedAudio, h io.ReadWriter) (s *Status) {
 	data.Lock()
 	defer data.Unlock()
 	s = &Status{ReadWriter: h}
@@ -36,7 +36,7 @@ func (s *Status) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	//fmt.Println("end of serveHTTP")
 }
 
-func (s *Status) UpdateStatus(data *paTestData) {
+func (s *Status) UpdateStatus(data *processedAudio) {
     for {
 		data.Lock()
     	s.SoundSignal = data.recordedSamples
@@ -49,7 +49,7 @@ func (s *Status) UpdateStatus(data *paTestData) {
     }
 }
 
-func StartWebServer(data *paTestData) {
+func StartWebServer(data *processedAudio) {
     var h io.ReadWriter
     var err error
 	h, err = os.OpenFile(*serial_port, os.O_RDWR, 0)

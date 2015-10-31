@@ -50,7 +50,9 @@ var (
 func main() {
 	flag.Parse()
 	data := StartSoundTracking()
-	StartWebServer(data)
+	audio := NewProcessedAudio()
+	audio.processAudio(data)
+	StartWebServer(audio)
 
 //initializing generators, cubes, filters
 	//brl := NewBinaryRunningLight(2 * EDGE_LENGTH, 1, .5, 0)
