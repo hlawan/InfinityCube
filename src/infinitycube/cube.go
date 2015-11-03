@@ -2,7 +2,7 @@ package main
 
 import(
   "io"
-  "net"
+  //"net"
   "time"
   "github.com/lucasb-eyer/go-colorful"
   //"fmt"
@@ -16,11 +16,11 @@ type Cube struct {
 }
 
 func NewCube(addr string) (c *Cube, err error) {
-	socketCon, err := net.Dial("tcp", addr)
+    /*socketCon, err := net.Dial("tcp", addr)
 	if err != nil {
 		return
-    }
-    c = &Cube{ReadWriter: socketCon}
+    }*///uncomment for cube connection
+    c = &Cube{ReadWriter: nil} // nil -> socketCon
     return
 }
 

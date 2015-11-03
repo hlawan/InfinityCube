@@ -90,7 +90,7 @@ func main() {
 	o := 0
 	starttime := time.Now()
 	for {
-    	a := time.Now()
+    a := time.Now()
 		c.resetPreCubes()
 
 		//i0.Tick(a.Sub(starttime), true)
@@ -99,7 +99,7 @@ func main() {
 	//	i2.Tick(a.Sub(starttime), true)
 		grl1.Tick(a.Sub(starttime), true)
 
-		c.renderCube()
+		//c.renderCube() uncomment for cubeconnection
     	b := time.Now()
     	elapsed = b.Sub(a)
     	time.Sleep(fps_duration - elapsed)
