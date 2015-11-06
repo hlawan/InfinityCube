@@ -26,7 +26,7 @@ export GOPATH
 all: infinitycube
 
 .PHONY: infinitycube
-infinitycube:
+infinitycube: content
 	$(GO) get github.com/lucasb-eyer/go-colorful
 	$(GO) get github.com/gordonklaus/portaudio
 	$(GO) get github.com/mjibson/go-dsp/spectral

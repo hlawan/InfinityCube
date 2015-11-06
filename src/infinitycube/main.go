@@ -98,7 +98,6 @@ func main() {
 	//	i1.Tick(a.Sub(starttime), true)
 	//	i2.Tick(a.Sub(starttime), true)
 		grl1.Tick(a.Sub(starttime), true)
-
 		//c.renderCube() uncomment for cubeconnection
     	b := time.Now()
     	elapsed = b.Sub(a)

@@ -16,11 +16,15 @@ type Status struct {
   SoundSignal []SAMPLE
 	SpectralDensity []float64
 	Freqs []float64
+	CurrentVolume float64
+	AverageVolume float64
+	MaxPeak float64
+	PeakAverageRatio float64
 }
 
 func NewStatus(data *processedAudio, h io.ReadWriter) (s *Status) {
-	data.Lock()
-	defer data.Unlock()
+	//data.Lock()
+	//defer data.Unlock()
 	s = &Status{ReadWriter: h}
   s.SoundSignal = data.recordedSamples
 	fmt.Println(len(data.spektralDensity), len(data.freqs))
@@ -41,6 +45,10 @@ func (s *Status) UpdateStatus(data *processedAudio) {
 		for i := 0; i < len(data.freqs); i++ {
 			s.SpectralDensity[i] = data.spektralDensity[i]
 			s.Freqs[i] = data.freqs[i]
+			s.CurrentVolume = data.currentVolume
+			s.AverageVolume = data.averageVolume
+			s.MaxPeak = data.maxPeak
+			s.PeakAverageRatio = data.peakAverageRatio
 		}
 		//data.Unlock()
   	time.Sleep(23 * time.Millisecond)
