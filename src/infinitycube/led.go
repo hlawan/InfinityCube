@@ -17,6 +17,8 @@ var (
     redish = colorful.Color{.8, .1, .3}
     red =  colorful.Color{.3, 0, 0}
     black= colorful.Color{0, 0, 0}
+    blue = colorful.Color{0, 0, 1}
+    green = colorful.Color{0, 1, 0}
 )
 
 func (l *Led) CheckColor() {

@@ -55,10 +55,17 @@ func main() {
 	StartWebServer(audio)
 
 	//initializing generators, cubes, filters
-	//brl := NewBinaryRunningLight(2 * EDGE_LENGTH, 1, .5, 0)
-	myHsvFader := NewHsvFader(0, LEDS, 20, .20, 0)
-	rl := NewRunningLight(violett, 2 * EDGE_LENGTH, 0.001, .5, 0)
-	grl1 := NewGausRunningLight(redish, 1 * EDGE_LENGTH, 2, .5, 0)
+	myHsvFader := NewHsvFader(0, LEDS, 10, .20, 0)
+
+	brl := NewBinaryRunningLight(LEDS, 1, .5, 0)
+
+	rl0 := NewRunningLight(violett, 2 * EDGE_LENGTH, 0.001, .5, 0)
+	rl1 := NewRunningLight(blue, 3 * EDGE_LENGTH, 0.002, .5, 0)
+
+	grl0 := NewGausRunningLight(redish, 2 * EDGE_LENGTH, 5, .5, 0)
+	grl1 := NewGausRunningLight(red, 1 * EDGE_LENGTH, 2, .5, 0)
+	grl2 := NewGausRunningLight(violett, 4 * EDGE_LENGTH, 11, .5, 0)
+
 	eq := NewEqualizer(0, LEDS, 1, 0, audio)
 
 	//r := &RandomTicker{Threshold: .05}
@@ -76,13 +83,17 @@ func main() {
 
 	//r.Consumer = g
 	//i0.Consumer = brl
-	//brl.Consumer = c
-	i0.Consumer = rl
-	rl.Consumer = c
 	myHsvFader.Consumer = c
+	brl.Consumer = c
+	rl0.Consumer = c
+	rl1.Consumer = c
+	grl0.Consumer = c
 	grl1.Consumer = c
+	grl2.Consumer = c
 	//bf.Consumer = c
 	eq.Consumer = c
+
+	i0.Consumer = rl1
 
 	//main loop
 
@@ -90,12 +101,31 @@ func main() {
 	var elapsed, slept time.Duration
 	var z time.Time
 	o := 0
-	//starttime := time.Now()
+	starttime := time.Now()
 	for {
 		a := time.Now()
 		c.resetPreCubes()
 
-		eq.EdgeVolume()
+		switch (audio.clapCount % 7) {
+		case 0:
+			myHsvFader.Tick(starttime, nil)
+		case 1:
+			brl.Tick(a.Sub(starttime), true)
+		case 2:
+			rl0.Tick(a.Sub(starttime), true)
+			rl1.Tick(a.Sub(starttime), true)
+		case 3:
+			grl0.Tick(a.Sub(starttime), true)
+			grl1.Tick(a.Sub(starttime), true)
+			grl2.Tick(a.Sub(starttime), true)
+		case 4:
+			eq.EdgeVolume()
+		case 5:
+			eq.WhiteSpectrum()
+		case 6:
+			eq.WhiteEdgeSpectrum()
+		}
+		//eq.EdgeVolume()
 		//i0.Tick(a.Sub(starttime), true)
 		//myHsvFader.Tick(starttime, nil)
 		//i1.Tick(a.Sub(starttime), true)

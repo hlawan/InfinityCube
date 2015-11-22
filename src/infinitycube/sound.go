@@ -40,6 +40,7 @@ type processedAudio struct {
     loudestFreqAmpl float64
     timeOfLastClap time.Time
     clapDetected bool
+    clapCount int
 }
 
 
@@ -131,10 +132,11 @@ func (audio *processedAudio) getVolume(){
 }
 
 func (audio *processedAudio) detectClap(){
-  if (audio.peakAverageRatio > 15 && time.Since(audio.timeOfLastClap) > 100 * time.Millisecond){
+  if (audio.peakAverageRatio > 15 && time.Since(audio.timeOfLastClap) > 1000 * time.Millisecond){
     audio.timeOfLastClap = time.Now()
     audio.clapDetected = true
-    fmt.Println(audio.peakAverageRatio, "\t Clap detected average PeakAverageRatio is:", audio.averagePeakAverageValue)
+    audio.clapCount += 1
+    fmt.Println("Clap detected average PeakAverageRatio is:", audio.averagePeakAverageValue, "\tclapCount:", audio.clapCount)
   } else {
     audio.clapDetected = false
   }
