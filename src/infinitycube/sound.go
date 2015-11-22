@@ -98,7 +98,7 @@ func (audio *processedAudio) anlayseSpectrum(){
   amplitude := 0.0;
   index := 0;
   for i := 0; i < len(audio.spektralDensity); i++ {
-    audio.spektralDensity[i] *= 1000 //make the values nicer....
+    audio.spektralDensity[i] *= 2000 //make the values nicer....
     if audio.spektralDensity[i] > amplitude {
       amplitude = audio.spektralDensity[i]
       index = i
