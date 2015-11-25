@@ -4,6 +4,7 @@ window.onload = ->
   $(window).resize(resizeHandler)
   resizeHandler()
   window.setInterval(update, 1000/50) #set updaterate to __hz
+  $('#effects').unbind()
 
 update = ->
   $.get('status', (data) ->

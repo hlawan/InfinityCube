@@ -52,7 +52,7 @@ func main() {
 	data := StartSoundTracking()
 	audio := NewProcessedAudio()
 	audio.processAudio(data)
-	StartWebServer(audio)
+	status := StartWebServer(audio)
 
 	//initializing generators, cubes, filters
 	myHsvFader := NewHsvFader(0, LEDS, 10, .20, 0)
@@ -100,13 +100,20 @@ func main() {
 	var elapsedTime, sleepingTime [200]time.Duration
 	var elapsed, slept time.Duration
 	var z time.Time
+	var selector int
 	o := 0
 	starttime := time.Now()
 	for {
 		a := time.Now()
 		c.resetPreCubes()
 
-		switch (audio.clapCount % 7) {
+		if status.clapSelect {
+			selector = audio.clapCount % 7
+		} else {
+			selector = status.selectedEffect
+		}
+
+		switch (selector) { //audio.clapCount % 7
 		case 0:
 			myHsvFader.Tick(starttime, nil)
 		case 1:

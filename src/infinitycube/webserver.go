@@ -7,6 +7,7 @@ import (
     "io"
     "fmt"
     "time"
+		"strconv"
 )
 
 // /*Status gathers all the information that is passed on to the webserver.
@@ -20,6 +21,8 @@ type Status struct {
 	AverageVolume float64
 	MaxPeak float64
 	PeakAverageRatio float64
+	selectedEffect int
+	clapSelect bool
 }
 
 func NewStatus(data *processedAudio, h io.ReadWriter) (s *Status) {
@@ -30,10 +33,23 @@ func NewStatus(data *processedAudio, h io.ReadWriter) (s *Status) {
 	fmt.Println(len(data.spektralDensity), len(data.freqs))
 	s.SpectralDensity = make([]float64, len(data.spektralDensity))
 	s.Freqs = make([]float64, len(data.freqs))
+	s.selectedEffect = 0
+	s.clapSelect = false
   return s
 }
 
 func (s *Status) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	t := req.FormValue("t")
+	s.selectedEffect , _ = strconv.Atoi(t)
+  fmt.Println("Selected effect", s.selectedEffect)
+
+	c := req.FormValue("c")
+	if c == "true" {
+		s.clapSelect = true
+	} else {
+		s.clapSelect= false
+	}
+	
 	w.Header().Add("Content-Type", "text/json")
 	json.NewEncoder(w).Encode(s)
 }
@@ -55,19 +71,20 @@ func (s *Status) UpdateStatus(data *processedAudio) {
   }
 }
 
-func StartWebServer(data *processedAudio) {
+func StartWebServer(data *processedAudio) (s *Status) {
   var h io.ReadWriter
   var err error
 	h, err = os.OpenFile(*serial_port, os.O_RDWR, 0)
 	CheckErr(err)
-  s := NewStatus(data, h)
+  s = NewStatus(data, h)
   go s.UpdateStatus(data)
 
+	http.Handle("/toggle", s)
   http.Handle("/status", s)
   http.Handle("/", http.FileServer(http.Dir(*static_path)))
 	go func(){
   	err = http.ListenAndServe(*listen_address, nil)
 		CheckErr(err)
 	}()
-	return
+	return s
 }
