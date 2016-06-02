@@ -54,7 +54,7 @@ func main() {
 	audio.processAudio(data)
 	status := StartWebServer(audio)
 
-	//initializing generators, cubes, filters
+	//initializing generators, cubes, filters...
 	myHsvFader := NewHsvFader(0, LEDS, 10, .20, 0)
 
 	brl := NewBinaryRunningLight(LEDS, 1, .5, 0)
