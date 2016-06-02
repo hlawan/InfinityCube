@@ -41,13 +41,13 @@ func (e *Equalizer) WhiteEdgeSpectrum() {
 		if i%EDGE_LENGTH < (EDGE_LENGTH / 2) {
 			e.Leds[i].Color = colorful.Color{
 				e.sound.spektralDensity[(i%EDGE_LENGTH)+1],
-				e.sound.spektralDensity[(i%EDGE_LENGTH)+1],
-				e.sound.spektralDensity[(i%EDGE_LENGTH)+1]}
+				e.sound.spektralDensity[(i%EDGE_LENGTH)+10],
+				e.sound.spektralDensity[(i%EDGE_LENGTH)+10]}
 		} else {
 			e.Leds[i].Color = colorful.Color{
 				e.sound.spektralDensity[EDGE_LENGTH-(i%EDGE_LENGTH)+1],
-				e.sound.spektralDensity[EDGE_LENGTH-(i%EDGE_LENGTH)+1],
-				e.sound.spektralDensity[EDGE_LENGTH-(i%EDGE_LENGTH)+1]}
+				e.sound.spektralDensity[EDGE_LENGTH-(i%EDGE_LENGTH)+10],
+				e.sound.spektralDensity[EDGE_LENGTH-(i%EDGE_LENGTH)+10]}
 		}
 	}
 	e.Consumer.AddPreCube(e.Leds, e.ColorOpacity, e.BlackOpacity)

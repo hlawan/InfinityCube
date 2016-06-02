@@ -110,7 +110,7 @@ func main() {
 		if status.clapSelect {
 			selector = audio.clapCount % 7
 		} else {
-			selector = status.selectedEffect
+			selector = 6//status.selectedEffect
 		}
 
 		switch (selector) { //audio.clapCount % 7
