@@ -1,40 +1,90 @@
 package main
-//
-// import (
-// 	"encoding/json"
-// 	"net/http"
-// )
-//
+
+import (
+	"encoding/json"
+	"net/http"
+    "os"
+    "io"
+    "fmt"
+    "time"
+		"strconv"
+)
+
 // /*Status gathers all the information that is passed on to the webserver.
-// *  The color infomation have to be transformed into int arrays because the
-// *  coffeescript didn't like my Cube struct.*/
-// type Status struct {
-// 	LedR         [NR_OF_SIDES][EDGES_PER_SIDE][EDGE_LENGTH]int
-// 	LedG         [NR_OF_SIDES][EDGES_PER_SIDE][EDGE_LENGTH]int
-// 	LedB         [NR_OF_SIDES][EDGES_PER_SIDE][EDGE_LENGTH]int
-// 	CubeRenderer []string
-// }
-//
-// /*NewStatus parses the color information from the Cube struct to the int array
-// *  and collects all the other information.*/
-// func NewStatus(c *Cube) (s *Status) {
-// 	s = &Status{}
-// 	for i := 0; i < NR_OF_SIDES; i++ {
-// 		for o := 0; o < EDGES_PER_SIDE; o++ {
-// 			for p := 0; p < EDGE_LENGTH; p++ {
-// 				s.LedR[i][o][p] = int(c.side[i].edge[o].led[p].Red)
-// 				s.LedG[i][o][p] = int(c.side[i].edge[o].led[p].Green)
-// 				s.LedB[i][o][p] = int(c.side[i].edge[o].led[p].Blue)
-// 			}
-// 		}
-// 	}
-// 	//idea: automatic gathering of all known methodes of Cube type in a string (reflect?)
-// 	s.CubeRenderer = []string{"RGBiteration", "simpleRunningLight", "and so on"}
-// 	return
-// }
-//
-// func (c *Cube) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-// 	s := NewStatus(c)
-// 	w.Header().Add("Content-Type", "text/json")
-// 	json.NewEncoder(w).Encode(s)
-// }
+
+type Status struct {
+  io.ReadWriter
+  SoundSignal []SAMPLE
+	SpectralDensity []float64
+	Freqs []float64
+	CurrentVolume float64
+	AverageVolume float64
+	MaxPeak float64
+	PeakAverageRatio float64
+	selectedEffect int
+	clapSelect bool
+}
+
+func NewStatus(data *processedAudio, h io.ReadWriter) (s *Status) {
+	//data.Lock()
+	//defer data.Unlock()
+	s = &Status{ReadWriter: h}
+  s.SoundSignal = data.recordedSamples
+	fmt.Println(len(data.spektralDensity), len(data.freqs))
+	s.SpectralDensity = make([]float64, len(data.spektralDensity))
+	s.Freqs = make([]float64, len(data.freqs))
+	s.selectedEffect = 0
+	s.clapSelect = false
+  return s
+}
+
+func (s *Status) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	t := req.FormValue("t")
+	s.selectedEffect , _ = strconv.Atoi(t)
+  fmt.Println("Selected effect", s.selectedEffect)
+
+	c := req.FormValue("c")
+	if c == "true" {
+		s.clapSelect = true
+	} else {
+		s.clapSelect= false
+	}
+	
+	w.Header().Add("Content-Type", "text/json")
+	json.NewEncoder(w).Encode(s)
+}
+
+func (s *Status) UpdateStatus(data *processedAudio) {
+  for {
+		//data.Lock()
+  	s.SoundSignal = data.recordedSamples
+		for i := 0; i < len(data.freqs); i++ {
+			s.SpectralDensity[i] = data.spektralDensity[i]
+			s.Freqs[i] = data.freqs[i]
+			s.CurrentVolume = data.currentVolume
+			s.AverageVolume = data.averageVolume
+			s.MaxPeak = data.maxPeak
+			s.PeakAverageRatio = data.peakAverageRatio
+		}
+		//data.Unlock()
+  	time.Sleep(23 * time.Millisecond)
+  }
+}
+
+func StartWebServer(data *processedAudio) (s *Status) {
+  var h io.ReadWriter
+  var err error
+	h, err = os.OpenFile(*serial_port, os.O_RDWR, 0)
+	CheckErr(err)
+  s = NewStatus(data, h)
+  go s.UpdateStatus(data)
+
+	http.Handle("/toggle", s)
+  http.Handle("/status", s)
+  http.Handle("/", http.FileServer(http.Dir(*static_path)))
+	go func(){
+  	err = http.ListenAndServe(*listen_address, nil)
+		CheckErr(err)
+	}()
+	return s
+}

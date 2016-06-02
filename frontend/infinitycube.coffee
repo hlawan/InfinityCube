@@ -1,77 +1,97 @@
 $ = jQuery
 
 window.onload = ->
-  window.setInterval(update, 1000/5) #set updaterate to __hz
+  #window.setInterval(update, 1000/5) #set updaterate to __hz
   $('#cube').css('margin', 1).css('width', 330).css('height', 430).svg({loadURL: 'fancycube.svg'}) #need 4 resizehandler
-  initJsPlumb()
+  bindEffectSelector()
+  bindClapSelector()
+  # initJsPlumb()
+
 
 
 update = ->
-  $.get('status', (data) ->
-    updateCubeLED(data)
-  , 'json')
+  $.get('status', (data), 'json')
 
-updateCubeLED = (data) ->
-	for i in [0..5]
-		for o in [0..3]
-			for p in [0..13]
-				color = Number(0x1000000 + data['LedR'][i][o][p]*0x10000 + data['LedG'][i][o][p]*0x100 + data['LedB'][i][o][p]).toString(16).substring(1);
-				cube = "0"
-				side = (i).toString()
-				edge = (o).toString()
-				led  = (p).toString()
-				field = "#" + cube + side + edge + led #matching number format to svg path
-				#console.log(field)
-				setColor(field, '#' + color)
+# update = ->
+#   $.get('status', (data) ->
+#      updateCubeLED(data)
+#   , 'json')
 
-setColor = (field, color) ->
-	#console.log("setColor called with field: ", field, " color: ", color)
-	$(field, $('#cube').svg('get').root()).css('fill', color)
+# updateCubeLED = (data) ->
+# 	for i in [0..5]
+# 		for o in [0..3]
+# 			for p in [0..13]
+# 				color = Number(0x1000000 + data['LedR'][i][o][p]*0x10000 + data['LedG'][i][o][p]*0x100 + data['LedB'][i][o][p]).toString(16).substring(1);
+# 				cube = "0"
+# 				side = (i).toString()
+# 				edge = (o).toString()
+# 				led  = (p).toString()
+# 				field = "#" + cube + side + edge + led #matching number format to svg path
+# 				#console.log(field)
+# 				setColor(field, '#' + color)
+#
+# setColor = (field, color) ->
+# 	#console.log("setColor called with field: ", field, " color: ", color)
+# 	$(field, $('#cube').svg('get').root()).css('fill', color)
+#
+# initJsPlumb = ->
+#   jsPlumb.ready ->
+#   a = $('#a')
+#   b = $('#b')
+#   stateMachineConnector =
+#     connector: 'StateMachine'
+#     paintStyle:
+#       lineWidth: 3
+#       strokeStyle: '#056'
+#     hoverPaintStyle: strokeStyle: '#dbe300'
+#     endpoint: 'Blank'
+#     anchor: 'Continuous'
+#     overlays: [ [
+#       'PlainArrow'
+#       {
+#         location: 1
+#         width: 15
+#         length: 12
+#       }
+#     ] ]
+#
+#   jsPlumb.connect {
+#     source: 'a'
+#     target: 'b'
+#   }, stateMachineConnector
+#
+#   jsPlumb.connect {
+#     source: 'b'
+#     target: 'a'
+#   }, stateMachineConnector
+#
+#   jsPlumb.draggable $('.window')
+#
+#   jsPlumb.animate $('#b'), {
+#     'left': 50
+#     'top': 300
+#   }, duration: 'slow'
+#
+#   jsPlumb.animate $('#a'), {
+#     'left': 250
+#     'top': 100
+#   }, duration: 'slow'
+#
+#   return
 
-initJsPlumb = ->
-  jsPlumb.ready ->
-  a = $('#a')
-  b = $('#b')
-  stateMachineConnector =
-    connector: 'StateMachine'
-    paintStyle:
-      lineWidth: 3
-      strokeStyle: '#056'
-    hoverPaintStyle: strokeStyle: '#dbe300'
-    endpoint: 'Blank'
-    anchor: 'Continuous'
-    overlays: [ [
-      'PlainArrow'
-      {
-        location: 1
-        width: 15
-        length: 12
-      }
-    ] ]
+bindEffectSelector = ->
+  $('#effects').bind 'change', ->
+    effect = $("#effects option:selected").val()
+    $.post('toggle', {t: effect}, (data, textStatus, jqXHR) ->
+      console.log(effect)
+    , 'json')
 
-  jsPlumb.connect {
-    source: 'a'
-    target: 'b'
-  }, stateMachineConnector
-
-  jsPlumb.connect {
-    source: 'b'
-    target: 'a'
-  }, stateMachineConnector
-
-  jsPlumb.draggable $('.window')
-
-  jsPlumb.animate $('#b'), {
-    'left': 50
-    'top': 300
-  }, duration: 'slow'
-
-  jsPlumb.animate $('#a'), {
-    'left': 250
-    'top': 100
-  }, duration: 'slow'
-
-  return
+bindClapSelector = ->
+  $('#clapSelect').bind 'change', ->
+    value = $("#clapSelect").prop('checked')
+    $.post('toggle', {c: value}, (data, textStatus, jqXHR) ->
+      console.log(value)
+    , 'json')
 
 #---------------------------------------------------------------------------
 #not used anymore....back from the time there was that switchy thing

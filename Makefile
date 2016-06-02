@@ -26,8 +26,10 @@ export GOPATH
 all: infinitycube
 
 .PHONY: infinitycube
-infinitycube:
+infinitycube: content
 	$(GO) get github.com/lucasb-eyer/go-colorful
+	$(GO) get github.com/gordonklaus/portaudio
+	$(GO) get github.com/mjibson/go-dsp/spectral
 	$(GO) install infinitycube
 
 .PHONY: format
@@ -51,7 +53,7 @@ static/jquery.js: static
 static/%.js: frontend/%.coffee static
 	coffee --compile --output static "$<"
 
-SCRIPTS = static/jquery.js static/infinitycube.js
+SCRIPTS = static/jquery.js static/infinitycube.js static/sound.js
 STATIC  = frontend/*.html frontend/*.svg frontend/*.css frontend/*.js frontend/*.ico
 IMAGES = frontend/images/*.png
 
