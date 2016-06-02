@@ -67,6 +67,7 @@ func main() {
 	grl2 := NewGausRunningLight(violett, 4 * EDGE_LENGTH, 11, .5, 0)
 
 	eq := NewEqualizer(0, LEDS, 1, 0, audio)
+	cA := NewCellularAutomata(1, 0, 152, .5)
 
 	//r := &RandomTicker{Threshold: .05}
 	i0 := &IntervalTicker{Interval: 10 * time.Microsecond / 2 / EDGE_LENGTH}
@@ -92,6 +93,7 @@ func main() {
 	grl2.Consumer = c
 	//bf.Consumer = c
 	eq.Consumer = c
+	cA.Consumer = c
 
 	i0.Consumer = rl1
 
@@ -111,6 +113,7 @@ func main() {
 			selector = audio.clapCount % 7
 		} else {
 			selector = status.selectedEffect
+			selector = 6;
 		}
 
 		switch (selector) { //audio.clapCount % 7
@@ -130,7 +133,8 @@ func main() {
 		case 5:
 			eq.WhiteSpectrum()
 		case 6:
-			eq.WhiteEdgeSpectrum()
+			//eq.WhiteEdgeSpectrum()
+			cA.Update()
 		}
 		//eq.EdgeVolume()
 		//i0.Tick(a.Sub(starttime), true)

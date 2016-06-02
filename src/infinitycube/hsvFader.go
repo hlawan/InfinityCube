@@ -11,8 +11,8 @@ type HsvFader struct {
 	Length          int  //Nr of Leds
 	ColorDifference float64
 	TimeFullFade    int  //in Seconds
-	ColorOpacity	float64
-	BlackOpacity	float64
+	ColorOpacity		float64
+	BlackOpacity		float64
 	Leds            [LEDS]Led
 }
 
