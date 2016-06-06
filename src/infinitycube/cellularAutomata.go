@@ -27,7 +27,7 @@ func NewCellularAutomata(colorOpacity, blackOpacity float64, rule int, secsPerGe
     cA.lastUpdate = time.Now()
 
     for i := 0; i < LEDS; i++ {
-      if rand.Float64() < 0.02 {
+      if rand.Float64() < 0.3 {
         cA.Leds[i].Color = red
       }else{
         cA.Leds[i].Color = black

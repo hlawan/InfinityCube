@@ -22,11 +22,11 @@ import (
 
 const (
 	DEBUG_LVL = 1
-	fps_target = 90
+	fps_target = 100
 	fps_duration = time.Second / fps_target
-	EDGE_LENGTH = 14 //in my setup there are always 14 leds in a row
-	EDGES_PER_SIDE = 4 //well for me its a square...so 4
-	NR_OF_SIDES = 6 //regular cube => 6 sides
+	EDGE_LENGTH = 10//14 //in my setup there are always 14 leds in a row
+	EDGES_PER_SIDE = 1//4 //well for me its a square...so 4
+	NR_OF_SIDES = 1//6 //regular cube => 6 sides
 	LEDS = EDGE_LENGTH * EDGES_PER_SIDE * NR_OF_SIDES
 	H_MAX = 360 // maximum Hue value (Hsv)
 	H_MIN = 0 // minimum Hue value (Hsv)
@@ -41,7 +41,8 @@ const (
 */
 
 var (
-	cube_address = flag.String("cube", "192.168.1.222:12345", "connect to cube backend using this address")
+	serverPtr = flag.String("fcserver", "192.168.1.222:7890", "Fadecandy server and port to connect to")
+	//cube_address = flag.String("cube", "192.168.1.222:12345", "connect to cube backend using this address")
 	serial_port = flag.String("serial", "/dev/zero", "serial port")
 	listen_address = flag.String("listen", ":2500", "http service address")
 	static_path    = flag.String("static", "static", "path to the static content")
@@ -74,7 +75,7 @@ func main() {
 
 	//bf := &DirtyBlurFilter{}
 
-	c, err := NewCube(*cube_address)
+	c, err := NewCube(*serverPtr, LEDS)
 	if err != nil {
 		fmt.Print(err)
 		return
@@ -113,7 +114,7 @@ func main() {
 			selector = audio.clapCount % 7
 		} else {
 			selector = status.selectedEffect
-			selector = 6;
+			//selector = 6;
 		}
 
 		switch (selector) { //audio.clapCount % 7

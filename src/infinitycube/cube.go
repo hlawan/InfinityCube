@@ -1,26 +1,38 @@
 package main
 
 import(
-  "io"
-  "net"
+  //"io"
+  //"net"
   "time"
   "github.com/lucasb-eyer/go-colorful"
+  "github.com/kellydunn/go-opc"
   //"fmt"
+  "log"
 )
 
 type Cube struct {
-  io.ReadWriter
+  fadeCandy *opc.Client
   preCubes []PreCube //every effect generator adds a PreCube
   finalCube [LEDS]Led //all PreCubes are merged to one finalCube, which then will be sent to the real cube
   buffer [3 * EDGE_LENGTH * EDGES_PER_SIDE * NR_OF_SIDES]byte
 }
 
-func NewCube(addr string) (c *Cube, err error) {
-  socketCon, err := net.Dial("tcp", addr)
+func NewCube(server string, leds_len int) (c *Cube, err error) {
+  /*socketCon, err := net.Dial("tcp", addr)
   if err != nil {
     return
     } //uncomment for cube connection
     c = &Cube{ReadWriter: socketCon} // nil -> socketCon
+  */
+
+  // Create a client
+  oc := opc.NewClient()
+  err = oc.Connect("tcp", server)
+  c =&Cube{fadeCandy: oc}
+  if err != nil {
+    log.Fatal("Could not connect to Fadecandy server", err)
+  }
+
     return
   }
 
@@ -33,17 +45,30 @@ func NewCube(addr string) (c *Cube, err error) {
     //leds := o.([]Led)
 
     leds := c.finalCube
-    h := 0
-    for i, _ := range leds {
-      c.buffer[h+0], c.buffer[h+1], c.buffer[h+2] = leds[i].Color.RGB255()
-      h += 3
-    }
 
-    var startByte [1]byte
+
+    /*var startByte [1]byte
     n, _ := c.Read(startByte[:])
     if(n == 1) {
       c.Write(c.buffer[:])
+    }*/
+
+    // send pixel data
+    m := opc.NewMessage(0)
+    m.SetLength(uint16(len(leds)*3))
+
+    for i := range leds {
+      r,g,b := leds[i].Color.RGB255()
+      m.SetPixelColor(i, r, g, b)
     }
+
+    err := c.fadeCandy.Send(m)
+    if err != nil {
+        log.Println("couldn't send color",err)
+    }
+
+
+
   }
 
   type PreCube struct {
