@@ -13,23 +13,19 @@ package main
 import (
 	"flag"
 	"fmt"
-	// "log"
-	// "net/http"
 	"time"
-	//"os"
-	//"github.com/lucasb-eyer/go-colorful"
 )
 
 const (
-	DEBUG_LVL = 1
-	fps_target = 100
-	fps_duration = time.Second / fps_target
-	EDGE_LENGTH = 14 //in my setup there are always 14 leds in a row
-	EDGES_PER_SIDE = 4 //well for me its a square...so 4
-	NR_OF_SIDES = 6 //regular cube => 6 sides
-	LEDS = EDGE_LENGTH * EDGES_PER_SIDE * NR_OF_SIDES
-	H_MAX = 360 // maximum Hue value (Hsv)
-	H_MIN = 0 // minimum Hue value (Hsv)
+	DEBUG_LVL      = 1
+	fps_target     = 100
+	fps_duration   = time.Second / fps_target
+	EDGE_LENGTH    = 14 //in my setup there are always 14 leds in a row
+	EDGES_PER_SIDE = 4  //well for me its a square...so 4
+	NR_OF_SIDES    = 6  //regular cube => 6 sides
+	LEDS           = EDGE_LENGTH * EDGES_PER_SIDE * NR_OF_SIDES
+	H_MAX          = 360 // maximum Hue value (Hsv)
+	H_MIN          = 0   // minimum Hue value (Hsv)
 )
 
 /*
@@ -41,9 +37,8 @@ const (
 */
 
 var (
-	serverPtr = flag.String("fcserver", "192.168.1.222:7890", "Fadecandy server and port to connect to")
-	//cube_address = flag.String("cube", "192.168.1.222:12345", "connect to cube backend using this address")
-	serial_port = flag.String("serial", "/dev/zero", "serial port")
+	serverPtr      = flag.String("fcserver", "192.168.1.222:7890", "Fadecandy server and port to connect to")
+	serial_port    = flag.String("serial", "/dev/zero", "serial port")
 	listen_address = flag.String("listen", ":2500", "http service address")
 	static_path    = flag.String("static", "static", "path to the static content")
 )
@@ -57,45 +52,23 @@ func main() {
 
 	//initializing generators, cubes, filters...
 	myHsvFader := NewHsvFader(0, LEDS, 10, .20, 0)
-
 	brl := NewBinaryRunningLight(LEDS, 1, .5, 0)
-
-	rl0 := NewRunningLight(violett, 2 * EDGE_LENGTH, 0.001, .5, 0)
-	rl1 := NewRunningLight(blue, 3 * EDGE_LENGTH, 0.002, .5, 0)
-
-	grl0 := NewGausRunningLight(redish, 2 * EDGE_LENGTH, 5, .5, 0)
-	grl1 := NewGausRunningLight(red, 1 * EDGE_LENGTH, 2, .5, 0)
-	grl2 := NewGausRunningLight(violett, 4 * EDGE_LENGTH, 11, .5, 0)
-
+	rl0 := NewRunningLight(violett, 2*EDGE_LENGTH, 0.001, .5, 0)
+	rl1 := NewRunningLight(blue, 3*EDGE_LENGTH, 0.002, .5, 0)
+	grl0 := NewGausRunningLight(redish, 2*EDGE_LENGTH, 5, .5, 0)
+	grl1 := NewGausRunningLight(red, 1*EDGE_LENGTH, 2, .5, 0)
+	grl2 := NewGausRunningLight(violett, 4*EDGE_LENGTH, 11, .5, 0)
 	eq := NewEqualizer(0, LEDS, 1, 0, audio)
 	cA := NewCellularAutomata(1, 0, 152, .5)
-
-	//r := &RandomTicker{Threshold: .05}
 	i0 := &IntervalTicker{Interval: 10 * time.Microsecond / 2 / EDGE_LENGTH}
 
-	//bf := &DirtyBlurFilter{}
-
-	c, err := NewCube(*serverPtr, LEDS)
+	c, err := NewCube(*serverPtr)
 	if err != nil {
 		fmt.Print(err)
 		return
 	}
 
 	//combining all parts as liked
-
-	//r.Consumer = g
-	//i0.Consumer = brl
-	myHsvFader.Consumer = c
-	brl.Consumer = c
-	rl0.Consumer = c
-	rl1.Consumer = c
-	grl0.Consumer = c
-	grl1.Consumer = c
-	grl2.Consumer = c
-	//bf.Consumer = c
-	eq.Consumer = c
-	cA.Consumer = c
-
 	i0.Consumer = rl1
 
 	//main loop
@@ -117,7 +90,7 @@ func main() {
 			//selector = 6;
 		}
 
-		switch (selector) { //audio.clapCount % 7
+		switch selector { //audio.clapCount % 7
 		case 0:
 			myHsvFader.Tick(starttime, nil)
 		case 1:
@@ -137,30 +110,22 @@ func main() {
 			//eq.WhiteEdgeSpectrum()
 			cA.Update()
 		}
-		//eq.EdgeVolume()
-		//i0.Tick(a.Sub(starttime), true)
-		//myHsvFader.Tick(starttime, nil)
-		//i1.Tick(a.Sub(starttime), true)
-		//i2.Tick(a.Sub(starttime), true)
-		//grl1.Tick(a.Sub(starttime), true)
 
-
-		c.renderCube() //uncomment for cubeconnection
+		c.renderCube()
 
 		b := time.Now()
 		elapsed = b.Sub(a)
 		time.Sleep(fps_duration - elapsed)
-
 
 		//only needed for FPS calculation
 		if false {
 			z = time.Now()
 			sleepingTime[o] = fps_duration - elapsed
 			elapsedTime[o] = z.Sub(a)
-			if (o > 198) {
+			if o > 198 {
 				totalTime := 0 * time.Second
 				currentFps := 0 * time.Second
-				for p:= 1; p < 200; p++ {
+				for p := 1; p < 200; p++ {
 					slept += sleepingTime[p]
 					totalTime += elapsedTime[p]
 				}
@@ -169,15 +134,15 @@ func main() {
 				currentFps = (1 * time.Second / totalTime)
 				sleepPercent := (100 * time.Millisecond / totalTime) * slept
 
-				if (DEBUG_LVL > 0) {
+				if DEBUG_LVL > 0 {
 					fmt.Println("-->loop time:", totalTime,
-						"-->FPS:",currentFps.Nanoseconds(),
+						"-->FPS:", currentFps.Nanoseconds(),
 						"-->I slept for:", slept,
-						" (", sleepPercent.Seconds() * 1000, "%)" )
-					}
-					o = 0
+						" (", sleepPercent.Seconds()*1000, "%)")
 				}
-				o++
+				o = 0
 			}
+			o++
 		}
 	}
+}
