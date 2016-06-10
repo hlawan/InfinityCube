@@ -65,7 +65,7 @@ content: static $(SCRIPTS) images
 
 .PHONY: serve
 serve: infinitycube content
-	bin/infinitycube -listen :2500
+	bin/infinitycube -fcserver localhost:7890
 
 .PHONY: deploy
 deploy: web content
@@ -77,6 +77,4 @@ clean:
 
 .PHONY: cube
 cube: infinitycube
-	sudo rm -f /tmp/so
-	sudo ./src/rpi_ws281x/test&
 	sudo bin/infinitycube -serial cube

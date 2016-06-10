@@ -24,9 +24,9 @@ const (
 	DEBUG_LVL = 1
 	fps_target = 100
 	fps_duration = time.Second / fps_target
-	EDGE_LENGTH = 10//14 //in my setup there are always 14 leds in a row
-	EDGES_PER_SIDE = 1//4 //well for me its a square...so 4
-	NR_OF_SIDES = 1//6 //regular cube => 6 sides
+	EDGE_LENGTH = 14 //in my setup there are always 14 leds in a row
+	EDGES_PER_SIDE = 4 //well for me its a square...so 4
+	NR_OF_SIDES = 6 //regular cube => 6 sides
 	LEDS = EDGE_LENGTH * EDGES_PER_SIDE * NR_OF_SIDES
 	H_MAX = 360 // maximum Hue value (Hsv)
 	H_MIN = 0 // minimum Hue value (Hsv)
