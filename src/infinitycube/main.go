@@ -17,9 +17,9 @@ import (
 )
 
 const (
-	DEBUG_LVL      = 1
-	fps_target     = 100
-	fps_duration   = time.Second / fps_target
+	debugLvl       = 1
+	fpsTarget     = 100
+	fpsDuration   = time.Second / fpsTarget
 	EDGE_LENGTH    = 14 //in my setup there are always 14 leds in a row
 	EDGES_PER_SIDE = 4  //well for me its a square...so 4
 	NR_OF_SIDES    = 6  //regular cube => 6 sides
@@ -69,6 +69,20 @@ func main() {
 	}
 
 	//combining all parts as liked
+
+	//r.Consumer = g
+	//i0.Consumer = brl
+	myHsvFader.Consumer = c
+	brl.Consumer = c
+	rl0.Consumer = c
+	rl1.Consumer = c
+	grl0.Consumer = c
+	grl1.Consumer = c
+	grl2.Consumer = c
+	//bf.Consumer = c
+	eq.Consumer = c
+	cA.Consumer = c
+
 	i0.Consumer = rl1
 
 	//main loop
@@ -115,12 +129,12 @@ func main() {
 
 		b := time.Now()
 		elapsed = b.Sub(a)
-		time.Sleep(fps_duration - elapsed)
+		time.Sleep(fpsDuration - elapsed)
 
 		//only needed for FPS calculation
 		if false {
 			z = time.Now()
-			sleepingTime[o] = fps_duration - elapsed
+			sleepingTime[o] = fpsDuration - elapsed
 			elapsedTime[o] = z.Sub(a)
 			if o > 198 {
 				totalTime := 0 * time.Second
@@ -134,7 +148,7 @@ func main() {
 				currentFps = (1 * time.Second / totalTime)
 				sleepPercent := (100 * time.Millisecond / totalTime) * slept
 
-				if DEBUG_LVL > 0 {
+				if debugLvl > 0 {
 					fmt.Println("-->loop time:", totalTime,
 						"-->FPS:", currentFps.Nanoseconds(),
 						"-->I slept for:", slept,

@@ -63,8 +63,9 @@ content: static $(SCRIPTS) images
 	cp --update $(STATIC) static
 	cp --update $(IMAGES) static/images
 
-.PHONY: serve
-serve: infinitycube content
+.PHONY: simulation
+simulation: infinitycube content
+	bin/gl_server -l frontend/cubeModel.json &
 	bin/infinitycube -fcserver localhost:7890
 
 .PHONY: deploy

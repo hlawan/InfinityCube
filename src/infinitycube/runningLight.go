@@ -7,12 +7,6 @@ import (
 	"time"
 )
 
-type Consumer interface {
-	Tick(time.Duration, interface{})
-	AddPreCube([LEDS]Led, float64, float64)
-}
-
-//-----------------------------------------------------------------------------
 type RunningLight struct {
 	Consumer
 	colorful.Color
@@ -143,7 +137,7 @@ func NewGausRunningLight(color colorful.Color, length int, interval, colorOpacit
 		ColorOpacity: colorOpacity,
 		BlackOpacity: blackOpacity,
 	}
-	r.Delta = (float64(1) / float64(r.Interval*fps_target))
+	r.Delta = (float64(1) / float64(r.Interval*fpsTarget))
 	return r
 }
 
