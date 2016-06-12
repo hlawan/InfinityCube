@@ -25,7 +25,7 @@ type SoundSingnal struct {
 	bufferChannel chan []SAMPLE
 }
 
-type processedAudio struct {
+type ProcessedAudio struct {
 	sync.Mutex
 	sampleRate              int
 	recordedSamples         []SAMPLE
@@ -54,8 +54,8 @@ func NewSoundSingnal() *SoundSingnal {
 	return d
 }
 
-func NewProcessedAudio() *processedAudio {
-	d := &processedAudio{}
+func NewProcessedAudio() *ProcessedAudio {
+	d := &ProcessedAudio{}
 	d.buffer64 = make([]float64, FRAMES_PER_BUFFER)
 	d.recordedSamples = make([]SAMPLE, FRAMES_PER_BUFFER)
 	d.spektralDensity = make([]float64, FRAMES_PER_BUFFER/2+1)
@@ -76,7 +76,8 @@ func (pa *SoundSingnal) RecordCallback(buffer []SAMPLE) {
 	pa.bufferChannel <- buffer
 }
 
-func (audio *processedAudio) processAudio(data *SoundSingnal) {
+func StartAudioProcessing(data *SoundSingnal) *ProcessedAudio{
+	audio := NewProcessedAudio()
 	go func() {
 		for {
 			audio.Lock() //pretty much blocks audio the whole time
@@ -90,9 +91,10 @@ func (audio *processedAudio) processAudio(data *SoundSingnal) {
 			audio.Unlock()
 		}
 	}()
+	return audio
 }
 
-func (audio *processedAudio) anlayseSpectrum() {
+func (audio *ProcessedAudio) anlayseSpectrum() {
 	pwelchOptions := spectral.PwelchOptions{NFFT: FRAMES_PER_BUFFER}
 	audio.spektralDensity, audio.freqs = spectral.Pwelch(audio.buffer64, SAMPLE_RATE, &pwelchOptions)
 	amplitude := 0.0
@@ -113,7 +115,7 @@ const (
 	scaledVolumeWeight = VolumeWeight * (float64(FRAMES_PER_BUFFER) / float64(SAMPLE_RATE)) //makes averageCalculation independent from BufferSize
 )
 
-func (audio *processedAudio) getVolume() {
+func (audio *ProcessedAudio) getVolume() {
 	newAverageVolume := 0.0
 	maxPeak := audio.buffer64[0]
 	for i := 0; i < FRAMES_PER_BUFFER; i++ {
@@ -130,7 +132,7 @@ func (audio *processedAudio) getVolume() {
 	audio.averagePeakAverageValue = audio.averagePeakAverageValue*(1-scaledVolumeWeight) + audio.peakAverageRatio*scaledVolumeWeight
 }
 
-func (audio *processedAudio) detectClap() {
+func (audio *ProcessedAudio) detectClap() {
 	if audio.peakAverageRatio > 15 && time.Since(audio.timeOfLastClap) > 1000*time.Millisecond {
 		audio.timeOfLastClap = time.Now()
 		audio.clapDetected = true

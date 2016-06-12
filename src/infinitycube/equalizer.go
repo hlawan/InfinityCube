@@ -11,11 +11,11 @@ type Equalizer struct {
 	Length       int
 	ColorOpacity float64
 	BlackOpacity float64
-	sound        *processedAudio
+	sound        *ProcessedAudio
 	Leds         [LEDS]Led
 }
 
-func NewEqualizer(offset, length int, colorOpacity, blackOpacity float64, s *processedAudio) *Equalizer {
+func NewEqualizer(offset, length int, colorOpacity, blackOpacity float64, s *ProcessedAudio) *Equalizer {
 	e := &Equalizer{
 		Offset:       offset,
 		Length:       length,

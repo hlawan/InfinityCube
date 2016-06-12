@@ -25,7 +25,7 @@ type Status struct {
 	clapSelect       bool
 }
 
-func NewStatus(data *processedAudio, h io.ReadWriter) (s *Status) {
+func NewStatus(data *ProcessedAudio, h io.ReadWriter) (s *Status) {
 	//data.Lock()
 	//defer data.Unlock()
 	s = &Status{ReadWriter: h}
@@ -54,7 +54,7 @@ func (s *Status) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(w).Encode(s)
 }
 
-func (s *Status) UpdateStatus(data *processedAudio) {
+func (s *Status) UpdateStatus(data *ProcessedAudio) {
 	for {
 		//data.Lock()
 		s.SoundSignal = data.recordedSamples
@@ -71,7 +71,7 @@ func (s *Status) UpdateStatus(data *processedAudio) {
 	}
 }
 
-func StartWebServer(data *processedAudio) (s *Status) {
+func StartWebServer(data *ProcessedAudio) (s *Status) {
 	var h io.ReadWriter
 	var err error
 	h, err = os.OpenFile(*serial_port, os.O_RDWR, 0)

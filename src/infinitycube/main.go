@@ -18,8 +18,8 @@ import (
 
 const (
 	debugLvl       = 1
-	fpsTarget     = 100
-	fpsDuration   = time.Second / fpsTarget
+	fpsTarget      = 100
+	fpsDuration    = time.Second / fpsTarget
 	EDGE_LENGTH    = 14 //in my setup there are always 14 leds in a row
 	EDGES_PER_SIDE = 4  //well for me its a square...so 4
 	NR_OF_SIDES    = 6  //regular cube => 6 sides
@@ -45,10 +45,9 @@ var (
 
 func main() {
 	flag.Parse()
-	data := StartSoundTracking()
-	audio := NewProcessedAudio()
-	audio.processAudio(data)
-	status := StartWebServer(audio)
+	rawSoundData := StartSoundTracking()
+	audio := StartAudioProcessing(rawSoundData)
+	webInterface := StartWebServer(audio)
 
 	//initializing generators, cubes, filters...
 	myHsvFader := NewHsvFader(0, LEDS, 10, .20, 0)
@@ -97,10 +96,10 @@ func main() {
 		a := time.Now()
 		c.resetPreCubes()
 
-		if status.clapSelect {
+		if webInterface.clapSelect {
 			selector = audio.clapCount % 7
 		} else {
-			selector = status.selectedEffect
+			selector = webInterface.selectedEffect
 			//selector = 6;
 		}
 
