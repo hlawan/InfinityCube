@@ -94,7 +94,6 @@ func main() {
 	starttime := time.Now()
 	for {
 		a := time.Now()
-		c.resetPreCubes()
 
 		if webInterface.clapSelect {
 			selector = audio.clapCount % 7

@@ -46,6 +46,7 @@ func (c *Cube) renderCube() {
 	if err != nil {
 		log.Println("couldn't send color", err)
 	}
+  c.resetPreCubes()
 }
 
 func (c *Cube) Tick(d time.Duration, o interface{}) {
