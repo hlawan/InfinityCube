@@ -14,7 +14,7 @@ var (
 	white   = colorful.Color{1, 1, 1}
 	violett = colorful.Color{.5, 0, .5}
 	redish  = colorful.Color{.8, .1, .3}
-	red     = colorful.Color{.3, 0, 0}
+	red     = colorful.Color{1, 0, 0}
 	black   = colorful.Color{0, 0, 0}
 	blue    = colorful.Color{0, 0, 1}
 	green   = colorful.Color{0, 1, 0}

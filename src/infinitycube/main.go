@@ -14,6 +14,8 @@ import (
 	"flag"
 	"fmt"
 	"time"
+	"reflect"
+	"github.com/fatih/structs"
 )
 
 const (
@@ -58,6 +60,8 @@ func main() {
 	//audio := StartAudioProcessing(rawSoundData)
 	//webInterface := StartWebServer(audio)
   eH.addCellularAutomata(1.0, 0.0, .3, 152)
+	fmt.Println(reflect.TypeOf(eH.Effects[0]))
+	fmt.Println(structs.Names(eH.Effects[0]))
 	for{eH.render()}
 }
 
