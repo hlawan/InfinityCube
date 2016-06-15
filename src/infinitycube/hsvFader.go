@@ -39,5 +39,5 @@ func (r *HsvFader) Tick(start time.Time, o interface{}) {
 		r.Leds[i].CheckColor()
 	}
 
-	r.Consumer.AddPreCube(r.Leds, r.ColorOpacity, r.BlackOpacity)
+	r.Consumer.AddPattern(r.Leds, r.ColorOpacity, r.BlackOpacity)
 }

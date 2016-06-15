@@ -33,7 +33,7 @@ func (e *Equalizer) WhiteSpectrum() {
 			e.sound.spektralDensity[(i%EDGE_LENGTH)+1],
 			e.sound.spektralDensity[(i%EDGE_LENGTH)+1]}
 	}
-	e.Consumer.AddPreCube(e.Leds, e.ColorOpacity, e.BlackOpacity)
+	e.Consumer.AddPattern(e.Leds, e.ColorOpacity, e.BlackOpacity)
 }
 
 func (e *Equalizer) WhiteEdgeSpectrum() {
@@ -50,7 +50,7 @@ func (e *Equalizer) WhiteEdgeSpectrum() {
 				e.sound.spektralDensity[EDGE_LENGTH-(i%EDGE_LENGTH)+10]}
 		}
 	}
-	e.Consumer.AddPreCube(e.Leds, e.ColorOpacity, e.BlackOpacity)
+	e.Consumer.AddPattern(e.Leds, e.ColorOpacity, e.BlackOpacity)
 }
 
 func (e *Equalizer) EdgeVolume() {
@@ -77,7 +77,7 @@ func (e *Equalizer) EdgeVolume() {
 		}
 	}
 
-	e.Consumer.AddPreCube(e.Leds, e.ColorOpacity, e.BlackOpacity)
+	e.Consumer.AddPattern(e.Leds, e.ColorOpacity, e.BlackOpacity)
 }
 
 func notNegative(nr float64) float64 {

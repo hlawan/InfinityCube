@@ -45,10 +45,23 @@ var (
 
 func main() {
 	flag.Parse()
-	rawSoundData := StartSoundTracking()
-	audio := StartAudioProcessing(rawSoundData)
-	webInterface := StartWebServer(audio)
 
+	c, err := NewCube(*serverPtr, LEDS)
+	if err != nil {
+		fmt.Print(err)
+		return
+	}
+
+	eH := NewEffectHandler(c, fpsTarget)
+
+	//rawSoundData := StartSoundTracking()
+	//audio := StartAudioProcessing(rawSoundData)
+	//webInterface := StartWebServer(audio)
+  eH.addCellularAutomata(1.0, 0.0, .3, 152)
+	for{eH.render()}
+}
+
+/*
 	//initializing generators, cubes, filters...
 	myHsvFader := NewHsvFader(0, LEDS, 10, .20, 0)
 	brl := NewBinaryRunningLight(LEDS, 1, .5, 0)
@@ -58,14 +71,10 @@ func main() {
 	grl1 := NewGausRunningLight(red, 1*EDGE_LENGTH, 2, .5, 0)
 	grl2 := NewGausRunningLight(violett, 4*EDGE_LENGTH, 11, .5, 0)
 	eq := NewEqualizer(0, LEDS, 1, 0, audio)
-	cA := NewCellularAutomata(1, 0, 152, .5)
+	//cA := NewCellularAutomata(1, 0, 152, .5)
 	i0 := &IntervalTicker{Interval: 10 * time.Microsecond / 2 / EDGE_LENGTH}
 
-	c, err := NewCube(*serverPtr)
-	if err != nil {
-		fmt.Print(err)
-		return
-	}
+
 
 	//combining all parts as liked
 
@@ -80,7 +89,7 @@ func main() {
 	grl2.Consumer = c
 	//bf.Consumer = c
 	eq.Consumer = c
-	cA.Consumer = c
+	//cA.Consumer = c
 
 	i0.Consumer = rl1
 
@@ -120,10 +129,10 @@ func main() {
 			eq.WhiteSpectrum()
 		case 6:
 			//eq.WhiteEdgeSpectrum()
-			cA.Update()
+			//cA.Update()
 		}
 
-		c.renderCube()
+		c.render()
 
 		b := time.Now()
 		elapsed = b.Sub(a)
@@ -157,4 +166,4 @@ func main() {
 			o++
 		}
 	}
-}
+	*/

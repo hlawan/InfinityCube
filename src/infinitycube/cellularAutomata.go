@@ -6,24 +6,25 @@ import (
 )
 
 type CellularAutomata struct {
-	Consumer
-	//Offset       int
 	ColorOpacity float64
 	BlackOpacity float64
 	Rule         int
 	SecsPerGen   float64
 	lastUpdate   time.Time
-	Leds         [LEDS]Led
+	Leds         []Led
+	myDisplay		 Display
 }
 
-func NewCellularAutomata(colorOpacity, blackOpacity float64, rule int, secsPerGen float64) *CellularAutomata {
+func NewCellularAutomata(newDisplay Display, colorOpacity, blackOpacity float64, rule int, secsPerGen float64) *CellularAutomata {
 	cA := &CellularAutomata{
 		ColorOpacity: colorOpacity,
 		BlackOpacity: blackOpacity,
 		Rule:         rule,
-		SecsPerGen:   secsPerGen}
+		SecsPerGen:   secsPerGen,
+		myDisplay:		newDisplay,
+		Leds: 				make([]Led, newDisplay.NrOfLeds())}
 
-	rand.Seed(42)
+	rand.Seed(int64(time.Now().Nanosecond()))
 	cA.lastUpdate = time.Now()
 
 	for i := 0; i < LEDS; i++ {
@@ -38,7 +39,7 @@ func NewCellularAutomata(colorOpacity, blackOpacity float64, rule int, secsPerGe
 
 func (cA *CellularAutomata) Update() {
 	var a, b, c bool
-	var nextGen [LEDS]Led
+	nextGen := make([]Led, len(cA.Leds))
 	if time.Since(cA.lastUpdate) > (150 * time.Millisecond) {
 		for i := 0; i < LEDS; i++ {
 			if i == 0 {
@@ -62,7 +63,7 @@ func (cA *CellularAutomata) Update() {
 			}
 		}
 		cA.Leds = nextGen
-		cA.Consumer.AddPreCube(cA.Leds, cA.ColorOpacity, cA.BlackOpacity)
+		cA.myDisplay.AddPattern(cA.Leds, cA.ColorOpacity, cA.BlackOpacity)
 		cA.lastUpdate = time.Now()
 	}
 }

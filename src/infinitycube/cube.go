@@ -1,36 +1,48 @@
 package main
 
 import (
-  "log"
-  "time"
 	"github.com/kellydunn/go-opc"
 	"github.com/lucasb-eyer/go-colorful"
+	"log"
+	"time"
 )
 
 type Cube struct {
 	fadeCandy *opc.Client
-	preCubes  []PreCube    //every effect generator adds a PreCube
-	finalCube [LEDS]Led    //all PreCubes are merged to one finalCube, which then will be sent to the real cube
+	Patterns  []Pattern //every effect generator adds a Pattern
+	finalCube []Led     //all Patterns are merged to one finalCube, which then will be sent to the real cube
 }
 
 type Consumer interface {
 	Tick(time.Duration, interface{})
-	AddPreCube([LEDS]Led, float64, float64)
+	AddPattern([LEDS]Led, float64, float64)
 }
 
-func NewCube(server string) (c *Cube, err error) {
+func NewCube(server string, nrOfLeds int) (c *Cube, err error) {
 	// Create a client
 	oc := opc.NewClient()
 	err = oc.Connect("tcp", server)
-	c = &Cube{fadeCandy: oc}
+	c = &Cube{
+		fadeCandy: oc,
+		finalCube: make([]Led, nrOfLeds)}
+
 	if err != nil {
 		log.Fatal("Could not connect to Fadecandy server", err)
 	}
 	return
 }
 
-func (c *Cube) renderCube() {
-	c.MergePreCubes()
+func (c *Cube) NrOfLeds() (nrOfLeds int) {
+	return len(c.finalCube)
+}
+
+func (c *Cube) render() {
+	c.MergePatterns()
+	c.resetPatterns()
+}
+
+func (c *Cube) Show() {
+  c.render()
 	leds := c.finalCube
 
 	// send pixel data
@@ -46,44 +58,46 @@ func (c *Cube) renderCube() {
 	if err != nil {
 		log.Println("couldn't send color", err)
 	}
-  c.resetPreCubes()
 }
 
 func (c *Cube) Tick(d time.Duration, o interface{}) {
-  //moved stuff to renderCube()
+	//moved stuff to renderCube()
 }
 
-type PreCube struct {
-	leds         [LEDS]Led
+type Pattern struct {
+	leds         []Led
 	colorOpacity float64
 	blackOpacity float64
 }
 
-func NewPreCube(newLeds [LEDS]Led, cOp, bOp float64) (pc *PreCube) {
-	pc = &PreCube{leds: newLeds, colorOpacity: cOp, blackOpacity: bOp}
+func NewPattern(newLeds []Led, cOp, bOp float64) (pc *Pattern) {
+	pc = &Pattern{
+		leds:         newLeds,
+		colorOpacity: cOp,
+		blackOpacity: bOp}
 	return
 }
 
-func (c *Cube) AddPreCube(leds [LEDS]Led, colorOpacity float64, blackOpacity float64) {
-	pc := NewPreCube(leds, colorOpacity, blackOpacity)
-	c.preCubes = append(c.preCubes, *pc)
+func (c *Cube) AddPattern(leds []Led, colorOpacity float64, blackOpacity float64) {
+	pc := NewPattern(leds, colorOpacity, blackOpacity)
+	c.Patterns = append(c.Patterns, *pc)
 }
 
-func (c *Cube) resetPreCubes() {
-	c.preCubes = nil
+func (c *Cube) resetPatterns() {
+	c.Patterns = nil
 }
 
-func (c *Cube) MergePreCubes() {
+func (c *Cube) MergePatterns() {
 	black := colorful.Color{0, 0, 0}
-	for i := range c.preCubes {
+	for i := range c.Patterns {
 		for p := 0; p < LEDS; p++ {
-			if i == 0 { //we dont want to merge the first PreCube with the still black "finalCube"
-				c.finalCube[p] = c.preCubes[i].leds[p]
-			} else { //and later we merge all folowing PreCubes
-				if c.preCubes[i].leds[p].Color == black {
-					c.finalCube[p].Color = c.finalCube[p].Color.BlendRgb(c.preCubes[i].leds[p].Color, c.preCubes[i].blackOpacity)
+			if i == 0 { //we dont want to merge the first Pattern with the still black "finalCube"
+				c.finalCube[p] = c.Patterns[i].leds[p]
+			} else { //and later we merge all folowing Patterns
+				if c.Patterns[i].leds[p].Color == black {
+					c.finalCube[p].Color = c.finalCube[p].Color.BlendRgb(c.Patterns[i].leds[p].Color, c.Patterns[i].blackOpacity)
 				} else {
-					c.finalCube[p].Color = c.finalCube[p].Color.BlendRgb(c.preCubes[i].leds[p].Color, c.preCubes[i].colorOpacity)
+					c.finalCube[p].Color = c.finalCube[p].Color.BlendRgb(c.Patterns[i].leds[p].Color, c.Patterns[i].colorOpacity)
 				}
 			}
 		}

@@ -65,7 +65,7 @@ func (r *RunningLight) Tick(d time.Duration, o interface{}) {
 		}
 	}
 
-	r.Consumer.AddPreCube(r.Leds, r.ColorOpacity, r.BlackOpacity)
+	r.Consumer.AddPattern(r.Leds, r.ColorOpacity, r.BlackOpacity)
 }
 
 //-----------------------------------------------------------------------------
@@ -113,7 +113,7 @@ func (g *BinaryRunningLight) Tick(d time.Duration, o interface{}) {
 		cube[i] = v
 	}
 	//g.Consumer.Tick(d, g.Leds[g.Offset:g.Offset+LEDS])
-	g.Consumer.AddPreCube(cube, g.ColorOpacity, g.BlackOpacity)
+	g.Consumer.AddPattern(cube, g.ColorOpacity, g.BlackOpacity)
 }
 
 //-----------------------------------------------------------------------------
@@ -158,7 +158,7 @@ func (r *GausRunningLight) Tick(d time.Duration, o interface{}) {
 		}
 	}
 
-	r.Consumer.AddPreCube(r.Leds, r.ColorOpacity, r.BlackOpacity)
+	r.Consumer.AddPattern(r.Leds, r.ColorOpacity, r.BlackOpacity)
 }
 
 //-----------------------------------------------------------------------------
