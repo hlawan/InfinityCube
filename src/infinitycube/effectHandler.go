@@ -2,6 +2,11 @@ package main
 
 import (
 	"time"
+	"reflect"
+	//"fmt"
+	"strings"
+	"encoding/json"
+	//"github.com/fatih/structs"
 )
 
 // An Effector is able to generate (light-)Patterns. The Update() method gets
@@ -23,7 +28,9 @@ type Display interface {
 // updating all active Effectors the EffectHandler calls the show() method of
 // its Display. The updateRate defines the frames per second.
 type EffectHandler struct {
-	Effects    []Effector
+	activeEffects    []Effector
+	effectProperties map[int][]byte
+	availableEffects []string
 	myDisplay  Display
 	lastUpdate time.Time
 	updateRate int
@@ -35,8 +42,30 @@ func NewEffectHandler(newDisplay Display, newUpdateRate int) (eH *EffectHandler)
 		myDisplay:  newDisplay,
 		lastUpdate: time.Now(),
 		updateRate: newUpdateRate,
-		loopTime:   10 * time.Millisecond}
+		loopTime:   10 * time.Millisecond,
+		effectProperties: make(map[int][]byte)}
+
+	eH.listAvailableEffects()
 	return
+}
+
+func (eH *EffectHandler) listAvailableEffects() {
+	eHType := reflect.TypeOf(eH)
+	for i := 0; i < eHType.NumMethod(); i++ {
+			method := eHType.Method(i).Name
+			if strings.Contains(method, "add") {
+				method = strings.TrimPrefix(method, "add")
+				eH.availableEffects = append(eH.availableEffects, method)
+			}
+	}
+}
+
+func (eH *EffectHandler) listEffectProperties() {
+	var err error
+	for i,ele := range eH.activeEffects {
+		eH.effectProperties[i], err = json.Marshal(ele)
+		CheckErr(err)
+	}
 }
 
 func (eH *EffectHandler) render() {
@@ -51,12 +80,13 @@ func (eH *EffectHandler) render() {
 }
 
 func (eH *EffectHandler) updateAll() {
-	for _, effect := range eH.Effects {
+	for _, effect := range eH.activeEffects {
 		effect.Update()
 	}
 }
 
 func (eH *EffectHandler) addCellularAutomata(colorOpacity, blackOpacity, secsPerGen float64, rule int) {
 	cA := NewCellularAutomata(eH.myDisplay, colorOpacity, blackOpacity, rule, secsPerGen)
-	eH.Effects = append(eH.Effects, cA)
+	eH.activeEffects = append(eH.activeEffects, cA)
+	eH.listEffectProperties() //where is a nice place for me?
 }

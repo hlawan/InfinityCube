@@ -14,8 +14,8 @@ import (
 	"flag"
 	"fmt"
 	"time"
-	"reflect"
-	"github.com/fatih/structs"
+	//"reflect"
+	//"github.com/fatih/structs"
 )
 
 const (
@@ -60,7 +60,8 @@ func main() {
 	//audio := StartAudioProcessing(rawSoundData)
 	//webInterface := StartWebServer(audio)
   eH.addCellularAutomata(1.0, 0.0, .3, 152)
-
+	
+/*
 	eHType := reflect.TypeOf(eH)
 	for i := 0; i < eHType.NumMethod(); i++ {
 	    method := eHType.Method(i)
@@ -71,6 +72,7 @@ func main() {
 
 	fmt.Println(reflect.TypeOf(eH.Effects[0]))
 	fmt.Println(structs.Names(eH.Effects[0]))
+*/
 	for{eH.render()}
 }
 

@@ -10,8 +10,7 @@ import (
 	"time"
 )
 
-// /*Status gathers all the information that is passed on to the webserver.
-
+// Status gathers all the information that is passed on to the webserver.
 type Status struct {
 	io.ReadWriter
 	SoundSignal      []SAMPLE
