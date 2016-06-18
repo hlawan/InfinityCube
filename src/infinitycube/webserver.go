@@ -13,6 +13,7 @@ import (
 // Status gathers all the information that is passed on to the webserver.
 type Status struct {
 	io.ReadWriter
+	AvailableEffects []string
 	SoundSignal      []SAMPLE
 	SpectralDensity  []float64
 	Freqs            []float64
@@ -24,10 +25,14 @@ type Status struct {
 	clapSelect       bool
 }
 
-func NewStatus(data *ProcessedAudio, h io.ReadWriter) (s *Status) {
+func NewStatus(data *ProcessedAudio, fx []string, h io.ReadWriter) (s *Status) {
 	//data.Lock()
 	//defer data.Unlock()
+	var err error
 	s = &Status{ReadWriter: h}
+	s.AvailableEffects = make([]string, len(fx))
+	s.AvailableEffects = fx
+	CheckErr(err)
 	s.SoundSignal = data.recordedSamples
 	fmt.Println(len(data.spektralDensity), len(data.freqs))
 	s.SpectralDensity = make([]float64, len(data.spektralDensity))
@@ -60,22 +65,22 @@ func (s *Status) UpdateStatus(data *ProcessedAudio) {
 		for i := 0; i < len(data.freqs); i++ {
 			s.SpectralDensity[i] = data.spektralDensity[i]
 			s.Freqs[i] = data.freqs[i]
-			s.CurrentVolume = data.currentVolume
-			s.AverageVolume = data.averageVolume
-			s.MaxPeak = data.maxPeak
-			s.PeakAverageRatio = data.peakAverageRatio
 		}
+		s.CurrentVolume = data.currentVolume
+		s.AverageVolume = data.averageVolume
+		s.MaxPeak = data.maxPeak
+		s.PeakAverageRatio = data.peakAverageRatio
 		//data.Unlock()
 		time.Sleep(23 * time.Millisecond)
 	}
 }
 
-func StartWebServer(data *ProcessedAudio) (s *Status) {
+func StartWebServer(data *ProcessedAudio, fx []string) (s *Status) {
 	var h io.ReadWriter
 	var err error
 	h, err = os.OpenFile(*serial_port, os.O_RDWR, 0)
 	CheckErr(err)
-	s = NewStatus(data, h)
+	s = NewStatus(data, fx, h)
 	go s.UpdateStatus(data)
 
 	http.Handle("/toggle", s)

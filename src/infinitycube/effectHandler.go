@@ -1,11 +1,11 @@
 package main
 
 import (
-	"time"
 	"reflect"
+	"time"
 	//"fmt"
-	"strings"
 	"encoding/json"
+	"strings"
 	//"github.com/fatih/structs"
 )
 
@@ -31,18 +31,18 @@ type EffectHandler struct {
 	activeEffects    []Effector
 	effectProperties map[int][]byte
 	availableEffects []string
-	myDisplay  Display
-	lastUpdate time.Time
-	updateRate int
-	loopTime   time.Duration
+	myDisplay        Display
+	lastUpdate       time.Time
+	updateRate       int
+	loopTime         time.Duration
 }
 
 func NewEffectHandler(newDisplay Display, newUpdateRate int) (eH *EffectHandler) {
 	eH = &EffectHandler{
-		myDisplay:  newDisplay,
-		lastUpdate: time.Now(),
-		updateRate: newUpdateRate,
-		loopTime:   10 * time.Millisecond,
+		myDisplay:        newDisplay,
+		lastUpdate:       time.Now(),
+		updateRate:       newUpdateRate,
+		loopTime:         10 * time.Millisecond,
 		effectProperties: make(map[int][]byte)}
 
 	eH.listAvailableEffects()
@@ -52,17 +52,17 @@ func NewEffectHandler(newDisplay Display, newUpdateRate int) (eH *EffectHandler)
 func (eH *EffectHandler) listAvailableEffects() {
 	eHType := reflect.TypeOf(eH)
 	for i := 0; i < eHType.NumMethod(); i++ {
-			method := eHType.Method(i).Name
-			if strings.Contains(method, "add") {
-				method = strings.TrimPrefix(method, "add")
-				eH.availableEffects = append(eH.availableEffects, method)
-			}
+		method := eHType.Method(i).Name
+		if strings.Contains(method, "add") {
+			method = strings.TrimPrefix(method, "add")
+			eH.availableEffects = append(eH.availableEffects, method)
+		}
 	}
 }
 
 func (eH *EffectHandler) listEffectProperties() {
 	var err error
-	for i,ele := range eH.activeEffects {
+	for i, ele := range eH.activeEffects {
 		eH.effectProperties[i], err = json.Marshal(ele)
 		CheckErr(err)
 	}

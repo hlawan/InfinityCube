@@ -55,12 +55,12 @@ func main() {
 	}
 
 	eH := NewEffectHandler(c, fpsTarget)
+	eH.addCellularAutomata(1.0, 0.0, .3, 152)
 
-	//rawSoundData := StartSoundTracking()
-	//audio := StartAudioProcessing(rawSoundData)
-	//webInterface := StartWebServer(audio)
-  eH.addCellularAutomata(1.0, 0.0, .3, 152)
-	
+	rawSoundData := StartSoundTracking()
+	audio := StartAudioProcessing(rawSoundData)
+	StartWebServer(audio, eH.availableEffects)
+
 /*
 	eHType := reflect.TypeOf(eH)
 	for i := 0; i < eHType.NumMethod(); i++ {
