@@ -3,6 +3,9 @@ $ = jQuery
 window.onload = ->
   #window.setInterval(update, 1000/5) #set updaterate to __hz
   $('#cube').css('margin', 1).css('width', 330).css('height', 430).svg({loadURL: 'fancycube.svg'}) #need 4 resizehandler
+  $.get('status', (data) ->
+    fillEffectSelector(data)
+  , 'json')
   bindEffectSelector()
   bindClapSelector()
   # initJsPlumb()
@@ -78,6 +81,16 @@ update = ->
 #   }, duration: 'slow'
 #
 #   return
+
+fillEffectSelector = (data) ->
+  opt = ""
+  for i in data['AvailableEffects']
+    console.log(i)
+    opt += "<option value='" + i + "'>" + i + "</option>"
+    
+  $('#effects').html("")
+  $('#effects').append(opt)
+
 
 bindEffectSelector = ->
   $('#effects').bind 'change', ->

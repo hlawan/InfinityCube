@@ -90,3 +90,7 @@ func (eH *EffectHandler) addCellularAutomata(colorOpacity, blackOpacity, secsPer
 	eH.activeEffects = append(eH.activeEffects, cA)
 	eH.listEffectProperties() //where is a nice place for me?
 }
+
+func (eH *EffectHandler) addRunningLight(){
+	
+}
