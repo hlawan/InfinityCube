@@ -45,24 +45,25 @@ check-format:
 static:
 	mkdir -p static
 
-
-images:
-	mkdir -p static/images
-
 static/jquery.js: static
 	test -e "$@" || wget "http://code.jquery.com/jquery-$(JQUERYVERSION).min.js" -O "$@"
+
+static/jquery.flot.js: static
+	test -e "$@" || wget "https://github.com/flot/flot/blob/master/jquery.flot.js" -O "$@"
+
+static/curvedLines.js: static
+	test -e "$@" || wget "https://github.com/MichaelZinsmaier/CurvedLines/blob/master/curvedLines.js" -O "$@"
 
 static/%.js: frontend/%.coffee static
 	coffee --compile --output static "$<"
 
-SCRIPTS = static/jquery.js static/infinitycube.js static/sound.js
-STATIC  = frontend/*.html frontend/*.svg frontend/*.css frontend/*.js frontend/*.ico
-IMAGES = frontend/images/*.png
+SCRIPTS = static/jquery.js static/infinitycube.js static/sound.js 	\
+					static/jquery.flot.js static/curvedLines.js
+STATIC  = frontend/*.html frontend/*.css frontend/*.js frontend/*.ico
 
 .PHONY: content
-content: static $(SCRIPTS) images
+content: static $(SCRIPTS)
 	cp --update $(STATIC) static
-	cp --update $(IMAGES) static/images
 
 .PHONY: simulation
 simulation: infinitycube content
