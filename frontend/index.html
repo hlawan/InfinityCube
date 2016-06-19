@@ -5,6 +5,7 @@
 <head>
   <title>InfinityCube</title>
   <link rel="stylesheet" type="text/css" media="screen" href="style.css" />
+  <link rel="stylesheet" type="text/css" media="screen" href="dropdown.css" />
   <script src="jquery.js" type="text/javascript"></script>
   <script src="infinitycube.js" type="text/javascript"></script>
 </head>
@@ -34,7 +35,9 @@
     <div id="outer2">
       <h3>Control</h3>
       <p>Select your Effect:</p>
-      <select id="effects" name="effects"></select><br>
+      <div class="dropdown dropdown-dark">
+        <select name="effects" id="effects" class="dropdown-select"></select>
+      </div><br>
       <input type="checkbox" id="clapSelect" value="1">switch effects by clapping<br>
     </div> <!-- end outer2 -->
 
