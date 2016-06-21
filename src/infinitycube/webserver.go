@@ -14,6 +14,7 @@ import (
 type Status struct {
 	io.ReadWriter
 	AvailableEffects []string
+	ActiveEffects 	 []string
 	effectRequest		 chan string
 	SoundSignal      []SAMPLE
 	SpectralDensity  []float64
@@ -22,33 +23,30 @@ type Status struct {
 	AverageVolume    float64
 	MaxPeak          float64
 	PeakAverageRatio float64
-	selectedEffect   string
 	clapSelect       bool
 }
 
 func NewStatus(data *ProcessedAudio, fx []string, ch chan string, h io.ReadWriter) (s *Status) {
 	//data.Lock()
 	//defer data.Unlock()
-	var err error
 	s = &Status{
 		ReadWriter: h,
 		effectRequest: ch}
 	s.AvailableEffects = make([]string, len(fx))
 	s.AvailableEffects = fx
-	CheckErr(err)
+	s.ActiveEffects = make([]string, 0)
 	s.SoundSignal = data.recordedSamples
 	fmt.Println(len(data.spektralDensity), len(data.freqs))
 	s.SpectralDensity = make([]float64, len(data.spektralDensity))
 	s.Freqs = make([]float64, len(data.freqs))
-	s.selectedEffect = ""
 	s.clapSelect = false
 	return s
 }
 
 func (s *Status) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	s.selectedEffect = req.FormValue("t")
-	fmt.Println("Selected effect", s.selectedEffect)
-	s.effectRequest <- s.selectedEffect
+	effRequest := req.FormValue("t")
+	fmt.Println("Effect Request: ", effRequest)
+	go s.requestEffect(effRequest)
 
 	c := req.FormValue("c")
 	if c == "true" {
@@ -59,6 +57,19 @@ func (s *Status) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	w.Header().Add("Content-Type", "text/json")
 	json.NewEncoder(w).Encode(s)
+}
+
+func (s *Status) requestEffect(eff string) {
+	s.effectRequest <- eff
+	newActEff := make([]string,0)
+	for actEff := range s.effectRequest {
+		if actEff == "done" {
+			break
+		}
+		newActEff = append(newActEff, actEff)
+	}
+	fmt.Println("Active Effects: ", newActEff)
+	s.ActiveEffects = newActEff
 }
 
 func (s *Status) UpdateStatus(data *ProcessedAudio) {

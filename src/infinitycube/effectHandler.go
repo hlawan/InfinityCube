@@ -72,7 +72,9 @@ func (eH *EffectHandler) updateAll() {
 func (eH *EffectHandler) handleRequests() (err error){
   eHValue := reflect.ValueOf(eH)
 	for{
+		//receive effect request from webserver
 		req := <- eH.effectRequest
+		//add requested effect to activeEffects
 		req = "Add" + req
   	m := eHValue.MethodByName(req)
   	if !m.IsValid() {
@@ -80,6 +82,12 @@ func (eH *EffectHandler) handleRequests() (err error){
   	}
   	in := make([]reflect.Value, 0)
   	m.Call(in)
+		//send updated list of active effects to webserver
+		for _, effect := range eH.activeEffects {
+			eType := reflect.TypeOf(effect)
+			eH.effectRequest <- eType.Elem().Name()
+		}
+		eH.effectRequest <- "done"
 	}
 }
 
