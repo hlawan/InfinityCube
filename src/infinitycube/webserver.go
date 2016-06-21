@@ -6,14 +6,15 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"strconv"
 	"time"
 )
 
-// Status gathers all the information that is passed on to the webserver.
+// Status gathers all the information that is passed to or received from
+// the webserver.
 type Status struct {
 	io.ReadWriter
 	AvailableEffects []string
+	effectRequest		 chan string
 	SoundSignal      []SAMPLE
 	SpectralDensity  []float64
 	Freqs            []float64
@@ -21,15 +22,17 @@ type Status struct {
 	AverageVolume    float64
 	MaxPeak          float64
 	PeakAverageRatio float64
-	selectedEffect   int
+	selectedEffect   string
 	clapSelect       bool
 }
 
-func NewStatus(data *ProcessedAudio, fx []string, h io.ReadWriter) (s *Status) {
+func NewStatus(data *ProcessedAudio, fx []string, ch chan string, h io.ReadWriter) (s *Status) {
 	//data.Lock()
 	//defer data.Unlock()
 	var err error
-	s = &Status{ReadWriter: h}
+	s = &Status{
+		ReadWriter: h,
+		effectRequest: ch}
 	s.AvailableEffects = make([]string, len(fx))
 	s.AvailableEffects = fx
 	CheckErr(err)
@@ -37,15 +40,15 @@ func NewStatus(data *ProcessedAudio, fx []string, h io.ReadWriter) (s *Status) {
 	fmt.Println(len(data.spektralDensity), len(data.freqs))
 	s.SpectralDensity = make([]float64, len(data.spektralDensity))
 	s.Freqs = make([]float64, len(data.freqs))
-	s.selectedEffect = 0
+	s.selectedEffect = ""
 	s.clapSelect = false
 	return s
 }
 
 func (s *Status) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	t := req.FormValue("t")
-	s.selectedEffect, _ = strconv.Atoi(t)
+	s.selectedEffect = req.FormValue("t")
 	fmt.Println("Selected effect", s.selectedEffect)
+	s.effectRequest <- s.selectedEffect
 
 	c := req.FormValue("c")
 	if c == "true" {
@@ -75,12 +78,12 @@ func (s *Status) UpdateStatus(data *ProcessedAudio) {
 	}
 }
 
-func StartWebServer(data *ProcessedAudio, fx []string) (s *Status) {
+func StartWebServer(data *ProcessedAudio, fx []string, ch chan string) (s *Status) {
 	var h io.ReadWriter
 	var err error
 	h, err = os.OpenFile(*serial_port, os.O_RDWR, 0)
 	CheckErr(err)
-	s = NewStatus(data, fx, h)
+	s = NewStatus(data, fx, ch, h)
 	go s.UpdateStatus(data)
 
 	http.Handle("/toggle", s)

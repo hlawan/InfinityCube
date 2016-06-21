@@ -15,6 +15,7 @@ type CellularAutomata struct {
 	myDisplay		 Display
 }
 
+/*
 func NewCellularAutomata(newDisplay Display, colorOpacity, blackOpacity float64, rule int, secsPerGen float64) *CellularAutomata {
 	cA := &CellularAutomata{
 		ColorOpacity: colorOpacity,
@@ -24,9 +25,27 @@ func NewCellularAutomata(newDisplay Display, colorOpacity, blackOpacity float64,
 		myDisplay:		newDisplay,
 		Leds: 				make([]Led, newDisplay.NrOfLeds())}
 
-	rand.Seed(int64(time.Now().Nanosecond()))
 	cA.lastUpdate = time.Now()
+	cA.sprinkle()
+	return cA
+}*/
 
+func NewCellularAutomata(newDisplay Display) *CellularAutomata {
+	cA := &CellularAutomata{
+		ColorOpacity: 0.5,
+		BlackOpacity: 0.0,
+		Rule:         152,
+		SecsPerGen:   0.33,
+		myDisplay:		newDisplay,
+		Leds: 				make([]Led, newDisplay.NrOfLeds())}
+
+	cA.lastUpdate = time.Now()
+	cA.sprinkle()
+	return cA
+}
+
+func (cA *CellularAutomata) sprinkle() {
+	rand.Seed(int64(time.Now().Nanosecond()))
 	for i := 0; i < LEDS; i++ {
 		if rand.Float64() < 0.3 {
 			cA.Leds[i].Color = red
@@ -34,7 +53,6 @@ func NewCellularAutomata(newDisplay Display, colorOpacity, blackOpacity float64,
 			cA.Leds[i].Color = black
 		}
 	}
-	return cA
 }
 
 func (cA *CellularAutomata) Update() {

@@ -55,11 +55,11 @@ func main() {
 	}
 
 	eH := NewEffectHandler(c, fpsTarget)
-	eH.addCellularAutomata(1.0, 0.0, .3, 152)
+	//eH.addCellularAutomata()
 
 	rawSoundData := StartSoundTracking()
 	audio := StartAudioProcessing(rawSoundData)
-	StartWebServer(audio, eH.availableEffects)
+	StartWebServer(audio, eH.availableEffects, eH.effectRequest)
 
 /*
 	eHType := reflect.TypeOf(eH)
