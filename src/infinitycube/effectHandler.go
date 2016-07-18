@@ -162,6 +162,12 @@ func (eH *EffectHandler) AddEdgeVolume() {
 	eH.listEffectProperties() //where is a nice place for me?
 }
 
+func (eH *EffectHandler) AddHsvFade() {
+	hsv := NewHsvFade(eH.myDisplay, eH.updateRate)
+	eH.activeEffects = append(eH.activeEffects, hsv)
+	eH.listEffectProperties() //where is a nice place for me?
+}
+
 
 func (eH *EffectHandler) AddRunningLight(){
 	fmt.Println("look at me I'm so pretty :-*")

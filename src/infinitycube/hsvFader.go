@@ -2,42 +2,37 @@ package main
 
 import (
 	"github.com/lucasb-eyer/go-colorful"
-	"time"
 )
 
-type HsvFader struct {
-	Consumer
-	FirstLed        int
-	Length          int 			//Nr of Leds
+type HsvFade struct {
+	*Effect
 	ColorDifference float64
-	TimeFullFade    int 			//in Seconds
-	ColorOpacity    float64
-	BlackOpacity    float64
-	Leds            [LEDS]Led
+	TimeFullFade    int //in Seconds
+	fpsTarget       int
 }
 
-func NewHsvFader(firstLed, length, timeFullFade int, colorOpacity, blackOpacity float64) *HsvFader {
-	r := &HsvFader{
-		FirstLed:     firstLed,
-		Length:       length,
-		TimeFullFade: timeFullFade,
-		ColorOpacity: colorOpacity,
-		BlackOpacity: blackOpacity}
+func NewHsvFade(disp Display, fps int) *HsvFade {
+	ef := NewEffect(disp, 0.5, 0.0)
 
-	for i := r.FirstLed; i < (r.Length + r.FirstLed); i++ {
+	r := &HsvFade{
+		Effect:       ef,
+		TimeFullFade: 20,
+		fpsTarget:    fps}
+
+	for i := r.Offset; i < (r.Length + r.Offset); i++ {
 		r.Leds[i].Color = colorful.Color{0, 255, 0}
 	}
-	r.ColorDifference = (float64(H_MAX-H_MIN) / float64(r.TimeFullFade*fpsTarget))
+	r.ColorDifference = (float64(H_MAX-H_MIN) / float64(r.TimeFullFade*r.fpsTarget))
 	return r
 }
 
-func (r *HsvFader) Tick(start time.Time, o interface{}) {
+func (r *HsvFade) Update() {
 	var h float64
-	for i := r.FirstLed; i < (r.Length + r.FirstLed); i++ {
+	for i := r.Offset; i < (r.Length + r.Offset); i++ {
 		h, _, _ = r.Leds[i].Color.Hsv()
 		r.Leds[i].Color = colorful.Hsv(h+r.ColorDifference, 1, 1)
 		r.Leds[i].CheckColor()
 	}
 
-	r.Consumer.AddPattern(r.Leds, r.ColorOpacity, r.BlackOpacity)
+	r.myDisplay.AddPattern(r.Leds, r.ColorOpacity, r.BlackOpacity)
 }

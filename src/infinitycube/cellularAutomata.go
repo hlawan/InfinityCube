@@ -7,9 +7,9 @@ import (
 
 type CellularAutomata struct {
 	*Effect
-	Rule         int
-	SecsPerGen   float64
-	lastUpdate   time.Time
+	Rule       int
+	SecsPerGen float64
+	lastUpdate time.Time
 }
 
 /*
@@ -31,9 +31,9 @@ func NewCellularAutomata(newDisp Display) *CellularAutomata {
 	ef := NewEffect(newDisp, 0.5, 0.0)
 
 	cA := &CellularAutomata{
-		Effect:				ef,
-		Rule:         152,
-		SecsPerGen:   0.33}
+		Effect:     ef,
+		Rule:       152,
+		SecsPerGen: 0.33}
 
 	cA.lastUpdate = time.Now()
 	cA.sprinkle()
