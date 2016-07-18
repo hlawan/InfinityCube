@@ -3,28 +3,23 @@ package main
 import (
 	"github.com/lucasb-eyer/go-colorful"
 	"math"
-	"time"
 )
 
 type RunningLight struct {
-	Consumer
+	*Effect
 	colorful.Color
-	Position     float64
-	Delta        float64
-	Length       int
-	ColorOpacity float64
-	BlackOpacity float64
-	Leds         [LEDS]Led
+	Position float64
+	Delta    float64
 }
 
-func NewRunningLight(color colorful.Color, length int, delta, colorOpacity, blackOpacity float64) *RunningLight {
+func NewRunningLight(disp Display) *RunningLight {
+	ef := NewEffect(disp, 0.5, 0.0)
+
 	r := &RunningLight{
-		Color:        color,
-		Length:       length,
-		Delta:        delta,
-		ColorOpacity: colorOpacity,
-		BlackOpacity: blackOpacity,
-	}
+		Effect: ef,
+		Color:  red,
+		Delta:  0.0001}
+
 	return r
 }
 
@@ -48,102 +43,50 @@ func dist(a, b float64) float64 {
 	return math.Abs(a - b)
 }
 
-func (r *RunningLight) Tick(d time.Duration, o interface{}) {
-	advance := o.(bool)
+func (r *RunningLight) Update() {
 
-	if advance {
-		r.Position += r.Delta
-		if r.Position > 1 {
-			r.Position -= 1
-		}
-
-		pos := r.Position * float64(r.Length)
-		for i, _ := range r.Leds {
-			j := i % r.Length
-			r.Leds[i].Color = BLACK.BlendRgb(r.Color, 1-min(1, dist(pos, float64(j))))
-		}
+	//if advance { // need a new system to define speed here
+	r.Position += r.Delta
+	if r.Position > 1 {
+		r.Position -= 1
 	}
 
-	r.Consumer.AddPattern(r.Leds, r.ColorOpacity, r.BlackOpacity)
-}
-
-//-----------------------------------------------------------------------------
-type BinaryRunningLight struct {
-	Consumer
-	Offset       int
-	Length       int
-	Direction    int
-	ColorOpacity float64
-	BlackOpacity float64
-	Leds         [LEDS * 2]Led
-}
-
-func NewBinaryRunningLight(length, direction int, colorOpacity, blackOpacity float64) *BinaryRunningLight {
-	g := &BinaryRunningLight{
-		Length:       length,
-		Direction:    direction,
-		ColorOpacity: colorOpacity,
-		BlackOpacity: blackOpacity,
+	pos := r.Position * float64(r.Length)
+	for i, _ := range r.Leds {
+		j := i % r.Length
+		r.Leds[i].Color = BLACK.BlendRgb(r.Color, 1-min(1, dist(pos, float64(j))))
 	}
-	for i, _ := range g.Leds {
-		if i%g.Length == 0 {
-			g.Leds[i].Color = colorful.Color{1, 0.4, 0}
-		} else {
-			g.Leds[i].Color = colorful.Color{0, 0, 0}
-		}
-	}
-	return g
-}
+	//}
 
-func (g *BinaryRunningLight) Tick(d time.Duration, o interface{}) {
-	advance := o.(bool)
-	if advance {
-		g.Offset += g.Direction
-		if g.Offset < 0 {
-			g.Offset += g.Length
-		}
-		if g.Offset > g.Length {
-			g.Offset -= g.Length
-		}
-	}
-
-	var cube [LEDS]Led
-	for i, v := range g.Leds[g.Offset : g.Offset+LEDS] {
-		cube[i] = v
-	}
-	//g.Consumer.Tick(d, g.Leds[g.Offset:g.Offset+LEDS])
-	g.Consumer.AddPattern(cube, g.ColorOpacity, g.BlackOpacity)
+	r.myDisplay.AddPattern(r.Leds, r.ColorOpacity, r.BlackOpacity)
 }
 
 //-----------------------------------------------------------------------------
 type GausRunningLight struct {
-	Consumer
+	*Effect
 	colorful.Color
 	Position     float64
 	Delta        float64
-	Length       int
 	Interval     float64
-	ColorOpacity float64
-	BlackOpacity float64
-	Leds         [LEDS]Led
+	fpsTarget       int
 }
 
-func NewGausRunningLight(color colorful.Color, length int, interval, colorOpacity, blackOpacity float64) *GausRunningLight {
+func NewGausRunningLight(disp Display, fps int) *GausRunningLight {
+	ef := NewEffect(disp, 0.5, 0.0)
+
 	r := &GausRunningLight{
-		Color:        color,
-		Length:       length,
-		Interval:     interval,
-		ColorOpacity: colorOpacity,
-		BlackOpacity: blackOpacity,
-	}
+		Effect:		ef,
+		Color:      blue,
+		fpsTarget:	fps,
+		Interval:     30}
+
 	r.Delta = (float64(1) / float64(r.Interval*fpsTarget))
 	return r
 }
 
-func (r *GausRunningLight) Tick(d time.Duration, o interface{}) {
-	advance := o.(bool)
+func (r *GausRunningLight) Update() {
 
-	if advance {
+//	if advance {
 		r.Position += r.Delta
 		if r.Position > 1 {
 			r.Position -= 1
@@ -155,7 +98,7 @@ func (r *GausRunningLight) Tick(d time.Duration, o interface{}) {
 			gaus := (1 / (math.Sqrt(math.Pi / 3))) * math.Exp(-(1)*math.Pow(distance, float64(2)))
 			r.Leds[i].Color = BLACK.BlendRgb(r.Color, gaus)
 		}
-	}
+//	}
 
-	r.Consumer.AddPattern(r.Leds, r.ColorOpacity, r.BlackOpacity)
+	r.myDisplay.AddPattern(r.Leds, r.ColorOpacity, r.BlackOpacity)
 }

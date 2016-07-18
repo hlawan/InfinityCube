@@ -168,7 +168,18 @@ func (eH *EffectHandler) AddHsvFade() {
 	eH.listEffectProperties() //where is a nice place for me?
 }
 
+func (eH *EffectHandler) AddRunningLight() {
+	rl := NewRunningLight(eH.myDisplay)
+	eH.activeEffects = append(eH.activeEffects, rl)
+	eH.listEffectProperties() //where is a nice place for me?
+}
 
-func (eH *EffectHandler) AddRunningLight(){
+func (eH *EffectHandler) AddGausRunningLight() {
+	grl := NewGausRunningLight(eH.myDisplay, eH.updateRate)
+	eH.activeEffects = append(eH.activeEffects, grl)
+	eH.listEffectProperties() //where is a nice place for me?
+}
+
+func (eH *EffectHandler) AddPrettyPrint(){
 	fmt.Println("look at me I'm so pretty :-*")
 }
