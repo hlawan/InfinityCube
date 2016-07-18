@@ -1,11 +1,12 @@
 package main
 
 import (
-	"reflect"
-	"time"
-	"fmt"
 	"encoding/json"
+	"fmt"
+	"reflect"
 	"strings"
+	"strconv"
+	"time"
 	//"github.com/fatih/structs"
 )
 
@@ -18,17 +19,17 @@ type Effect struct {
 	Length       int
 	ColorOpacity float64
 	BlackOpacity float64
-	myDisplay		 Display
+	myDisplay    Display
 }
 
 func NewEffect(disp Display, colorOp, blackOp float64) *Effect {
 	ef := &Effect{
-		Leds: 				make([]Led, disp.NrOfLeds()),
-		Offset:				0,
-		Length:				disp.NrOfLeds(),
+		Leds:         make([]Led, disp.NrOfLeds()),
+		Offset:       0,
+		Length:       disp.NrOfLeds(),
 		ColorOpacity: colorOp,
 		BlackOpacity: blackOp,
-		myDisplay:		disp}
+		myDisplay:    disp}
 
 	return ef
 }
@@ -55,12 +56,12 @@ type EffectHandler struct {
 	activeEffects    []Effector
 	effectProperties map[int][]byte
 	availableEffects []string
-	effectRequest		 chan string
+	effectRequest    chan string
 	myDisplay        Display
 	lastUpdate       time.Time
 	updateRate       int
 	loopTime         time.Duration
-	audio						 *ProcessedAudio
+	audio            *ProcessedAudio
 }
 
 func NewEffectHandler(newDisplay Display, newUpdateRate int, newAudio *ProcessedAudio) (eH *EffectHandler) {
@@ -70,8 +71,8 @@ func NewEffectHandler(newDisplay Display, newUpdateRate int, newAudio *Processed
 		updateRate:       newUpdateRate,
 		loopTime:         10 * time.Millisecond,
 		effectProperties: make(map[int][]byte),
-		effectRequest: 		make(chan string),
-		audio:						newAudio}
+		effectRequest:    make(chan string),
+		audio:            newAudio}
 
 	eH.listAvailableEffects()
 	go eH.handleRequests()
@@ -95,19 +96,30 @@ func (eH *EffectHandler) updateAll() {
 	}
 }
 
-func (eH *EffectHandler) handleRequests() (err error){
-  eHValue := reflect.ValueOf(eH)
-	for{
+func (eH *EffectHandler) handleRequests() (err error) {
+	eHValue := reflect.ValueOf(eH)
+	var idx int
+	for {
 		//receive effect request from webserver
-		req := <- eH.effectRequest
-		//add requested effect to activeEffects
-		req = "Add" + req
-  	m := eHValue.MethodByName(req)
-  	if !m.IsValid() {
-      return fmt.Errorf("Method not found \"%s\"", req)
-  	}
-  	in := make([]reflect.Value, 0)
-  	m.Call(in)
+		req := <-eH.effectRequest
+
+
+		if strings.HasPrefix(req, "del") {
+			// it is a delete request
+			req = strings.TrimPrefix(req, "del")
+			idx, err = strconv.Atoi(req)
+			CheckErr(err)
+			eH.removeEffect(idx)
+		} else {
+			//request to add effect to activeEffects
+			req = "Add" + req
+			m := eHValue.MethodByName(req)
+			if !m.IsValid() {
+				return fmt.Errorf("Method not found \"%s\"", req)
+			}
+			in := make([]reflect.Value, 0)
+			m.Call(in)
+		}
 		//send updated list of active effects to webserver
 		for _, effect := range eH.activeEffects {
 			eType := reflect.TypeOf(effect)
@@ -115,6 +127,16 @@ func (eH *EffectHandler) handleRequests() (err error){
 		}
 		eH.effectRequest <- "done"
 	}
+}
+
+func (eH *EffectHandler) removeEffect(ele int) {
+	var newList []Effector
+	for i, effect := range eH.activeEffects {
+		if i != ele {
+			newList = append(newList, effect)
+		}
+	}
+	eH.activeEffects = newList
 }
 
 func (eH *EffectHandler) listAvailableEffects() {
@@ -180,6 +202,6 @@ func (eH *EffectHandler) AddGausRunningLight() {
 	eH.listEffectProperties() //where is a nice place for me?
 }
 
-func (eH *EffectHandler) AddPrettyPrint(){
+func (eH *EffectHandler) AddPrettyPrint() {
 	fmt.Println("look at me I'm so pretty :-*")
 }

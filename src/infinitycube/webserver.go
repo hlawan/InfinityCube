@@ -23,7 +23,6 @@ type Status struct {
 	AverageVolume    float64
 	MaxPeak          float64
 	PeakAverageRatio float64
-	clapSelect       bool
 }
 
 func NewStatus(data *ProcessedAudio, fx []string, ch chan string, h io.ReadWriter) (s *Status) {
@@ -39,20 +38,20 @@ func NewStatus(data *ProcessedAudio, fx []string, ch chan string, h io.ReadWrite
 	fmt.Println(len(data.spektralDensity), len(data.freqs))
 	s.SpectralDensity = make([]float64, len(data.spektralDensity))
 	s.Freqs = make([]float64, len(data.freqs))
-	s.clapSelect = false
 	return s
 }
 
 func (s *Status) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	effRequest := req.FormValue("t")
-	fmt.Println("Effect Request: ", effRequest)
-	go s.requestEffect(effRequest)
+	if effRequest != "" {
+		fmt.Println("Effect Request: ", effRequest)
+		go s.requestEffect(effRequest)
+	}
 
-	c := req.FormValue("c")
-	if c == "true" {
-		s.clapSelect = true
-	} else {
-		s.clapSelect = false
+	delRequest := req.FormValue("r")
+	if delRequest != "" {
+		fmt.Println("Delete Request: ", delRequest)
+		go s.requestEffect("del" + delRequest)
 	}
 
 	w.Header().Add("Content-Type", "text/json")

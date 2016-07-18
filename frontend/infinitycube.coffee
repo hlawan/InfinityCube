@@ -6,6 +6,7 @@ window.onload = ->
   , 'json')
   bindEffectSelector()
   bindClapSelector()
+  bindRemoveButton()
 
 fillEffectSelector = (data) ->
   opt = ""
@@ -16,6 +17,17 @@ fillEffectSelector = (data) ->
   $('#effects').html("")
   $('#effects').append(opt)
 
+fillActiveEffectSelector = (data) ->
+  opt = ""
+  idx = 0
+  for i in data['ActiveEffects']
+    console.log(i)
+    opt += "<option value='" + idx + "'>" + idx + ". " + i + "</option>"
+    idx++
+
+  $('#activeEffects').html("")
+  $('#activeEffects').append(opt)
+
 
 bindEffectSelector = ->
   $('#effects').bind 'change', ->
@@ -23,6 +35,20 @@ bindEffectSelector = ->
     $.post('toggle', {t: effect}, (data, textStatus, jqXHR) ->
       console.log(effect)
     , 'json')
+    $.get('status', (data) ->
+      fillActiveEffectSelector(data)
+    , 'json')
+
+bindRemoveButton = ->
+    $('#remover').bind 'click', ->
+      value = $("#activeEffects option:selected").val()
+      $.post('toggle', {r: value}, (data, textStatus, jqXHR) ->
+        console.log(value)
+      , 'json')
+      $.get('status', (data) ->
+        fillActiveEffectSelector(data)
+      , 'json')
+
 
 bindClapSelector = ->
   $('#clapSelect').bind 'change', ->

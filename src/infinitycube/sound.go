@@ -137,7 +137,7 @@ func (audio *ProcessedAudio) detectClap() {
 		audio.timeOfLastClap = time.Now()
 		audio.clapDetected = true
 		audio.clapCount += 1
-		fmt.Println("Clap detected average PeakAverageRatio is:", audio.averagePeakAverageValue, "\tclapCount:", audio.clapCount)
+		//fmt.Println("Clap detected average PeakAverageRatio is:", audio.averagePeakAverageValue, "\tclapCount:", audio.clapCount)
 	} else {
 		audio.clapDetected = false
 	}
