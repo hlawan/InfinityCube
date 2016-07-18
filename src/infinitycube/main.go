@@ -54,11 +54,10 @@ func main() {
 		return
 	}
 
-	eH := NewEffectHandler(c, fpsTarget)
-	//eH.addCellularAutomata()
-
 	rawSoundData := StartSoundTracking()
 	audio := StartAudioProcessing(rawSoundData)
+
+	eH := NewEffectHandler(c, fpsTarget, audio)	
 	StartWebServer(audio, eH.availableEffects, eH.effectRequest)
 
 /*

@@ -6,13 +6,10 @@ import (
 )
 
 type CellularAutomata struct {
-	ColorOpacity float64
-	BlackOpacity float64
+	*Effect
 	Rule         int
 	SecsPerGen   float64
 	lastUpdate   time.Time
-	Leds         []Led
-	myDisplay		 Display
 }
 
 /*
@@ -30,14 +27,13 @@ func NewCellularAutomata(newDisplay Display, colorOpacity, blackOpacity float64,
 	return cA
 }*/
 
-func NewCellularAutomata(newDisplay Display) *CellularAutomata {
+func NewCellularAutomata(newDisp Display) *CellularAutomata {
+	ef := NewEffect(newDisp, 0.5, 0.0)
+
 	cA := &CellularAutomata{
-		ColorOpacity: 0.5,
-		BlackOpacity: 0.0,
+		Effect:				ef,
 		Rule:         152,
-		SecsPerGen:   0.33,
-		myDisplay:		newDisplay,
-		Leds: 				make([]Led, newDisplay.NrOfLeds())}
+		SecsPerGen:   0.33}
 
 	cA.lastUpdate = time.Now()
 	cA.sprinkle()

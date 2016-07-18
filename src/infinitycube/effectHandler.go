@@ -9,6 +9,30 @@ import (
 	//"github.com/fatih/structs"
 )
 
+// An Effect has to provide information about the current led-pattern,
+// the blackOpacity and the colorOpacity of its leds and which Display
+// it belongs to.
+type Effect struct {
+	Leds         []Led
+	Offset       int
+	Length       int
+	ColorOpacity float64
+	BlackOpacity float64
+	myDisplay		 Display
+}
+
+func NewEffect(disp Display, colorOp, blackOp float64) *Effect {
+	ef := &Effect{
+		Leds: 				make([]Led, disp.NrOfLeds()),
+		Offset:				0,
+		Length:				disp.NrOfLeds(),
+		ColorOpacity: colorOp,
+		BlackOpacity: blackOp,
+		myDisplay:		disp}
+
+	return ef
+}
+
 // An Effector is able to generate (light-)Patterns. The Update() method gets
 // called by its EffectHandler and has to call the AddPattern() method of its
 // Display.
@@ -36,16 +60,18 @@ type EffectHandler struct {
 	lastUpdate       time.Time
 	updateRate       int
 	loopTime         time.Duration
+	audio						 *ProcessedAudio
 }
 
-func NewEffectHandler(newDisplay Display, newUpdateRate int) (eH *EffectHandler) {
+func NewEffectHandler(newDisplay Display, newUpdateRate int, newAudio *ProcessedAudio) (eH *EffectHandler) {
 	eH = &EffectHandler{
 		myDisplay:        newDisplay,
 		lastUpdate:       time.Now(),
 		updateRate:       newUpdateRate,
 		loopTime:         10 * time.Millisecond,
 		effectProperties: make(map[int][]byte),
-		effectRequest: 		make(chan string)}
+		effectRequest: 		make(chan string),
+		audio:						newAudio}
 
 	eH.listAvailableEffects()
 	go eH.handleRequests()
@@ -110,11 +136,32 @@ func (eH *EffectHandler) listEffectProperties() {
 	}
 }
 
+// List of addable Effects
+
 func (eH *EffectHandler) AddCellularAutomata() {
-	cA := NewCellularAutomata(eH.myDisplay)
-	eH.activeEffects = append(eH.activeEffects, cA)
+	ca := NewCellularAutomata(eH.myDisplay)
+	eH.activeEffects = append(eH.activeEffects, ca)
 	eH.listEffectProperties() //where is a nice place for me?
 }
+
+func (eH *EffectHandler) AddWhiteSpectrum() {
+	ws := NewWhiteSpectrum(eH.myDisplay, eH.audio)
+	eH.activeEffects = append(eH.activeEffects, ws)
+	eH.listEffectProperties() //where is a nice place for me?
+}
+
+func (eH *EffectHandler) AddWhiteEdgeSpectrum() {
+	wes := NewWhiteEdgeSpectrum(eH.myDisplay, eH.audio)
+	eH.activeEffects = append(eH.activeEffects, wes)
+	eH.listEffectProperties() //where is a nice place for me?
+}
+
+func (eH *EffectHandler) AddEdgeVolume() {
+	ev := NewEdgeVolume(eH.myDisplay, eH.audio)
+	eH.activeEffects = append(eH.activeEffects, ev)
+	eH.listEffectProperties() //where is a nice place for me?
+}
+
 
 func (eH *EffectHandler) AddRunningLight(){
 	fmt.Println("look at me I'm so pretty :-*")

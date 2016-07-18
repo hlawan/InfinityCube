@@ -5,38 +5,49 @@ import (
 	//"fmt"
 )
 
-type Equalizer struct {
-	Consumer
-	Offset       int
-	Length       int
-	ColorOpacity float64
-	BlackOpacity float64
-	sound        *ProcessedAudio
-	Leds         [LEDS]Led
+// Effect: White Spectrum
+type WhiteSpectrum struct {
+	*Effect
+	sound *ProcessedAudio
 }
 
-func NewEqualizer(offset, length int, colorOpacity, blackOpacity float64, s *ProcessedAudio) *Equalizer {
-	e := &Equalizer{
-		Offset:       offset,
-		Length:       length,
-		ColorOpacity: colorOpacity,
-		BlackOpacity: blackOpacity,
-		sound:        s,
+func NewWhiteSpectrum(disp Display, s *ProcessedAudio) *WhiteSpectrum {
+	ef := NewEffect(disp, 0.5, 0.0)
+
+	e := &WhiteSpectrum{
+		Effect: ef,
+		sound:  s,
 	}
 	return e
 }
 
-func (e *Equalizer) WhiteSpectrum() {
+func (e *WhiteSpectrum) Update() {
 	for i := (0 + e.Offset); i < (e.Offset + e.Length); i++ {
 		e.Leds[i].Color = colorful.Color{
 			e.sound.spektralDensity[(i%EDGE_LENGTH)+1],
 			e.sound.spektralDensity[(i%EDGE_LENGTH)+1],
 			e.sound.spektralDensity[(i%EDGE_LENGTH)+1]}
 	}
-	e.Consumer.AddPattern(e.Leds, e.ColorOpacity, e.BlackOpacity)
+	e.myDisplay.AddPattern(e.Leds, e.ColorOpacity, e.BlackOpacity)
 }
 
-func (e *Equalizer) WhiteEdgeSpectrum() {
+// Effect: White Edge Spectrum
+type WhiteEdgeSpectrum struct {
+	*Effect
+	sound *ProcessedAudio
+}
+
+func NewWhiteEdgeSpectrum(disp Display, s *ProcessedAudio) *WhiteEdgeSpectrum {
+	ef := NewEffect(disp, 0.5, 0.0)
+
+	e := &WhiteEdgeSpectrum{
+		Effect: ef,
+		sound:  s,
+	}
+	return e
+}
+
+func (e *WhiteEdgeSpectrum) Update() {
 	for i := (0 + e.Offset); i < (e.Offset + e.Length); i++ {
 		if i%EDGE_LENGTH < (EDGE_LENGTH / 2) {
 			e.Leds[i].Color = colorful.Color{
@@ -50,10 +61,26 @@ func (e *Equalizer) WhiteEdgeSpectrum() {
 				e.sound.spektralDensity[EDGE_LENGTH-(i%EDGE_LENGTH)+10]}
 		}
 	}
-	e.Consumer.AddPattern(e.Leds, e.ColorOpacity, e.BlackOpacity)
+	e.myDisplay.AddPattern(e.Leds, e.ColorOpacity, e.BlackOpacity)
 }
 
-func (e *Equalizer) EdgeVolume() {
+// Effect: Edge Volume
+type EdgeVolume struct {
+	*Effect
+	sound *ProcessedAudio
+}
+
+func NewEdgeVolume(disp Display, s *ProcessedAudio) *EdgeVolume {
+	ef := NewEffect(disp, 0.5, 0.0)
+
+	e := &EdgeVolume{
+		Effect: ef,
+		sound:  s,
+	}
+	return e
+}
+
+func (e *EdgeVolume) Update() {
 	for i := 0; i < e.Length; i++ {
 
 		r := float64(i%EDGE_LENGTH) * 1.0 / float64(EDGE_LENGTH)
@@ -77,7 +104,7 @@ func (e *Equalizer) EdgeVolume() {
 		}
 	}
 
-	e.Consumer.AddPattern(e.Leds, e.ColorOpacity, e.BlackOpacity)
+	e.myDisplay.AddPattern(e.Leds, e.ColorOpacity, e.BlackOpacity)
 }
 
 func notNegative(nr float64) float64 {
