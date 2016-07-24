@@ -16,6 +16,7 @@ type Status struct {
 	AvailableEffects []string
 	ActiveEffects 	 []string
 	effectRequest		 chan string
+	EffectParameter  map[string]string
 	SoundSignal      []SAMPLE
 	SpectralDensity  []float64
 	Freqs            []float64
@@ -48,6 +49,12 @@ func (s *Status) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		go s.requestEffect(effRequest)
 	}
 
+	parRequest := req.FormValue("act")
+	if parRequest != "" {
+		fmt.Println("Parameter Request: ", parRequest)
+		go s.requestParameter("par" + parRequest)
+	}
+
 	delRequest := req.FormValue("r")
 	if delRequest != "" {
 		fmt.Println("Delete Request: ", delRequest)
@@ -58,8 +65,37 @@ func (s *Status) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(w).Encode(s)
 }
 
-func (s *Status) requestEffect(eff string) {
+func (s *Status) requestParameter(eff string) {
 	s.effectRequest <- eff
+	fmt.Println("<- sent parameterRequest for", eff)
+	var newPar map[string]string
+	newPar = make(map[string]string)
+	next := true
+	var key, value string
+	for Par := range s.effectRequest {
+		if Par == "done" {
+			fmt.Println("Received done (requestParameter() webserver)")
+			break
+		}
+		if next {
+			key = Par
+			fmt.Println("-> received key = ", key)
+			next = false
+		} else {
+			value = Par
+			fmt.Println("-> received value = ", value)
+			newPar[key] = value
+			next = true
+		}
+	}
+	fmt.Println("Effect Parameter: ", newPar)
+	s.EffectParameter = newPar
+}
+
+func (s *Status) requestEffect(eff string) {
+  fmt.Println("trying to send effect request: ", eff)
+	s.effectRequest <- eff
+	fmt.Println("Sent Effect Request from webserver: ", eff)
 	newActEff := make([]string,0)
 	for actEff := range s.effectRequest {
 		if actEff == "done" {

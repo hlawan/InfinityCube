@@ -7,6 +7,7 @@ window.onload = ->
   bindEffectSelector()
   bindClapSelector()
   bindRemoveButton()
+  bindActiveSelector()
 
 fillEffectSelector = (data) ->
   opt = ""
@@ -28,6 +29,17 @@ fillActiveEffectSelector = (data) ->
   $('#activeEffects').html("")
   $('#activeEffects').append(opt)
 
+fillEffectParameter = (data) ->
+  opt = "<p><h1>EffectParameter:</h1><UL>"
+  console.log(data['EffectParameter'])
+  for k,v of data['EffectParameter']
+    console.log(k)
+    opt += "<LI>" + k + ": <input type='text' name='" + k + "' value='" + v + "' maxlength='5' size='5'><br></p>"
+  opt += "</UL>"
+
+  $('#Parameter').html("")
+  $('#Parameter').append(opt)
+
 
 bindEffectSelector = ->
   $('#effects').bind 'change', ->
@@ -38,6 +50,17 @@ bindEffectSelector = ->
     $.get('status', (data) ->
       fillActiveEffectSelector(data)
     , 'json')
+
+bindActiveSelector = ->
+  $('#activeEffects').bind 'change', ->
+    effect = $("#activeEffects option:selected").val()
+    $.post('toggle', {act: effect}, (data, textStatus, jqXHR) ->
+      console.log(effect)
+    , 'json')
+    $.get('status', (data) ->
+      fillEffectParameter(data)
+    , 'json')
+
 
 bindRemoveButton = ->
     $('#remover').bind 'click', ->

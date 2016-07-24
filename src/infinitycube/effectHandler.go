@@ -101,30 +101,40 @@ func (eH *EffectHandler) handleRequests() (err error) {
 	var idx int
 	for {
 		//receive effect request from webserver
+		fmt.Println("Waiting for Request (Backend)...")
 		req := <-eH.effectRequest
 
-		if strings.HasPrefix(req, "del") {
-			// it is a delete request
-			req = strings.TrimPrefix(req, "del")
+		if strings.HasPrefix(req, "par") {
+			// it is a parameter request
+			req = strings.TrimPrefix(req, "par")
 			idx, err = strconv.Atoi(req)
 			CheckErr(err)
-			eH.removeEffect(idx)
+			eH.sendEffectProperties(idx)
 		} else {
-			//request to add effect to activeEffects
-			req = "Add" + req
-			m := eHValue.MethodByName(req)
-			if !m.IsValid() {
-				return fmt.Errorf("Method not found \"%s\"", req)
+			if strings.HasPrefix(req, "del") {
+				// it is a delete request
+				req = strings.TrimPrefix(req, "del")
+				idx, err = strconv.Atoi(req)
+				CheckErr(err)
+				eH.removeEffect(idx)
+			} else {
+				//request to add effect to activeEffects
+				req = "Add" + req
+				m := eHValue.MethodByName(req)
+				if !m.IsValid() {
+					return fmt.Errorf("Method not found \"%s\"", req)
+				}
+				in := make([]reflect.Value, 0)
+				m.Call(in)
 			}
-			in := make([]reflect.Value, 0)
-			m.Call(in)
+
+			//send updated list of active effects to webserver
+			for _, effect := range eH.activeEffects {
+				eType := reflect.TypeOf(effect)
+				eH.effectRequest <- eType.Elem().Name()
+			}
+			eH.effectRequest <- "done"
 		}
-		//send updated list of active effects to webserver
-		for _, effect := range eH.activeEffects {
-			eType := reflect.TypeOf(effect)
-			eH.effectRequest <- eType.Elem().Name()
-		}
-		eH.effectRequest <- "done"
 	}
 }
 
@@ -147,6 +157,20 @@ func (eH *EffectHandler) listAvailableEffects() {
 			eH.availableEffects = append(eH.availableEffects, method)
 		}
 	}
+}
+
+func (eH *EffectHandler) sendEffectProperties(nr int) {
+  eH.listEffectProperties()
+	fmt.Println("Nr of Effects with Properties = ", len(eH.effectProperties),
+							" Trying to send props of nr: ",nr+1)
+	for par, val := range eH.effectProperties[nr] {
+		eH.effectRequest <- par
+		fmt.Println(" sent: ", par, " as par")
+		eH.effectRequest <- val
+		fmt.Println(" sent: ", val, " as val")
+	}
+	eH.effectRequest <- "done"
+	fmt.Println(" sent: done (EffectProperties)")
 }
 
 func (eH *EffectHandler) listEffectProperties() {
@@ -174,15 +198,14 @@ func (eH *EffectHandler) listEffectProperties() {
 			}
 		}
 
-		//eH.effectProperties[i], err = json.Marshal(ele)
-		//CheckErr(err)
+		eH.effectProperties = propList;
 	}
 
-	fmt.Println("*** Listed EffectProperties")
-	for i, props := range propList {
-		fmt.Println("* Effect Nr ", i)
-		fmt.Println(props)
-	}
+	// fmt.Println("*** Listed EffectProperties")
+	// for i, props := range propList {
+	// 	fmt.Println("* Effect Nr ", i)
+	// 	fmt.Println(props)
+	// }
 
 }
 
@@ -196,43 +219,36 @@ func FloatToString(input_num float64) string {
 func (eH *EffectHandler) AddCellularAutomata() {
 	ca := NewCellularAutomata(eH.myDisplay)
 	eH.activeEffects = append(eH.activeEffects, ca)
-	eH.listEffectProperties() //where is a nice place for me?
 }
 
 func (eH *EffectHandler) AddWhiteSpectrum() {
 	ws := NewWhiteSpectrum(eH.myDisplay, eH.audio)
 	eH.activeEffects = append(eH.activeEffects, ws)
-	eH.listEffectProperties() //where is a nice place for me?
 }
 
 func (eH *EffectHandler) AddWhiteEdgeSpectrum() {
 	wes := NewWhiteEdgeSpectrum(eH.myDisplay, eH.audio)
 	eH.activeEffects = append(eH.activeEffects, wes)
-	eH.listEffectProperties() //where is a nice place for me?
 }
 
 func (eH *EffectHandler) AddEdgeVolume() {
 	ev := NewEdgeVolume(eH.myDisplay, eH.audio)
 	eH.activeEffects = append(eH.activeEffects, ev)
-	eH.listEffectProperties() //where is a nice place for me?
 }
 
 func (eH *EffectHandler) AddHsvFade() {
 	hsv := NewHsvFade(eH.myDisplay, eH.updateRate)
 	eH.activeEffects = append(eH.activeEffects, hsv)
-	eH.listEffectProperties() //where is a nice place for me?
 }
 
 func (eH *EffectHandler) AddRunningLight() {
 	rl := NewRunningLight(eH.myDisplay)
 	eH.activeEffects = append(eH.activeEffects, rl)
-	eH.listEffectProperties() //where is a nice place for me?
 }
 
 func (eH *EffectHandler) AddGausRunningLight() {
 	grl := NewGausRunningLight(eH.myDisplay, eH.updateRate)
 	eH.activeEffects = append(eH.activeEffects, grl)
-	eH.listEffectProperties() //where is a nice place for me?
 }
 
 func (eH *EffectHandler) AddPrettyPrint() {
