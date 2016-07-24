@@ -3,6 +3,8 @@ $ = jQuery
 window.onload = ->
   $.get('status', (data) ->
     fillEffectSelector(data)
+    fillActiveEffectSelector(data)
+    fillEffectParameter(data)
   , 'json')
   bindEffectSelector()
   bindClapSelector()
@@ -30,15 +32,22 @@ fillActiveEffectSelector = (data) ->
   $('#activeEffects').append(opt)
 
 fillEffectParameter = (data) ->
-  opt = "<p><h1>EffectParameter:</h1><UL>"
+  opt = "<h1>EffectParameter:</h1><UL>"
   console.log(data['EffectParameter'])
   for k,v of data['EffectParameter']
-    console.log(k)
-    opt += "<LI>" + k + ": <input type='text' name='" + k + "' value='" + v + "' maxlength='5' size='5'><br></p>"
+    opt += "<LI>" + k + ": <input type='text' id='" + k + "' value='" + v + "' maxlength='5' size='5'>"
   opt += "</UL>"
 
   $('#Parameter').html("")
   $('#Parameter').append(opt)
+  for k,v of data['EffectParameter']
+    obj = "input#" + k
+    console.log(obj)
+    $(obj).bind 'change', ->
+      value = "set" + k + " " + $(this).val()
+      $.post('toggle', {act: value}, (data, textStatus, jqXHR) ->
+        console.log(value)
+      , 'json')
 
 
 bindEffectSelector = ->
@@ -58,6 +67,7 @@ bindActiveSelector = ->
       console.log(effect)
     , 'json')
     $.get('status', (data) ->
+      #console.log("binded Active selector get()")
       fillEffectParameter(data)
     , 'json')
 

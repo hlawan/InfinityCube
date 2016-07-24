@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"time"
+	"strings"
 )
 
 // Status gathers all the information that is passed to or received from
@@ -52,7 +53,7 @@ func (s *Status) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	parRequest := req.FormValue("act")
 	if parRequest != "" {
 		fmt.Println("Parameter Request: ", parRequest)
-		go s.requestParameter("par" + parRequest)
+		go s.requestParameter(parRequest)
 	}
 
 	delRequest := req.FormValue("r")
@@ -66,8 +67,17 @@ func (s *Status) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 }
 
 func (s *Status) requestParameter(eff string) {
-	s.effectRequest <- eff
+	if strings.HasPrefix(eff, "set") {
+		eff = strings.TrimPrefix(eff, "set")
+		// ****** to be conituned ********
+	}
+
+
+	s.effectRequest <- ("par" + eff)
 	fmt.Println("<- sent parameterRequest for", eff)
+
+
+	// receive current Parameter
 	var newPar map[string]string
 	newPar = make(map[string]string)
 	next := true
