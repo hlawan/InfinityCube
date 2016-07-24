@@ -1,11 +1,11 @@
 package main
 
 import (
-	"encoding/json"
+	//"encoding/json"
 	"fmt"
 	"reflect"
-	"strings"
 	"strconv"
+	"strings"
 	"time"
 	//"github.com/fatih/structs"
 )
@@ -54,7 +54,7 @@ type Display interface {
 // its Display. The updateRate defines the frames per second.
 type EffectHandler struct {
 	activeEffects    []Effector
-	effectProperties map[int][]byte
+	effectProperties []map[string]string
 	availableEffects []string
 	effectRequest    chan string
 	myDisplay        Display
@@ -66,13 +66,13 @@ type EffectHandler struct {
 
 func NewEffectHandler(newDisplay Display, newUpdateRate int, newAudio *ProcessedAudio) (eH *EffectHandler) {
 	eH = &EffectHandler{
-		myDisplay:        newDisplay,
-		lastUpdate:       time.Now(),
-		updateRate:       newUpdateRate,
-		loopTime:         10 * time.Millisecond,
-		effectProperties: make(map[int][]byte),
-		effectRequest:    make(chan string),
-		audio:            newAudio}
+		myDisplay:  newDisplay,
+		lastUpdate: time.Now(),
+		updateRate: newUpdateRate,
+		loopTime:   10 * time.Millisecond,
+		//effectProperties: make([]map[string][]string),
+		effectRequest: make(chan string),
+		audio:         newAudio}
 
 	eH.listAvailableEffects()
 	go eH.handleRequests()
@@ -102,7 +102,6 @@ func (eH *EffectHandler) handleRequests() (err error) {
 	for {
 		//receive effect request from webserver
 		req := <-eH.effectRequest
-
 
 		if strings.HasPrefix(req, "del") {
 			// it is a delete request
@@ -151,11 +150,45 @@ func (eH *EffectHandler) listAvailableEffects() {
 }
 
 func (eH *EffectHandler) listEffectProperties() {
-	var err error
+	var propList []map[string]string
+	//var props = make(map[string][]string))
+
 	for i, ele := range eH.activeEffects {
-		eH.effectProperties[i], err = json.Marshal(ele)
-		CheckErr(err)
+		propList = append(propList, make(map[string]string))
+
+		s := reflect.ValueOf(ele).Elem()
+		typ := s.Type()
+
+		for p := 0; p < s.NumField(); p++ {
+			prop := s.Field(p)
+			id := typ.Field(p).Name
+			if strings.HasSuffix(id, "Par") {
+				id = strings.TrimSuffix(id, "Par")
+				if prop.Kind() == reflect.Int {
+					propList[i][id] = strconv.Itoa(int(prop.Int()))
+				} else if prop.Kind() == reflect.Float64 {
+					propList[i][id] = FloatToString(prop.Float())
+				} else {
+					propList[i][id] = " "
+				}
+			}
+		}
+
+		//eH.effectProperties[i], err = json.Marshal(ele)
+		//CheckErr(err)
 	}
+
+	fmt.Println("*** Listed EffectProperties")
+	for i, props := range propList {
+		fmt.Println("* Effect Nr ", i)
+		fmt.Println(props)
+	}
+
+}
+
+func FloatToString(input_num float64) string {
+	// to convert a float number to a string
+	return strconv.FormatFloat(input_num, 'f', 6, 64)
 }
 
 // List of addable Effects

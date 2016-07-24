@@ -7,7 +7,7 @@ import (
 type HsvFade struct {
 	*Effect
 	ColorDifference float64
-	TimeFullFade    int //in Seconds
+	TimeFullFadePar    int //in Seconds
 	fpsTarget       int
 }
 
@@ -16,13 +16,13 @@ func NewHsvFade(disp Display, fps int) *HsvFade {
 
 	r := &HsvFade{
 		Effect:       ef,
-		TimeFullFade: 20,
+		TimeFullFadePar: 20,
 		fpsTarget:    fps}
 
 	for i := r.Offset; i < (r.Length + r.Offset); i++ {
 		r.Leds[i].Color = colorful.Color{0, 255, 0}
 	}
-	r.ColorDifference = (float64(H_MAX-H_MIN) / float64(r.TimeFullFade*r.fpsTarget))
+	r.ColorDifference = (float64(H_MAX-H_MIN) / float64(r.TimeFullFadePar*r.fpsTarget))
 	return r
 }
 

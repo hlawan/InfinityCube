@@ -9,7 +9,7 @@ type RunningLight struct {
 	*Effect
 	colorful.Color
 	Position float64
-	Delta    float64
+	DeltaPar    float64
 }
 
 func NewRunningLight(disp Display) *RunningLight {
@@ -18,7 +18,7 @@ func NewRunningLight(disp Display) *RunningLight {
 	r := &RunningLight{
 		Effect: ef,
 		Color:  red,
-		Delta:  0.0001}
+		DeltaPar:  0.0001}
 
 	return r
 }
@@ -46,7 +46,7 @@ func dist(a, b float64) float64 {
 func (r *RunningLight) Update() {
 
 	//if advance { // need a new system to define speed here
-	r.Position += r.Delta
+	r.Position += r.DeltaPar
 	if r.Position > 1 {
 		r.Position -= 1
 	}
@@ -67,7 +67,7 @@ type GausRunningLight struct {
 	colorful.Color
 	Position     float64
 	Delta        float64
-	Interval     float64
+	IntervalPar     float64
 	fpsTarget       int
 }
 
@@ -78,9 +78,9 @@ func NewGausRunningLight(disp Display, fps int) *GausRunningLight {
 		Effect:		ef,
 		Color:      blue,
 		fpsTarget:	fps,
-		Interval:     30}
+		IntervalPar:     30}
 
-	r.Delta = (float64(1) / float64(r.Interval*fpsTarget))
+	r.Delta = (float64(1) / float64(r.IntervalPar*fpsTarget))
 	return r
 }
 
