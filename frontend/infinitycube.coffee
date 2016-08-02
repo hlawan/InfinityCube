@@ -35,8 +35,15 @@ fillEffectParameter = (data) ->
   opt = "<h1>EffectParameter:</h1><UL>"
   console.log(data['EffectParameter'])
   for k,v of data['EffectParameter']
-    opt += "<LI>" + k + ": <input type='text' id='" + k + "' value='" + v + "' maxlength='5' size='5'>"
+    opt += "<LI>" + k
+    if k.lastIndexOf("Int", 0) == 0
+      opt += ": <input type='range' id='" + k + "' value='" + v + "' min ='" + 1 + "' max='" + (parseInt v*10) + "'>"
+    else if k.lastIndexOf("Float", 0) == 0
+      opt += ": <input type='range' id='" + k + "' value='" + v + "' min ='" + 0.00001 + "' max='" + 10.1 + " step='0.01'>"
+    else
+      opt += ": <input type='text' id='" + k + "' value='" + v + "' maxlength='5' size='5'>"
   opt += "</UL>"
+
 
   $('#Parameter').html("")
   $('#Parameter').append(opt)

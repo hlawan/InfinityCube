@@ -136,6 +136,25 @@ func (eH *EffectHandler) setParameter(req string) {
 	if strings.HasPrefix(par, "Float") {
 		eH.setFloat(effNr, par, val)
 	}
+	if strings.HasPrefix(par, "Int") {
+		eH.setInt(effNr, par, val)
+	}
+}
+
+func (eH *EffectHandler) setInt(effNr int, par, val string) {
+	par = strings.TrimPrefix(par, "Int")
+	par += "Par"
+	valInt, err := strconv.ParseInt(val, 10, 64)
+	CheckErr(err)
+
+	eff := reflect.ValueOf(eH.activeEffects[effNr]).Elem().FieldByName(par)
+
+	if eff.CanSet() {
+		eff.SetInt(valInt)
+		fmt.Println("set ", par, " to ", valInt, " --- now it is", eff.Int())
+	} else {
+		fmt.Println("Effect Parameter: ", par, " is not settable")
+	}
 }
 
 func (eH *EffectHandler) setFloat(effNr int, par, val string) {

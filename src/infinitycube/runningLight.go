@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/lucasb-eyer/go-colorful"
 	"math"
 )
@@ -100,6 +99,5 @@ func (r *GausRunningLight) Update() {
 		r.Leds[i].Color = BLACK.BlendRgb(r.Color, gaus)
 	}
 	//	}
-	fmt.Println(r.IntervalPar)
 	r.myDisplay.AddPattern(r.Leds, r.ColorOpacity, r.BlackOpacity)
 }

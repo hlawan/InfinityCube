@@ -54,7 +54,7 @@ func (cA *CellularAutomata) sprinkle() {
 func (cA *CellularAutomata) Update() {
 	var a, b, c bool
 	nextGen := make([]Led, len(cA.Leds))
-	if time.Since(cA.lastUpdate) > (150 * time.Millisecond) {
+	if time.Since(cA.lastUpdate) > (time.Duration(int(1000*cA.SecsPerGenPar)) * time.Millisecond) {
 		for i := 0; i < LEDS; i++ {
 			if i == 0 {
 				a = cA.Leds[LEDS-1].OnOrOff()
