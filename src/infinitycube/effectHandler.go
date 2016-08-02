@@ -97,48 +97,68 @@ func (eH *EffectHandler) updateAll() {
 }
 
 func (eH *EffectHandler) handleRequests() (err error) {
-	eHValue := reflect.ValueOf(eH)
-	var idx int
 	for {
-		//receive effect request from webserver
+		//receive request from webserver
 		fmt.Println("Waiting for Request (Backend)...")
 		req := <-eH.effectRequest
 
 		if strings.HasPrefix(req, "par") {
-			// it is a parameter request
-			req = strings.TrimPrefix(req, "par")
-			idx, err = strconv.Atoi(req)
-			CheckErr(err)
-			eH.sendEffectProperties(idx)
-		} else {
-			if strings.HasPrefix(req, "del") {
-				// it is a delete request
-				req = strings.TrimPrefix(req, "del")
-				idx, err = strconv.Atoi(req)
-				CheckErr(err)
-				eH.removeEffect(idx)
-			} else {
-				//request to add effect to activeEffects
-				req = "Add" + req
-				m := eHValue.MethodByName(req)
-				if !m.IsValid() {
-					return fmt.Errorf("Method not found \"%s\"", req)
-				}
-				in := make([]reflect.Value, 0)
-				m.Call(in)
-			}
+			eH.sendEffectProperties(req)
+		}
 
-			//send updated list of active effects to webserver
-			for _, effect := range eH.activeEffects {
-				eType := reflect.TypeOf(effect)
-				eH.effectRequest <- eType.Elem().Name()
-			}
-			eH.effectRequest <- "done"
+		if strings.HasPrefix(req, "set") {
+			eH.setParameter(req)
+		}
+
+		if strings.HasPrefix(req, "del") {
+			eH.removeEffect(req)
+			eH.sendActiveEffects()
+		}
+
+		if strings.HasPrefix(req, "Add") {
+			eH.appendEffect(req)
+			eH.sendActiveEffects()
 		}
 	}
 }
 
-func (eH *EffectHandler) removeEffect(ele int) {
+func (eH *EffectHandler) setParameter(req string) {
+	req = strings.TrimPrefix(req, "set")
+	in := strings.Split(req, "Par")
+	effNr, err := strconv.Atoi(in[0])
+	CheckErr(err)
+	in = strings.Split(in[1], "Val")
+	val := in[1]
+	par := in[0]
+
+	fmt.Println(effNr, par, val)
+
+	if strings.HasPrefix(par, "Float") {
+		eH.setFloat(effNr, par, val)
+	}
+}
+
+func (eH *EffectHandler) setFloat(effNr int, par, val string) {
+	par = strings.TrimPrefix(par, "Float")
+	par += "Par"
+	valFloat, err := strconv.ParseFloat(val, 64)
+	CheckErr(err)
+
+	eff := reflect.ValueOf(eH.activeEffects[effNr]).Elem().FieldByName(par)
+
+	if eff.CanSet() {
+		eff.SetFloat(valFloat)
+		fmt.Println("set ", par, " to ", valFloat, " --- now it is", eff.Float())
+	} else {
+		fmt.Println("Effect Parameter: ", par, " is not settable")
+	}
+}
+
+func (eH *EffectHandler) removeEffect(req string) {
+	req = strings.TrimPrefix(req, "del")
+	ele, err := strconv.Atoi(req)
+	CheckErr(err)
+
 	var newList []Effector
 	for i, effect := range eH.activeEffects {
 		if i != ele {
@@ -146,6 +166,17 @@ func (eH *EffectHandler) removeEffect(ele int) {
 		}
 	}
 	eH.activeEffects = newList
+}
+
+func (eH *EffectHandler) appendEffect(req string) {
+	fmt.Println("append called with: ", req)
+	eHValue := reflect.ValueOf(eH)
+	m := eHValue.MethodByName(req)
+	if !m.IsValid() {
+		fmt.Errorf("Method not found \"%s\"", req)
+	}
+	in := make([]reflect.Value, 0)
+	m.Call(in)
 }
 
 func (eH *EffectHandler) listAvailableEffects() {
@@ -159,13 +190,23 @@ func (eH *EffectHandler) listAvailableEffects() {
 	}
 }
 
-func (eH *EffectHandler) sendEffectProperties(nr int) {
-  eH.listEffectProperties()
-	fmt.Println("Nr of Effects with Properties = ", len(eH.effectProperties),
-							" Trying to send props of nr: ",nr+1)
+func (eH *EffectHandler) sendActiveEffects() {
+	for _, effect := range eH.activeEffects {
+		eType := reflect.TypeOf(effect)
+		eH.effectRequest <- eType.Elem().Name()
+	}
+	eH.effectRequest <- "done"
+}
+
+func (eH *EffectHandler) sendEffectProperties(req string) {
+	req = strings.TrimPrefix(req, "par")
+	nr, err := strconv.Atoi(req)
+	CheckErr(err)
+	eH.listEffectProperties()
+
 	for par, val := range eH.effectProperties[nr] {
 		eH.effectRequest <- par
-		fmt.Println(" sent: ", par, " as par")
+		fmt.Print(" sent: ", par, " as par and")
 		eH.effectRequest <- val
 		fmt.Println(" sent: ", val, " as val")
 	}
@@ -175,7 +216,6 @@ func (eH *EffectHandler) sendEffectProperties(nr int) {
 
 func (eH *EffectHandler) listEffectProperties() {
 	var propList []map[string]string
-	//var props = make(map[string][]string))
 
 	for i, ele := range eH.activeEffects {
 		propList = append(propList, make(map[string]string))
@@ -189,24 +229,18 @@ func (eH *EffectHandler) listEffectProperties() {
 			if strings.HasSuffix(id, "Par") {
 				id = strings.TrimSuffix(id, "Par")
 				if prop.Kind() == reflect.Int {
+					id = "Int" + id
 					propList[i][id] = strconv.Itoa(int(prop.Int()))
 				} else if prop.Kind() == reflect.Float64 {
+					id = "Float" + id
 					propList[i][id] = FloatToString(prop.Float())
 				} else {
 					propList[i][id] = " "
 				}
 			}
 		}
-
-		eH.effectProperties = propList;
+		eH.effectProperties = propList
 	}
-
-	// fmt.Println("*** Listed EffectProperties")
-	// for i, props := range propList {
-	// 	fmt.Println("* Effect Nr ", i)
-	// 	fmt.Println(props)
-	// }
-
 }
 
 func FloatToString(input_num float64) string {

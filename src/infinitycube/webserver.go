@@ -6,8 +6,8 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"time"
 	"strings"
+	"time"
 )
 
 // Status gathers all the information that is passed to or received from
@@ -15,8 +15,8 @@ import (
 type Status struct {
 	io.ReadWriter
 	AvailableEffects []string
-	ActiveEffects 	 []string
-	effectRequest		 chan string
+	ActiveEffects    []string
+	effectRequest    chan string
 	EffectParameter  map[string]string
 	SoundSignal      []SAMPLE
 	SpectralDensity  []float64
@@ -31,7 +31,7 @@ func NewStatus(data *ProcessedAudio, fx []string, ch chan string, h io.ReadWrite
 	//data.Lock()
 	//defer data.Unlock()
 	s = &Status{
-		ReadWriter: h,
+		ReadWriter:    h,
 		effectRequest: ch}
 	s.AvailableEffects = make([]string, len(fx))
 	s.AvailableEffects = fx
@@ -47,7 +47,7 @@ func (s *Status) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	effRequest := req.FormValue("t")
 	if effRequest != "" {
 		fmt.Println("Effect Request: ", effRequest)
-		go s.requestEffect(effRequest)
+		go s.requestEffect("Add" + effRequest)
 	}
 
 	parRequest := req.FormValue("act")
@@ -68,45 +68,44 @@ func (s *Status) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 func (s *Status) requestParameter(eff string) {
 	if strings.HasPrefix(eff, "set") {
-		eff = strings.TrimPrefix(eff, "set")
+		s.effectRequest <- (eff)
 		// ****** to be conituned ********
-	}
 
+	} else {
+		s.effectRequest <- ("par" + eff)
+		fmt.Println("<- sent parameterRequest for", eff)
 
-	s.effectRequest <- ("par" + eff)
-	fmt.Println("<- sent parameterRequest for", eff)
-
-
-	// receive current Parameter
-	var newPar map[string]string
-	newPar = make(map[string]string)
-	next := true
-	var key, value string
-	for Par := range s.effectRequest {
-		if Par == "done" {
-			fmt.Println("Received done (requestParameter() webserver)")
-			break
+		// receive current Parameter
+		var newPar map[string]string
+		newPar = make(map[string]string)
+		next := true
+		var key, value string
+		for Par := range s.effectRequest {
+			if Par == "done" {
+				//fmt.Println("Received done (requestParameter() webserver)")
+				break
+			}
+			if next {
+				key = Par
+				//fmt.Println("-> received key = ", key)
+				next = false
+			} else {
+				value = Par
+				//fmt.Println("-> received value = ", value)
+				newPar[key] = value
+				next = true
+			}
 		}
-		if next {
-			key = Par
-			fmt.Println("-> received key = ", key)
-			next = false
-		} else {
-			value = Par
-			fmt.Println("-> received value = ", value)
-			newPar[key] = value
-			next = true
-		}
+		//fmt.Println("Effect Parameter: ", newPar)
+		s.EffectParameter = newPar
 	}
-	fmt.Println("Effect Parameter: ", newPar)
-	s.EffectParameter = newPar
 }
 
 func (s *Status) requestEffect(eff string) {
-  fmt.Println("trying to send effect request: ", eff)
+	//fmt.Println("trying to send effect request: ", eff)
 	s.effectRequest <- eff
 	fmt.Println("Sent Effect Request from webserver: ", eff)
-	newActEff := make([]string,0)
+	newActEff := make([]string, 0)
 	for actEff := range s.effectRequest {
 		if actEff == "done" {
 			break
