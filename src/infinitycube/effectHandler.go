@@ -54,7 +54,7 @@ type Display interface {
 // its Display. The updateRate defines the frames per second.
 type EffectHandler struct {
 	activeEffects    []Effector
-	effectProperties []map[string]string
+	effectParameter []map[string]string
 	availableEffects []string
 	effectRequest    chan string
 	myDisplay        Display
@@ -70,7 +70,7 @@ func NewEffectHandler(newDisplay Display, newUpdateRate int, newAudio *Processed
 		lastUpdate: time.Now(),
 		updateRate: newUpdateRate,
 		loopTime:   10 * time.Millisecond,
-		//effectProperties: make([]map[string][]string),
+		//effectParameter: make([]map[string][]string),
 		effectRequest: make(chan string),
 		audio:         newAudio}
 
@@ -103,7 +103,7 @@ func (eH *EffectHandler) handleRequests() (err error) {
 		req := <-eH.effectRequest
 
 		if strings.HasPrefix(req, "par") {
-			eH.sendEffectProperties(req)
+			eH.sendEffectParameter(req)
 		}
 
 		if strings.HasPrefix(req, "set") {
@@ -217,23 +217,23 @@ func (eH *EffectHandler) sendActiveEffects() {
 	eH.effectRequest <- "done"
 }
 
-func (eH *EffectHandler) sendEffectProperties(req string) {
+func (eH *EffectHandler) sendEffectParameter(req string) {
 	req = strings.TrimPrefix(req, "par")
 	nr, err := strconv.Atoi(req)
 	CheckErr(err)
-	eH.listEffectProperties()
+	eH.listEffectParameter()
 
-	for par, val := range eH.effectProperties[nr] {
+	for par, val := range eH.effectParameter[nr] {
 		eH.effectRequest <- par
 		fmt.Print(" sent: ", par, " as par and")
 		eH.effectRequest <- val
 		fmt.Println(" sent: ", val, " as val")
 	}
 	eH.effectRequest <- "done"
-	fmt.Println(" sent: done (EffectProperties)")
+	fmt.Println(" sent: done (EffectParameter)")
 }
 
-func (eH *EffectHandler) listEffectProperties() {
+func (eH *EffectHandler) listEffectParameter() {
 	var propList []map[string]string
 
 	for i, ele := range eH.activeEffects {
@@ -245,6 +245,7 @@ func (eH *EffectHandler) listEffectProperties() {
 		for p := 0; p < s.NumField(); p++ {
 			prop := s.Field(p)
 			id := typ.Field(p).Name
+
 			if strings.HasSuffix(id, "Par") {
 				id = strings.TrimSuffix(id, "Par")
 				if prop.Kind() == reflect.Int {
@@ -256,9 +257,10 @@ func (eH *EffectHandler) listEffectProperties() {
 				} else {
 					propList[i][id] = " "
 				}
+
 			}
 		}
-		eH.effectProperties = propList
+		eH.effectParameter = propList
 	}
 }
 
