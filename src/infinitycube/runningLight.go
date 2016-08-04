@@ -51,9 +51,9 @@ func (r *RunningLight) Update() {
 		r.Position -= 1
 	}
 
-	pos := r.Position * float64(r.Length)
+	pos := r.Position * float64(r.LengthPar)
 	for i, _ := range r.Leds {
-		j := i % r.Length
+		j := i % r.LengthPar
 		r.Leds[i].Color = BLACK.BlendRgb(r.Color, 1-min(1, dist(pos, float64(j))))
 	}
 	//}
@@ -91,9 +91,9 @@ func (r *GausRunningLight) Update() {
 	if r.Position > 1 {
 		r.Position -= 1
 	}
-	pos := r.Position * float64(r.Length)
+	pos := r.Position * float64(r.LengthPar)
 	for i, _ := range r.Leds {
-		j := i % r.Length
+		j := i % r.LengthPar
 		distance := dist(pos, float64(j))
 		gaus := (1 / (math.Sqrt(math.Pi / 3))) * math.Exp(-(1)*math.Pow(distance, float64(2)))
 		r.Leds[i].Color = BLACK.BlendRgb(r.Color, gaus)

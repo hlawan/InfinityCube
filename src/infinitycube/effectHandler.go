@@ -15,8 +15,8 @@ import (
 // it belongs to.
 type Effect struct {
 	Leds         []Led
-	Offset       int
-	Length       int
+	OffsetPar    int
+	LengthPar    int
 	ColorOpacity float64
 	BlackOpacity float64
 	myDisplay    Display
@@ -25,8 +25,8 @@ type Effect struct {
 func NewEffect(disp Display, colorOp, blackOp float64) Effect {
 	ef := Effect{
 		Leds:         make([]Led, disp.NrOfLeds()),
-		Offset:       0,
-		Length:       disp.NrOfLeds(),
+		OffsetPar:    0,
+		LengthPar:    disp.NrOfLeds(),
 		ColorOpacity: colorOp,
 		BlackOpacity: blackOp,
 		myDisplay:    disp}
@@ -54,7 +54,7 @@ type Display interface {
 // its Display. The updateRate defines the frames per second.
 type EffectHandler struct {
 	activeEffects    []Effector
-	effectParameter []map[string]string
+	effectParameter  []map[string]string
 	availableEffects []string
 	effectRequest    chan string
 	myDisplay        Display
@@ -238,30 +238,47 @@ func (eH *EffectHandler) listEffectParameter() {
 
 	for i, ele := range eH.activeEffects {
 		propList = append(propList, make(map[string]string))
+		propList[i] = analyseEffectParameter(reflect.ValueOf(ele).Elem())
+	}
+	fmt.Println(propList[0])
+	eH.effectParameter = propList
+}
 
-		s := reflect.ValueOf(ele).Elem()
-		typ := s.Type()
+func analyseEffectParameter(s reflect.Value) map[string]string {
+	parList := make(map[string]string)
+	//fmt.Println(reflect.ValueOf(o))
+	//fmt.Println(reflect.ValueOf(o).Elem())
 
-		for p := 0; p < s.NumField(); p++ {
-			prop := s.Field(p)
-			id := typ.Field(p).Name
-			fmt.Println(prop.Kind())
-			if strings.HasSuffix(id, "Par") {
-				id = strings.TrimSuffix(id, "Par")
-				if prop.Kind() == reflect.Int {
-					id = "Int" + id
-					propList[i][id] = strconv.Itoa(int(prop.Int()))
-				} else if prop.Kind() == reflect.Float64 {
-					id = "Float" + id
-					propList[i][id] = FloatToString(prop.Float())
-				} else {
-					propList[i][id] = " "
-				}
+	//s := reflect.ValueOf(o).Elem()
+	typ := s.Type()
 
+	for p := 0; p < s.NumField(); p++ {
+		prop := s.Field(p)
+		id := typ.Field(p).Name
+		fmt.Println(prop.Kind(), " -> ", id)
+		if strings.HasSuffix(id, "Par") {
+			id = strings.TrimSuffix(id, "Par")
+
+			switch prop.Kind() {
+			case reflect.Int:
+				id = "Int" + id
+				parList[id] = strconv.Itoa(int(prop.Int()))
+			case reflect.Float64:
+				id = "Float" + id
+				parList[id] = FloatToString(prop.Float())
+			default:
+				parList[id] = " "
+			}
+		}	else if prop.Kind() == reflect.Struct {
+			deepFields := analyseEffectParameter(prop)
+			fmt.Println("found struct")
+			for k, v := range deepFields {
+				parList[k] = v
 			}
 		}
-		eH.effectParameter = propList
 	}
+	fmt.Println(parList)
+	return parList
 }
 
 func FloatToString(input_num float64) string {

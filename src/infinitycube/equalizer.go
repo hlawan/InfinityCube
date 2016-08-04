@@ -22,7 +22,7 @@ func NewWhiteSpectrum(disp Display, s *ProcessedAudio) *WhiteSpectrum {
 }
 
 func (e *WhiteSpectrum) Update() {
-	for i := (0 + e.Offset); i < (e.Offset + e.Length); i++ {
+	for i := (0 + e.OffsetPar); i < (e.OffsetPar + e.LengthPar); i++ {
 		e.Leds[i].Color = colorful.Color{
 			e.sound.spektralDensity[(i%EDGE_LENGTH)+1],
 			e.sound.spektralDensity[(i%EDGE_LENGTH)+1],
@@ -48,7 +48,7 @@ func NewWhiteEdgeSpectrum(disp Display, s *ProcessedAudio) *WhiteEdgeSpectrum {
 }
 
 func (e *WhiteEdgeSpectrum) Update() {
-	for i := (0 + e.Offset); i < (e.Offset + e.Length); i++ {
+	for i := (0 + e.OffsetPar); i < (e.OffsetPar + e.LengthPar); i++ {
 		if i%EDGE_LENGTH < (EDGE_LENGTH / 2) {
 			e.Leds[i].Color = colorful.Color{
 				e.sound.spektralDensity[(i%EDGE_LENGTH)+1],
@@ -81,7 +81,7 @@ func NewEdgeVolume(disp Display, s *ProcessedAudio) *EdgeVolume {
 }
 
 func (e *EdgeVolume) Update() {
-	for i := 0; i < e.Length; i++ {
+	for i := 0; i < e.LengthPar; i++ {
 
 		r := float64(i%EDGE_LENGTH) * 1.0 / float64(EDGE_LENGTH)
 		g := notNegative(1 - (float64(i%EDGE_LENGTH) * 1.0 / float64(EDGE_LENGTH)) - 0.2)
@@ -90,13 +90,13 @@ func (e *EdgeVolume) Update() {
 		effectIndex := (i % (2 * EDGE_LENGTH))
 
 		if effectIndex < (EDGE_LENGTH) {
-			p := (e.Length + e.Offset) - (i) - EDGE_LENGTH
+			p := (e.LengthPar + e.OffsetPar) - (i) - EDGE_LENGTH
 			e.Leds[p].Color = colorful.Color{r, g, b}
 			if float64(effectIndex) > e.sound.maxPeak*EDGE_LENGTH {
 				e.Leds[p].Color = e.Leds[p].Color.BlendRgb(black, 1.0)
 			}
 		} else {
-			k := e.Offset + i
+			k := e.OffsetPar + i
 			e.Leds[k].Color = colorful.Color{r, g, b}
 			if float64(effectIndex-EDGE_LENGTH) > e.sound.maxPeak*EDGE_LENGTH {
 				e.Leds[k].Color = e.Leds[k].Color.BlendRgb(black, 1.0)

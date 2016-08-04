@@ -19,7 +19,7 @@ func NewHsvFade(disp Display, fps int) *HsvFade {
 		TimeFullFadePar: 20,
 		fpsTarget:       fps}
 
-	for i := r.Offset; i < (r.Length + r.Offset); i++ {
+	for i := r.OffsetPar; i < (r.LengthPar + r.OffsetPar); i++ {
 		r.Leds[i].Color = colorful.Color{0, 255, 0}
 	}
 	r.ColorDifference = (float64(H_MAX-H_MIN) / float64(r.TimeFullFadePar*r.fpsTarget))
@@ -30,7 +30,7 @@ func (r *HsvFade) Update() {
 	r.ColorDifference = (float64(H_MAX-H_MIN) / float64(r.TimeFullFadePar*r.fpsTarget))
 
 	var h float64
-	for i := r.Offset; i < (r.Length + r.Offset); i++ {
+	for i := r.OffsetPar; i < (r.LengthPar + r.OffsetPar); i++ {
 		h, _, _ = r.Leds[i].Color.Hsv()
 		r.Leds[i].Color = colorful.Hsv(h+r.ColorDifference, 1, 1)
 		r.Leds[i].CheckColor()

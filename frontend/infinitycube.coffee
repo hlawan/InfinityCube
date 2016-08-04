@@ -35,10 +35,11 @@ fillEffectParameter = (data) ->
   opt = "<h1>EffectParameter:</h1><UL>"
   console.log(data['EffectParameter'])
   for k,v of data['EffectParameter']
+    console.log("first loop " + k + v)
     opt += "<LI>" + k
     if k.lastIndexOf("Int", 0) == 0
       opt += ": <input type='range' id='" + k + "' value='" + v + "' min ='" + 1 + "' max='" + (parseInt v*10) + "'>"
-    else if k.lastIndexOf("Float", 0) == 0
+    else  if k.lastIndexOf("Float", 0) == 0
       opt += ": <input type='range' id='" + k + "' value='" + v + "' min ='" + 0.00001 + "' max='" + 10.1 + " step='0.01'>"
     else
       opt += ": <input type='text' id='" + k + "' value='" + v + "' maxlength='5' size='5'>"
@@ -50,9 +51,9 @@ fillEffectParameter = (data) ->
   for k,v of data['EffectParameter']
     obj = "input#" + k
     effect = $("#activeEffects option:selected").val()
-    console.log(obj)
+
     $(obj).bind 'change', ->
-      value = "set" + effect + "Par" + k + "Val" + $(this).val()
+      value = "set" + effect + "Par" + $(obj).name() + "Val" + $(obj).val()
       $.post('toggle', {act: value}, (data, textStatus, jqXHR) ->
         console.log("+++ EffectParameter")
         console.log(value)
