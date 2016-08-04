@@ -5,7 +5,7 @@ import (
 )
 
 type HsvFade struct {
-	*Effect
+	Effect
 	ColorDifference float64
 	TimeFullFadePar int //in Seconds
 	fpsTarget       int

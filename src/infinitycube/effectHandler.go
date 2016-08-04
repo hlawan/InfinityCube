@@ -22,8 +22,8 @@ type Effect struct {
 	myDisplay    Display
 }
 
-func NewEffect(disp Display, colorOp, blackOp float64) *Effect {
-	ef := &Effect{
+func NewEffect(disp Display, colorOp, blackOp float64) Effect {
+	ef := Effect{
 		Leds:         make([]Led, disp.NrOfLeds()),
 		Offset:       0,
 		Length:       disp.NrOfLeds(),
@@ -245,7 +245,7 @@ func (eH *EffectHandler) listEffectParameter() {
 		for p := 0; p < s.NumField(); p++ {
 			prop := s.Field(p)
 			id := typ.Field(p).Name
-
+			fmt.Println(prop.Kind())
 			if strings.HasSuffix(id, "Par") {
 				id = strings.TrimSuffix(id, "Par")
 				if prop.Kind() == reflect.Int {

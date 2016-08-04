@@ -6,7 +6,7 @@ import (
 )
 
 type CellularAutomata struct {
-	*Effect
+	Effect
 	Rule          int
 	SecsPerGenPar float64
 	lastUpdate    time.Time

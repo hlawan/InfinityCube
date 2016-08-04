@@ -6,7 +6,7 @@ import (
 )
 
 type RunningLight struct {
-	*Effect
+	Effect
 	colorful.Color
 	Position float64
 	DeltaPar float64
@@ -63,7 +63,7 @@ func (r *RunningLight) Update() {
 
 //-----------------------------------------------------------------------------
 type GausRunningLight struct {
-	*Effect
+	Effect
 	colorful.Color
 	Position    float64
 	Delta       float64

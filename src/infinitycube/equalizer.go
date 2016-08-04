@@ -7,7 +7,7 @@ import (
 
 // Effect: White Spectrum
 type WhiteSpectrum struct {
-	*Effect
+	Effect
 	sound *ProcessedAudio
 }
 
@@ -33,7 +33,7 @@ func (e *WhiteSpectrum) Update() {
 
 // Effect: White Edge Spectrum
 type WhiteEdgeSpectrum struct {
-	*Effect
+	Effect
 	sound *ProcessedAudio
 }
 
@@ -66,7 +66,7 @@ func (e *WhiteEdgeSpectrum) Update() {
 
 // Effect: Edge Volume
 type EdgeVolume struct {
-	*Effect
+	Effect
 	sound *ProcessedAudio
 }
 
