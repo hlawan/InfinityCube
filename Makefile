@@ -67,9 +67,9 @@ content: static $(SCRIPTS)
 
 .PHONY: simulation
 simulation: infinitycube content
-	bin/gl_server -l frontend/cubeModel.json &
+	bin/gl_server -p 28144 -l frontend/cubeModel.json &
 	sleep 1
-	bin/infinitycube -fcserver localhost:7890
+	bin/infinitycube -fcserver localhost:28144
 
 .PHONY: deploy
 deploy: web content
