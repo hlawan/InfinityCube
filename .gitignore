@@ -2,6 +2,11 @@ bin/
 pkg/
 static/
 other/
+src/golang.org/
+src/github.com/
+src/9fans.net/
+src/gopkg.in/
+src/code.google.com/
 
 # Compiled source #
 ###################
