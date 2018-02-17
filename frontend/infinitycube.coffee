@@ -1,17 +1,22 @@
 $ = jQuery
 
-window.onload = ->
+document.ready = ->
+  console.log("onLy")
   $.get('status', (data) ->
     fillEffectSelector(data)
     fillActiveEffectSelector(data)
     fillEffectParameter(data)
+    console.log("test")
   , 'json')
+  console.log("onLy")
   bindEffectSelector()
   bindClapSelector()
   bindRemoveButton()
   bindActiveSelector()
 
 fillEffectSelector = (data) ->
+  console.log("AvailableEffects")
+  console.log(data['AvailableEffects'])
   opt = ""
   for i in data['AvailableEffects']
     console.log(i)
@@ -88,6 +93,7 @@ bindActiveSelector = ->
 
 bindRemoveButton = ->
     $('#remover').bind 'click', ->
+      console.log("remoooove!")
       value = $("#activeEffects option:selected").val()
       $.post('toggle', {r: value}, (data, textStatus, jqXHR) ->
         console.log(value)
