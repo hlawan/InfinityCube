@@ -24,7 +24,7 @@ type Status struct {
 	CurrentVolume    float64
 	AverageVolume    float64
 	MaxPeak          float64
-	PeakAverageRatio float64
+	//PeakAverageRatio float64
 }
 
 func NewStatus(data *ProcessedAudio, fx []string, ch chan string, h io.ReadWriter) (s *Status) {
@@ -35,9 +35,11 @@ func NewStatus(data *ProcessedAudio, fx []string, ch chan string, h io.ReadWrite
 		effectRequest: ch}
 	s.AvailableEffects = make([]string, len(fx))
 	s.AvailableEffects = fx
+	//fmt.Println("*NewStatus()* List of available Effects: ", s.AvailableEffects)
 	s.ActiveEffects = make([]string, 0)
 	s.SoundSignal = data.recordedSamples
-	fmt.Println(len(data.spektralDensity), len(data.freqs))
+	//fmt.Println("hello")
+	//fmt.Println(len(data.spektralDensity), len(data.freqs))
 	s.SpectralDensity = make([]float64, len(data.spektralDensity))
 	s.Freqs = make([]float64, len(data.freqs))
 	return s
@@ -127,10 +129,22 @@ func (s *Status) UpdateStatus(data *ProcessedAudio) {
 		s.CurrentVolume = data.currentVolume
 		s.AverageVolume = data.averageVolume
 		s.MaxPeak = data.maxPeak
-		s.PeakAverageRatio = data.peakAverageRatio
+		//s.PeakAverageRatio = data.peakAverageRatio
 		//data.Unlock()
 		time.Sleep(23 * time.Millisecond)
 	}
+}
+
+func (s *Status) GetHandler(w http.ResponseWriter, r *http.Request) {
+	//fmt.Println(s)
+	jsonBody, err := json.Marshal(s)
+	if err != nil {
+		fmt.Println(err)
+		http.Error(w, "Error converting results to json",
+			http.StatusInternalServerError)
+	}
+	//fmt.Println(jsonBody)
+	w.Write(jsonBody)
 }
 
 func StartWebServer(data *ProcessedAudio, fx []string, ch chan string) (s *Status) {
@@ -142,7 +156,7 @@ func StartWebServer(data *ProcessedAudio, fx []string, ch chan string) (s *Statu
 	go s.UpdateStatus(data)
 
 	http.Handle("/toggle", s)
-	http.Handle("/status", s)
+	http.HandleFunc("/status", s.GetHandler)
 	http.Handle("/", http.FileServer(http.Dir(*static_path)))
 	go func() {
 		err = http.ListenAndServe(*listen_address, nil)

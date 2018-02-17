@@ -207,6 +207,7 @@ func (eH *EffectHandler) listAvailableEffects() {
 			eH.availableEffects = append(eH.availableEffects, method)
 		}
 	}
+	//fmt.Println("*EffectHandler.listAvailableEffects()*: ", eH.availableEffects)
 }
 
 func (eH *EffectHandler) sendActiveEffects() {
