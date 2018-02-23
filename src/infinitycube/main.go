@@ -43,7 +43,7 @@ listen_address 	port the webserver is using, leads to webinterface
 static_path			folder containg website content
 */
 var (
-	serverPtr      = flag.String("fcserver", "192.168.178.39:7890", "Fadecandy server and port to connect to")
+	serverPtr      = flag.String("fcserver", "localhost:7890", "Fadecandy server and port to connect to")
 	serial_port    = flag.String("serial", "/dev/zero", "serial port")
 	listen_address = flag.String("listen", ":2500", "http service address")
 	static_path    = flag.String("static", "static", "path to the static content")
