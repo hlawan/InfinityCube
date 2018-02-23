@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-  "math"
+	"math"
 	"sync"
 	"time"
-  "github.com/gordonklaus/portaudio"
+
+	"github.com/gordonklaus/portaudio"
 	"github.com/mjibson/go-dsp/spectral"
 )
 
@@ -29,7 +30,7 @@ type ProcessedAudio struct {
 	sync.Mutex
 	sampleRate              int
 	recordedSamples         []SAMPLE
-	buffer64                []float64  //same as recordedSamples just 64 bit
+	buffer64                []float64 //same as recordedSamples just 64 bit
 	spektralDensity         []float64
 	freqs                   []float64
 	currentVolume           float64
@@ -76,7 +77,7 @@ func (pa *SoundSingnal) RecordCallback(buffer []SAMPLE) {
 	pa.bufferChannel <- buffer
 }
 
-func StartAudioProcessing(data *SoundSingnal) *ProcessedAudio{
+func StartAudioProcessing(data *SoundSingnal) *ProcessedAudio {
 	audio := NewProcessedAudio()
 	go func() {
 		for {
@@ -128,7 +129,9 @@ func (audio *ProcessedAudio) getVolume() {
 	audio.currentVolume = newAverageVolume
 	audio.averageVolume = audio.averageVolume*(1-scaledVolumeWeight) + newAverageVolume*scaledVolumeWeight
 	audio.maxPeak = maxPeak
-	audio.peakAverageRatio = maxPeak / audio.averageVolume
+	if audio.averageVolume > 0 {
+		audio.peakAverageRatio = maxPeak / audio.averageVolume
+	}
 	audio.averagePeakAverageValue = audio.averagePeakAverageValue*(1-scaledVolumeWeight) + audio.peakAverageRatio*scaledVolumeWeight
 }
 
