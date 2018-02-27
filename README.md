@@ -12,5 +12,5 @@ You have to do the following things to be able to build the software:
 ### Run Software
 
 * clone repository
-* run `make simluation`
+* run `make simluation` or `make infinitycube` (if real display is available)
 * access WebInterface at localhost:2500
