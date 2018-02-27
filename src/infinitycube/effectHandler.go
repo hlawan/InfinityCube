@@ -270,7 +270,7 @@ func analyseEffectParameter(s reflect.Value) map[string]string {
 			default:
 				parList[id] = " "
 			}
-		}	else if prop.Kind() == reflect.Struct {
+		} else if prop.Kind() == reflect.Struct {
 			deepFields := analyseEffectParameter(prop)
 			fmt.Println("found struct")
 			for k, v := range deepFields {
@@ -321,6 +321,11 @@ func (eH *EffectHandler) AddRunningLight() {
 
 func (eH *EffectHandler) AddGausRunningLight() {
 	grl := NewGausRunningLight(eH.myDisplay, eH.updateRate)
+	eH.activeEffects = append(eH.activeEffects, grl)
+}
+
+func (eH *EffectHandler) AddMultiRunningLight() {
+	grl := NewMultiRunningLight(eH.myDisplay, eH.updateRate)
 	eH.activeEffects = append(eH.activeEffects, grl)
 }
 

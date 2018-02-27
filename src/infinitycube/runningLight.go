@@ -1,24 +1,31 @@
 package main
 
 import (
-	"github.com/lucasb-eyer/go-colorful"
+	//"fmt"
 	"math"
+
+	"github.com/lucasb-eyer/go-colorful"
 )
 
 type RunningLight struct {
 	Effect
 	colorful.Color
-	Position float64
-	DeltaPar float64
+	Position  float64
+	DeltaPar  float64
+	Bounce    bool
+	Direction bool
 }
 
 func NewRunningLight(disp Display) *RunningLight {
 	ef := NewEffect(disp, 0.5, 0.0)
 
 	r := &RunningLight{
-		Effect:   ef,
-		Color:    red,
-		DeltaPar: 0.0001}
+		Effect:    ef,
+		Color:     red,
+		DeltaPar:  0.0001,
+		Bounce:    true,
+		Direction: true,
+	}
 
 	return r
 }
@@ -45,18 +52,45 @@ func dist(a, b float64) float64 {
 
 func (r *RunningLight) Update() {
 
-	//if advance { // need a new system to define speed here
-	r.Position += r.DeltaPar
-	if r.Position > 1 {
-		r.Position -= 1
+	if r.Bounce {
+		// way there
+		if r.Position >= 1 && r.Direction {
+			r.Direction = false
+		}
+		// way back
+		if r.Position <= 0 && !r.Direction {
+			r.Direction = true
+		}
+
+		if r.Direction {
+			r.Position += r.DeltaPar
+		} else {
+			r.Position -= r.DeltaPar
+
+		}
+	} else {
+		r.Position += r.DeltaPar
+		if r.Position > 1 {
+			r.Position -= 1
+		}
 	}
 
 	pos := r.Position * float64(r.LengthPar)
-	for i, _ := range r.Leds {
-		j := i % r.LengthPar
-		r.Leds[i].Color = BLACK.BlendRgb(r.Color, 1-min(1, dist(pos, float64(j))))
+	//fmt.Println(pos)
+
+	for i := 0; i < r.LengthPar; i++ {
+		j := i
+		if dist(pos, float64(j)) < 1 {
+			//fmt.Println(dist(pos, float64(j)))
+		}
+
+		r.Leds[i+r.OffsetPar].Color = BLACK.BlendRgb(r.Color, 1-min(1, dist(pos, float64(j))))
 	}
-	//}
+	//fmt.Println(r.Leds)
+	// for i, _ := range r.Leds {
+	// 	j := i
+	// 	r.Leds[i].Color = BLACK.BlendRgb(r.Color, 1-min(1, dist(pos, float64(j))))
+	// }
 
 	r.myDisplay.AddPattern(r.Leds, r.ColorOpacity, r.BlackOpacity)
 }
@@ -100,4 +134,48 @@ func (r *GausRunningLight) Update() {
 	}
 	//	}
 	r.myDisplay.AddPattern(r.Leds, r.ColorOpacity, r.BlackOpacity)
+}
+
+type MultiRunningLight struct {
+	Effect
+	runningLights     []Effector
+	IntervalPar       float64
+	fpsTarget         int
+	ledsPerDisplayPar int
+}
+
+func NewMultiRunningLight(disp Display, fps int) *MultiRunningLight {
+	ef := NewEffect(disp, 0.5, 0.0)
+
+	r := &MultiRunningLight{
+		Effect:            ef,
+		fpsTarget:         fps,
+		IntervalPar:       30,
+		ledsPerDisplayPar: 2}
+
+	for i := 0; i < NR_OF_SIDES*EDGES_PER_SIDE; i++ {
+		shift := i * EDGE_LENGTH
+		//fmt.Println(i)
+
+		for o := 0; o < r.ledsPerDisplayPar; o++ {
+			//fmt.Println("newRunningLight")
+			//fmt.Println(o)
+			rl := NewRunningLight(r.myDisplay)
+			rl.OffsetPar = shift
+			rl.LengthPar = EDGE_LENGTH
+			rl.Position = (float64(EDGE_LENGTH) / float64(r.ledsPerDisplayPar)) * float64(o)
+			rl.Color = colorful.Color{5, 0, 0}
+			rl.DeltaPar = 0.001
+			rl.BlackOpacity = 0
+			r.runningLights = append(r.runningLights, rl)
+		}
+	}
+
+	return r
+}
+
+func (r *MultiRunningLight) Update() {
+	for _, effect := range r.runningLights {
+		effect.Update()
+	}
 }
