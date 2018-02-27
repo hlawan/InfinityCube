@@ -64,12 +64,12 @@ type EffectHandler struct {
 	audio            *ProcessedAudio
 }
 
-func NewEffectHandler(newDisplay Display, newUpdateRate int, newAudio *ProcessedAudio) (eH *EffectHandler) {
+func NewEffectHandler(newDisplay Display, fps int, newAudio *ProcessedAudio) (eH *EffectHandler) {
 	eH = &EffectHandler{
 		myDisplay:  newDisplay,
 		lastUpdate: time.Now(),
-		updateRate: newUpdateRate,
-		loopTime:   10 * time.Millisecond,
+		updateRate: fps,
+		loopTime:   time.Duration(float64(1000000000) / float64(fps)), // in nanoseconds
 		//effectParameter: make([]map[string][]string),
 		effectRequest: make(chan string),
 		audio:         newAudio}
