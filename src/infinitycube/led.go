@@ -33,7 +33,7 @@ func (l *Led) CheckColor() {
 }
 
 func (a *Led) OnOrOff() bool {
-	if (a.Color.R + a.Color.G + a.Color.B) < 0.0001 {
+	if (a.Color.R + a.Color.G + a.Color.B) < 0.01 {
 		return false
 	} else {
 		return true
