@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/kellydunn/go-opc"
-	"github.com/lucasb-eyer/go-colorful"
 	"log"
 	"time"
+
+	"github.com/kellydunn/go-opc"
 )
 
 type Cube struct {
@@ -42,7 +42,7 @@ func (c *Cube) render() {
 }
 
 func (c *Cube) Show() {
-  c.render()
+	c.render()
 	leds := c.finalCube
 
 	// send pixel data
@@ -88,16 +88,15 @@ func (c *Cube) resetPatterns() {
 }
 
 func (c *Cube) MergePatterns() {
-	black := colorful.Color{0, 0, 0}
 	for i := range c.Patterns {
 		for p := 0; p < LEDS; p++ {
 			if i == 0 { //we dont want to merge the first Pattern with the still black "finalCube"
 				c.finalCube[p] = c.Patterns[i].leds[p]
 			} else { //and later we merge all folowing Patterns
-				if c.Patterns[i].leds[p].Color == black {
-					c.finalCube[p].Color = c.finalCube[p].Color.BlendRgb(c.Patterns[i].leds[p].Color, c.Patterns[i].blackOpacity)
-				} else {
+				if c.Patterns[i].leds[p].OnOrOff() {
 					c.finalCube[p].Color = c.finalCube[p].Color.BlendRgb(c.Patterns[i].leds[p].Color, c.Patterns[i].colorOpacity)
+				} else {
+					c.finalCube[p].Color = c.finalCube[p].Color.BlendRgb(c.Patterns[i].leds[p].Color, c.Patterns[i].blackOpacity)
 				}
 			}
 		}
