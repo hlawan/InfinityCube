@@ -32,14 +32,12 @@ const (
 	EDGES_PER_SIDE = 4  //well for me its a square...so 4
 	NR_OF_SIDES    = 6  //regular cube => 6 sides
 	LEDS           = EDGE_LENGTH * EDGES_PER_SIDE * NR_OF_SIDES
-	H_MAX          = 100 // maximum Hue value (Hsv)
-	H_MIN          = 0   // minimum Hue value (Hsv)
 )
 
 /*
 serverPtr 			address of Raspberry running the fadeCandyServer
 serial_port
-listen_address 	port the webserver is using, leads to webinterface
+listen_address 		port the webserver is using, leads to webinterface
 static_path			folder containg website content
 */
 var (
