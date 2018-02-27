@@ -10,49 +10,58 @@ import (
 type RunningLight struct {
 	Effect
 	colorful.Color
-	Position  float64
-	DeltaPar  float64
-	Bounce    bool
-	Direction bool
+	Position    float64
+	IntervalPar float64
+	delta       float64
+	Bounce      bool
+	Direction   bool
+	ModePar     int8
 }
 
 func NewRunningLight(disp Display) *RunningLight {
 	ef := NewEffect(disp, 0.5, 0.0)
 
 	r := &RunningLight{
-		Effect:    ef,
-		Color:     red,
-		DeltaPar:  0.0001,
-		Bounce:    true,
-		Direction: true,
+		Effect:      ef,
+		Color:       red,
+		IntervalPar: 10,
+		Bounce:      false,
+		Direction:   true,
+		ModePar:     2,
 	}
 
+	r.SetDelta(r.IntervalPar)
 	return r
 }
 
-var BLACK = colorful.Color{0, 0, 0}
-
-func max(a, b float64) float64 {
-	if a < b {
-		return b
-	}
-	return a
-}
-
-func min(a, b float64) float64 {
-	if a < b {
-		return a
-	}
-	return b
-}
-
-func dist(a, b float64) float64 {
-	return math.Abs(a - b)
+func (r *RunningLight) SetDelta(sec float64) {
+	r.delta = (float64(1) / float64(sec*fpsTarget))
 }
 
 func (r *RunningLight) Update() {
 
+	// update Position of the Light on the Display [scaled: (0.0 ... 1.0)]
+	r.moveLightPosition()
+
+	// update the LightPattern depending on the choosen runningLight mode
+	switch r.ModePar {
+	case 0:
+		r.updateSimple()
+	case 1:
+		r.updateStride()
+	case 2:
+		r.updateGauß()
+	default:
+		r.updateSimple()
+	}
+
+	r.myDisplay.AddPattern(r.Leds, r.ColorOpacity, r.BlackOpacity)
+}
+
+func (r *RunningLight) moveLightPosition() {
+
 	if r.Bounce {
+		// Running light runs back an forth
 		// way there
 		if r.Position >= 1 && r.Direction {
 			r.Direction = false
@@ -63,77 +72,63 @@ func (r *RunningLight) Update() {
 		}
 
 		if r.Direction {
-			r.Position += r.DeltaPar
+			r.Position += r.delta
 		} else {
-			r.Position -= r.DeltaPar
-
+			r.Position -= r.delta
 		}
+
 	} else {
-		r.Position += r.DeltaPar
+		// one way runningLight and at the end start from begining
+		r.Position += r.delta
 		if r.Position > 1 {
-			r.Position -= 1
+			r.Position = 0
 		}
 	}
+}
 
-	pos := r.Position * float64(r.LengthPar)
-	//fmt.Println(pos)
+func (r *RunningLight) updateSimple() {
+
+	// calc ledNr from scaled position (0.0 ... 1.0)
+	pos := r.Position * float64(r.LengthPar-1) // "-1" -> starting to count at 0
+	ledNr := int(math.Round(pos))
 
 	for i := 0; i < r.LengthPar; i++ {
-		j := i
-		if dist(pos, float64(j)) < 1 {
-			//fmt.Println(dist(pos, float64(j)))
+		// all LEDs Black, only LED at current postion colored
+		if i != ledNr {
+			r.Leds[i+r.OffsetPar].Color = BLACK
+		} else {
+			r.Leds[i+r.OffsetPar].Color = r.Color
 		}
-
-		r.Leds[i+r.OffsetPar].Color = BLACK.BlendRgb(r.Color, 1-min(1, dist(pos, float64(j))))
 	}
-	//fmt.Println(r.Leds)
-	// for i, _ := range r.Leds {
-	// 	j := i
-	// 	r.Leds[i].Color = BLACK.BlendRgb(r.Color, 1-min(1, dist(pos, float64(j))))
-	// }
-
-	r.myDisplay.AddPattern(r.Leds, r.ColorOpacity, r.BlackOpacity)
 }
 
-//-----------------------------------------------------------------------------
-type GausRunningLight struct {
-	Effect
-	colorful.Color
-	Position    float64
-	Delta       float64
-	IntervalPar float64
-	fpsTarget   int
-}
+func (r *RunningLight) updateStride() {
 
-func NewGausRunningLight(disp Display, fps int) *GausRunningLight {
-	ef := NewEffect(disp, 0.5, 0.0)
+	// calc light position on real display
+	pos := r.Position * float64(r.LengthPar-1) // "-1" -> starting to count at 0
 
-	r := &GausRunningLight{
-		Effect:      ef,
-		Color:       blue,
-		fpsTarget:   fps,
-		IntervalPar: 30}
-
-	r.Delta = (float64(1) / float64(r.IntervalPar*fpsTarget))
-	return r
-}
-
-func (r *GausRunningLight) Update() {
-	r.Delta = (float64(1) / float64(r.IntervalPar*fpsTarget))
-	//	if advance {
-	r.Position += r.Delta
-	if r.Position > 1 {
-		r.Position -= 1
+	for i := 0; i < r.LengthPar; i++ {
+		// calculate the color of every LED based on the distance to the current position of the Light
+		r.Leds[i+r.OffsetPar].Color = BLACK.BlendRgb(r.Color, 1-math.Min(1, dist(pos, float64(i))))
 	}
-	pos := r.Position * float64(r.LengthPar)
-	for i, _ := range r.Leds {
-		j := i % r.LengthPar
-		distance := dist(pos, float64(j))
+}
+
+func (r *RunningLight) updateGauß() {
+
+	// calc light position on real display
+	pos := r.Position * float64(r.LengthPar-1) // "-1" -> starting to count at 0
+
+	for i := 0; i < r.LengthPar; i++ {
+		distance := dist(pos, float64(i))
 		gaus := (1 / (math.Sqrt(math.Pi / 3))) * math.Exp(-(1)*math.Pow(distance, float64(2)))
-		r.Leds[i].Color = BLACK.BlendRgb(r.Color, gaus)
+		r.Leds[i+r.OffsetPar].Color = BLACK.BlendRgb(r.Color, gaus)
 	}
-	//	}
-	r.myDisplay.AddPattern(r.Leds, r.ColorOpacity, r.BlackOpacity)
+}
+
+var BLACK = colorful.Color{0, 0, 0}
+
+func dist(a, b float64) float64 {
+	return math.Abs(a - b)
 }
 
 type MultiRunningLight struct {
@@ -150,22 +145,23 @@ func NewMultiRunningLight(disp Display, fps int) *MultiRunningLight {
 	r := &MultiRunningLight{
 		Effect:            ef,
 		fpsTarget:         fps,
-		IntervalPar:       30,
+		IntervalPar:       5,
 		ledsPerDisplayPar: 2}
 
+	// for every edge
 	for i := 0; i < NR_OF_SIDES*EDGES_PER_SIDE; i++ {
 		shift := i * EDGE_LENGTH
-		//fmt.Println(i)
 
+		// runningLights per Display
 		for o := 0; o < r.ledsPerDisplayPar; o++ {
-			//fmt.Println("newRunningLight")
-			//fmt.Println(o)
 			rl := NewRunningLight(r.myDisplay)
 			rl.OffsetPar = shift
 			rl.LengthPar = EDGE_LENGTH
-			rl.Position = (float64(EDGE_LENGTH) / float64(r.ledsPerDisplayPar)) * float64(o)
-			rl.Color = colorful.Color{5, 0, 0}
-			rl.DeltaPar = 0.001
+			gap := 1.0 / float64(r.ledsPerDisplayPar-1)
+			rl.Position = float64(o) * gap
+			rl.Color = colorful.Color{1, 0, 0}
+			rl.Bounce = true
+			rl.SetDelta(r.IntervalPar)
 			rl.BlackOpacity = 0
 			r.runningLights = append(r.runningLights, rl)
 		}

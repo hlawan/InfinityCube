@@ -1,13 +1,11 @@
 package main
 
 import (
-	//"encoding/json"
 	"fmt"
 	"reflect"
 	"strconv"
 	"strings"
 	"time"
-	//"github.com/fatih/structs"
 )
 
 // An Effect has to provide information about the current led-pattern,
@@ -317,11 +315,6 @@ func (eH *EffectHandler) AddHsvFade() {
 func (eH *EffectHandler) AddRunningLight() {
 	rl := NewRunningLight(eH.myDisplay)
 	eH.activeEffects = append(eH.activeEffects, rl)
-}
-
-func (eH *EffectHandler) AddGausRunningLight() {
-	grl := NewGausRunningLight(eH.myDisplay, eH.updateRate)
-	eH.activeEffects = append(eH.activeEffects, grl)
 }
 
 func (eH *EffectHandler) AddMultiRunningLight() {
