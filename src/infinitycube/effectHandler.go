@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -18,6 +19,7 @@ type Effect struct {
 	ColorOpacity float64
 	BlackOpacity float64
 	myDisplay    Display
+	mux          sync.Mutex
 }
 
 func NewEffect(disp Display, colorOp, blackOp float64) Effect {

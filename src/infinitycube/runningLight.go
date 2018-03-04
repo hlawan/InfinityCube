@@ -1,7 +1,7 @@
 package main
 
 import (
-	//"fmt"
+	"fmt"
 	"math"
 
 	"github.com/lucasb-eyer/go-colorful"
@@ -15,7 +15,7 @@ type RunningLight struct {
 	delta       float64
 	Bounce      bool
 	Direction   bool
-	ModePar     int8
+	ModePar     int
 }
 
 func NewRunningLight(disp Display) *RunningLight {
@@ -39,6 +39,11 @@ func (r *RunningLight) SetDelta(sec float64) {
 }
 
 func (r *RunningLight) Update() {
+	r.mux.Lock()
+	defer r.mux.Unlock()
+
+	// update delta (work around) to be improved ;)
+	r.SetDelta(r.IntervalPar)
 
 	// update Position of the Light on the Display [scaled: (0.0 ... 1.0)]
 	r.moveLightPosition()
@@ -133,7 +138,7 @@ func dist(a, b float64) float64 {
 
 type MultiRunningLight struct {
 	Effect
-	runningLights     []Effector
+	runningLights     []*RunningLight
 	IntervalPar       float64
 	fpsTarget         int
 	ledsPerDisplayPar int
@@ -172,6 +177,7 @@ func NewMultiRunningLight(disp Display, fps int) *MultiRunningLight {
 
 func (r *MultiRunningLight) Update() {
 	for _, effect := range r.runningLights {
+		effect.IntervalPar = r.IntervalPar // update delta (work around) to be improved ;)
 		effect.Update()
 	}
 }

@@ -43,26 +43,31 @@ fillEffectParameter = (data) ->
     console.log("first loop " + k + v)
     opt += "<LI>" + k
     if k.lastIndexOf("Int", 0) == 0
-      opt += ": <input type='range' id='" + k + "' value='" + v + "' min ='" + 1 + "' max='" + (parseInt v*10) + "'>"
+      opt += ": <input type='range' id='" + k + "' value='" + v + "' min ='" + 0 + "' max='" + (parseInt v*10) + "'></input>"
     else  if k.lastIndexOf("Float", 0) == 0
-      opt += ": <input type='range' id='" + k + "' value='" + v + "' min ='" + 0.00001 + "' max='" + 10.1 + " step='0.01'>"
+      opt += ": <input type='range' id='" + k + "' value='" + v + "' min ='" + 0 + "' max='" + (parseInt v*10) + " step='0.01'></input>"
     else
-      opt += ": <input type='text' id='" + k + "' value='" + v + "' maxlength='5' size='5'>"
+      opt += ": <input type='text' id='" + k + "' value='" + v + "' maxlength='5' size='5'></input>"
   opt += "</UL>"
 
 
   $('#Parameter').html("")
   $('#Parameter').append(opt)
+  console.log("<<< Before bindLoop")
   for k,v of data['EffectParameter']
-    obj = "input#" + k
-    effect = $("#activeEffects option:selected").val()
+    do (k) ->
+      obj = "input#" + k
+      div = "#" + k
+      effect = $("#activeEffects option:selected").val()
 
-    $(obj).bind 'change', ->
-      value = "set" + effect + "Par" + $(obj).name() + "Val" + $(obj).val()
-      $.post('toggle', {act: value}, (data, textStatus, jqXHR) ->
-        console.log("+++ EffectParameter")
-        console.log(value)
-      , 'json')
+      $(obj).change ->
+        value = 'set' + effect + 'Par' + $(obj).attr('id') + 'Val' + $(obj).val()
+        $.post 'toggle', { act: value }, ((data, textStatus, jqXHR) ->
+          console.log '+++ EffectParameter'
+          console.log value
+        ), 'json'
+
+
 
 
 bindEffectSelector = ->
