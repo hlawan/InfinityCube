@@ -14,6 +14,7 @@ import (
 // it belongs to.
 type Effect struct {
 	Leds         []Led
+	Painter      ColorGenerator
 	OffsetPar    int
 	LengthPar    int
 	ColorOpacity float64

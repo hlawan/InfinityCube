@@ -31,6 +31,8 @@ func NewRunningLight(disp Display) *RunningLight {
 	}
 
 	r.SetDelta(r.IntervalPar)
+	r.Painter = NewConstantColor(&r.Effect)
+
 	return r
 }
 
@@ -59,6 +61,9 @@ func (r *RunningLight) Update() {
 	default:
 		r.updateSimple()
 	}
+
+	r.Painter.Colorize(&r.Leds)
+	fmt.Println(r.Leds)
 
 	r.myDisplay.AddPattern(r.Leds, r.ColorOpacity, r.BlackOpacity)
 }
@@ -100,9 +105,9 @@ func (r *RunningLight) updateSimple() {
 	for i := 0; i < r.LengthPar; i++ {
 		// all LEDs Black, only LED at current postion colored
 		if i != ledNr {
-			r.Leds[i+r.OffsetPar].Color = BLACK
+			r.Leds[i+r.OffsetPar].Color = colorful.Hsv(0, 0, 0)
 		} else {
-			r.Leds[i+r.OffsetPar].Color = r.Color
+			r.Leds[i+r.OffsetPar].Color = colorful.Hsv(0, 0, 1)
 		}
 	}
 }
@@ -114,7 +119,8 @@ func (r *RunningLight) updateStride() {
 
 	for i := 0; i < r.LengthPar; i++ {
 		// calculate the color of every LED based on the distance to the current position of the Light
-		r.Leds[i+r.OffsetPar].Color = BLACK.BlendRgb(r.Color, 1-math.Min(1, dist(pos, float64(i))))
+		//r.Leds[i+r.OffsetPar].Color = BLACK.BlendRgb(r.Color, 1-math.Min(1, dist(pos, float64(i))))
+		r.Leds[i+r.OffsetPar].Color = colorful.Hsv(0, 0, 1-math.Min(1, dist(pos, float64(i))))
 	}
 }
 
@@ -126,7 +132,9 @@ func (r *RunningLight) updateGauß() {
 	for i := 0; i < r.LengthPar; i++ {
 		distance := dist(pos, float64(i))
 		gaus := (1 / (math.Sqrt(math.Pi / 3))) * math.Exp(-(1)*math.Pow(distance, float64(2)))
-		r.Leds[i+r.OffsetPar].Color = BLACK.BlendRgb(r.Color, gaus)
+		//r.Leds[i+r.OffsetPar].Color = BLACK.BlendRgb(r.Color, gaus)
+		r.Leds[i+r.OffsetPar].Color = colorful.Hsv(240, 1, gaus)
+
 	}
 }
 
