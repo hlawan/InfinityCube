@@ -3,13 +3,11 @@ package main
 import (
 	"fmt"
 	"math"
-
-	"github.com/lucasb-eyer/go-colorful"
+	//"github.com/lucasb-eyer/go-colorful"
 )
 
 type RunningLight struct {
 	Effect
-	colorful.Color
 	Position    float64
 	IntervalPar float64
 	delta       float64
@@ -23,7 +21,6 @@ func NewRunningLight(disp Display) *RunningLight {
 
 	r := &RunningLight{
 		Effect:      ef,
-		Color:       red,
 		IntervalPar: 10,
 		Bounce:      false,
 		Direction:   true,
@@ -63,7 +60,7 @@ func (r *RunningLight) Update() {
 	}
 
 	r.Painter.Colorize(&r.Leds)
-	fmt.Println(r.Leds)
+	//fmt.Println(r.Leds)
 
 	r.myDisplay.AddPattern(r.Leds, r.ColorOpacity, r.BlackOpacity)
 }
@@ -105,9 +102,9 @@ func (r *RunningLight) updateSimple() {
 	for i := 0; i < r.LengthPar; i++ {
 		// all LEDs Black, only LED at current postion colored
 		if i != ledNr {
-			r.Leds[i+r.OffsetPar].Color = colorful.Hsv(0, 0, 0)
+			r.Leds[i+r.OffsetPar].Color.Y = 0
 		} else {
-			r.Leds[i+r.OffsetPar].Color = colorful.Hsv(0, 0, 1)
+			r.Leds[i+r.OffsetPar].Color.Y = 255
 		}
 	}
 }
@@ -120,7 +117,7 @@ func (r *RunningLight) updateStride() {
 	for i := 0; i < r.LengthPar; i++ {
 		// calculate the color of every LED based on the distance to the current position of the Light
 		//r.Leds[i+r.OffsetPar].Color = BLACK.BlendRgb(r.Color, 1-math.Min(1, dist(pos, float64(i))))
-		r.Leds[i+r.OffsetPar].Color = colorful.Hsv(0, 0, 1-math.Min(1, dist(pos, float64(i))))
+		r.Leds[i+r.OffsetPar].Color.Y = uint8((1 - math.Min(1, dist(pos, float64(i)))) * 255)
 	}
 }
 
@@ -133,12 +130,12 @@ func (r *RunningLight) updateGauß() {
 		distance := dist(pos, float64(i))
 		gaus := (1 / (math.Sqrt(math.Pi / 3))) * math.Exp(-(1)*math.Pow(distance, float64(2)))
 		//r.Leds[i+r.OffsetPar].Color = BLACK.BlendRgb(r.Color, gaus)
-		r.Leds[i+r.OffsetPar].Color = colorful.Hsv(240, 1, gaus)
+		r.Leds[i+r.OffsetPar].Color.Y = uint8(gaus * 255)
 
 	}
 }
 
-var BLACK = colorful.Color{0, 0, 0}
+//var BLACK = colorful.Color{0, 0, 0}
 
 func dist(a, b float64) float64 {
 	return math.Abs(a - b)
@@ -172,7 +169,6 @@ func NewMultiRunningLight(disp Display, fps int) *MultiRunningLight {
 			rl.LengthPar = EDGE_LENGTH
 			gap := 1.0 / float64(r.ledsPerDisplayPar-1)
 			rl.Position = float64(o) * gap
-			rl.Color = colorful.Color{1, 0, 0}
 			rl.Bounce = true
 			rl.SetDelta(r.IntervalPar)
 			rl.BlackOpacity = 0

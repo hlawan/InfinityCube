@@ -2,38 +2,40 @@
 package main
 
 import (
-	"fmt"
-
-	"github.com/lucasb-eyer/go-colorful"
+	//"fmt"
+	"image/color"
 )
 
 type ColorGenerator interface {
-	Colorize(*[]Led)
+	Colorize(*[]Led) /*(uint8, uint8)*/
 }
 
 type ConstantColor struct {
 	myEffect *Effect
-	ColorPar colorful.Color
+	ColorPar color.NYCbCrA
 }
 
 func NewConstantColor(eff *Effect) *ConstantColor {
 
+	var col color.NYCbCrA
+	col.Y = 255
+	col.Cb = 0
+	col.Cr = 0
+	col.A = 255
+
 	cc := &ConstantColor{
 		myEffect: eff,
-		ColorPar: colorful.Hsv(120, 1, 1)}
+		ColorPar: col}
 
 	return cc
 }
-func (cc *ConstantColor) Colorize(leds *[]Led) {
-	for _, led := range cc.myEffect.Leds {
-		// get value (brightness) from current pattern
-		_, _, v := led.Color.Hsv()
-		// get saturation and hue (color) to set
-		h, s, _ := cc.ColorPar.Hsv()
-		// set
-		//fmt.Println(h, " ", s, " ", v)
-		fmt.Println(colorful.Hsv(h, s, v).RGB255())
-		newColor := colorful.Hsv(h, s, v)
-		led.Color = newColor
+func (cc *ConstantColor) Colorize(leds *[]Led) /* (uint8, uint8)*/ {
+	for _, led := range *leds {
+
+		led.Color.Cr = cc.ColorPar.YCbCr.Cr
+		led.Color.Cb = cc.ColorPar.YCbCr.Cb
+
+		//fmt.Println(led.Color)
 	}
+	return //cc.ColorPar.YCbCr.Y, cc.ColorPar.YCbCr.Y
 }

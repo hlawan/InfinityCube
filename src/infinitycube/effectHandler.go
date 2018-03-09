@@ -290,30 +290,30 @@ func FloatToString(input_num float64) string {
 
 // List of addable Effects
 
-func (eH *EffectHandler) AddCellularAutomata() {
-	ca := NewCellularAutomata(eH.myDisplay)
-	eH.activeEffects = append(eH.activeEffects, ca)
-}
+//func (eH *EffectHandler) AddCellularAutomata() {
+//	ca := NewCellularAutomata(eH.myDisplay)
+//	eH.activeEffects = append(eH.activeEffects, ca)
+//}
 
-func (eH *EffectHandler) AddWhiteSpectrum() {
-	ws := NewWhiteSpectrum(eH.myDisplay, eH.audio)
-	eH.activeEffects = append(eH.activeEffects, ws)
-}
+//func (eH *EffectHandler) AddWhiteSpectrum() {
+//	ws := NewWhiteSpectrum(eH.myDisplay, eH.audio)
+//	eH.activeEffects = append(eH.activeEffects, ws)
+//}
 
-func (eH *EffectHandler) AddWhiteEdgeSpectrum() {
-	wes := NewWhiteEdgeSpectrum(eH.myDisplay, eH.audio)
-	eH.activeEffects = append(eH.activeEffects, wes)
-}
+//func (eH *EffectHandler) AddWhiteEdgeSpectrum() {
+//	wes := NewWhiteEdgeSpectrum(eH.myDisplay, eH.audio)
+//	eH.activeEffects = append(eH.activeEffects, wes)
+//}
 
-func (eH *EffectHandler) AddEdgeVolume() {
-	ev := NewEdgeVolume(eH.myDisplay, eH.audio)
-	eH.activeEffects = append(eH.activeEffects, ev)
-}
+//func (eH *EffectHandler) AddEdgeVolume() {
+//	ev := NewEdgeVolume(eH.myDisplay, eH.audio)
+//	eH.activeEffects = append(eH.activeEffects, ev)
+//}
 
-func (eH *EffectHandler) AddHsvFade() {
-	hsv := NewHsvFade(eH.myDisplay, eH.updateRate)
-	eH.activeEffects = append(eH.activeEffects, hsv)
-}
+//func (eH *EffectHandler) AddHsvFade() {
+//	hsv := NewHsvFade(eH.myDisplay, eH.updateRate)
+//	eH.activeEffects = append(eH.activeEffects, hsv)
+//}
 
 func (eH *EffectHandler) AddRunningLight() {
 	rl := NewRunningLight(eH.myDisplay)

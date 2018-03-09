@@ -1,7 +1,9 @@
 package main
 
 import (
+	"image/color"
 	"log"
+	"math"
 	"time"
 
 	"github.com/kellydunn/go-opc"
@@ -50,8 +52,13 @@ func (c *Cube) Show() {
 	m.SetLength(uint16(len(leds) * 3)) // *3 -> r, g, b
 
 	for i := range leds {
-		r, g, b := leds[i].Color.RGB255()
-		m.SetPixelColor(i, r, g, b)
+		r, g, b, _ := leds[i].Color.RGBA()
+		fmt.Println(r, g, b)
+		r8 := uint8(255 * (r / (2 ^ 32)))
+		g8 := uint8(255 * (g / (2 ^ 32)))
+		b8 := uint8(255 * (b / (2 ^ 32)))
+
+		m.SetPixelColor(i, r8, g8, b8)
 	}
 
 	err := c.fadeCandy.Send(m)
@@ -93,12 +100,28 @@ func (c *Cube) MergePatterns() {
 			if i == 0 { //we dont want to merge the first Pattern with the still black "finalCube"
 				c.finalCube[p] = c.Patterns[i].leds[p]
 			} else { //and later we merge all folowing Patterns
-				if c.Patterns[i].leds[p].OnOrOff() {
-					c.finalCube[p].Color = c.finalCube[p].Color.BlendRgb(c.Patterns[i].leds[p].Color, c.Patterns[i].colorOpacity)
-				} else {
-					c.finalCube[p].Color = c.finalCube[p].Color.BlendRgb(c.Patterns[i].leds[p].Color, c.Patterns[i].blackOpacity)
-				}
+				//				if c.Patterns[i].leds[p].OnOrOff() {
+				c.finalCube[p].Color = blendYCbCr(c.finalCube[p].Color, c.Patterns[i].leds[p].Color)
+				//				} else {
+				//					c.finalCube[p].Color = c.finalCube[p].Color.BlendRgb(c.Patterns[i].leds[p].Color, c.Patterns[i].blackOpacity)
+				//				}
 			}
 		}
 	}
+}
+
+func blendYCbCr(col1, col2 color.NYCbCrA) color.NYCbCrA {
+	//	nY = (col1.Y + col2.Y) / 2
+	nY := math.Max(float64(col1.Y), float64(col2.Y))
+	nCb := (float64(col1.Cb) + float64(col2.Cb)) / 2
+	nCr := (float64(col1.Cr) + float64(col2.Cr)) / 2
+	nA := (float64(col1.A) + float64(col2.A)) / 2
+
+	var col color.NYCbCrA
+	col.Y = uint8(nY)
+	col.Cb = uint8(nCb)
+	col.Cr = uint8(nCr)
+	col.A = uint8(nA)
+
+	return col
 }
