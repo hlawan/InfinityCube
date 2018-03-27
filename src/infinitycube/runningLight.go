@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	//"fmt"
 	"math"
 	//"github.com/lucasb-eyer/go-colorful"
 )
@@ -59,7 +59,7 @@ func (r *RunningLight) Update() {
 		r.updateSimple()
 	}
 
-	r.Painter.Colorize(&r.Leds)
+	r.Leds = r.Painter.Colorize(r.Leds)
 	//fmt.Println(r.Leds)
 
 	r.myDisplay.AddPattern(r.Leds, r.ColorOpacity, r.BlackOpacity)

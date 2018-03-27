@@ -7,7 +7,7 @@ import (
 )
 
 type ColorGenerator interface {
-	Colorize(*[]Led) /*(uint8, uint8)*/
+	Colorize([]Led) []Led
 }
 
 type ConstantColor struct {
@@ -19,8 +19,8 @@ func NewConstantColor(eff *Effect) *ConstantColor {
 
 	var col color.NYCbCrA
 	col.Y = 255
-	col.Cb = 0
-	col.Cr = 0
+	col.Cb = 100
+	col.Cr = 100
 	col.A = 255
 
 	cc := &ConstantColor{
@@ -29,13 +29,22 @@ func NewConstantColor(eff *Effect) *ConstantColor {
 
 	return cc
 }
-func (cc *ConstantColor) Colorize(leds *[]Led) /* (uint8, uint8)*/ {
-	for _, led := range *leds {
+func (cc *ConstantColor) Colorize(leds []Led) []Led {
 
-		led.Color.Cr = cc.ColorPar.YCbCr.Cr
-		led.Color.Cb = cc.ColorPar.YCbCr.Cb
+	var colLeds []Led
 
-		//fmt.Println(led.Color)
+	for _, led := range leds {
+		var col color.NYCbCrA
+		col.Y = led.Color.YCbCr.Y
+		col.Cb = cc.ColorPar.YCbCr.Cb
+		col.Cr = cc.ColorPar.YCbCr.Cr
+		col.A = cc.ColorPar.A
+
+		var colLed Led
+		colLed.Color = col
+
+		colLeds = append(colLeds, colLed)
 	}
-	return //cc.ColorPar.YCbCr.Y, cc.ColorPar.YCbCr.Y
+
+	return colLeds
 }

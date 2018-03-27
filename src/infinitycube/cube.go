@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"image/color"
 	"log"
 	"math"
@@ -50,15 +51,19 @@ func (c *Cube) Show() {
 	// send pixel data
 	m := opc.NewMessage(0)
 	m.SetLength(uint16(len(leds) * 3)) // *3 -> r, g, b
-
+	//fmt.Println(leds)
 	for i := range leds {
-		r, g, b, _ := leds[i].Color.RGBA()
+		fmt.Println(leds[i].Color)
+		//y := leds[i].Color.Y
+		cb := leds[i].Color.Cb
+		cr := leds[i].Color.Cr
+		r, g, b := color.YCbCrToRGB(0, cb, cr)
 		fmt.Println(r, g, b)
-		r8 := uint8(255 * (r / (2 ^ 32)))
-		g8 := uint8(255 * (g / (2 ^ 32)))
-		b8 := uint8(255 * (b / (2 ^ 32)))
+		//r8 := uint8(255 * (r / (2 ^ 32)))
+		//g8 := uint8(255 * (g / (2 ^ 32)))
+		//b8 := uint8(255 * (b / (2 ^ 32)))
 
-		m.SetPixelColor(i, r8, g8, b8)
+		m.SetPixelColor(i, r, g, b)
 	}
 
 	err := c.fadeCandy.Send(m)
