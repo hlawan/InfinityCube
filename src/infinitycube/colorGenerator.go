@@ -1,27 +1,20 @@
 // colorGenerator
 package main
 
-import (
-	//"fmt"
-	"image/color"
-)
-
 type ColorGenerator interface {
 	Colorize([]Led) []Led
 }
 
 type ConstantColor struct {
 	myEffect *Effect
-	ColorPar color.NYCbCrA
+	ColorPar Led
 }
 
 func NewConstantColor(eff *Effect) *ConstantColor {
 
-	var col color.NYCbCrA
-	col.Y = 255
-	col.Cb = 100
-	col.Cr = 100
-	col.A = 255
+	var col Led
+	col.S = 255
+	col.H = 180
 
 	cc := &ConstantColor{
 		myEffect: eff,
@@ -34,14 +27,13 @@ func (cc *ConstantColor) Colorize(leds []Led) []Led {
 	var colLeds []Led
 
 	for _, led := range leds {
-		var col color.NYCbCrA
-		col.Y = led.Color.YCbCr.Y
-		col.Cb = cc.ColorPar.YCbCr.Cb
-		col.Cr = cc.ColorPar.YCbCr.Cr
-		col.A = cc.ColorPar.A
 
 		var colLed Led
-		colLed.Color = col
+		colLed.S = 255
+		colLed.H = 180
+
+		// dont touch brightness/value
+		colLed.V = led.V
 
 		colLeds = append(colLeds, colLed)
 	}

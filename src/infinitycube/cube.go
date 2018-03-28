@@ -1,10 +1,10 @@
 package main
 
 import (
-	"fmt"
-	"image/color"
+	//	"fmt"
+	//	"image/color"
 	"log"
-	"math"
+	//	"math"
 	"time"
 
 	"github.com/kellydunn/go-opc"
@@ -52,18 +52,9 @@ func (c *Cube) Show() {
 	m := opc.NewMessage(0)
 	m.SetLength(uint16(len(leds) * 3)) // *3 -> r, g, b
 	//fmt.Println(leds)
-	for i := range leds {
-		fmt.Println(leds[i].Color)
-		//y := leds[i].Color.Y
-		cb := leds[i].Color.Cb
-		cr := leds[i].Color.Cr
-		r, g, b := color.YCbCrToRGB(0, cb, cr)
-		fmt.Println(r, g, b)
-		//r8 := uint8(255 * (r / (2 ^ 32)))
-		//g8 := uint8(255 * (g / (2 ^ 32)))
-		//b8 := uint8(255 * (b / (2 ^ 32)))
 
-		m.SetPixelColor(i, r, g, b)
+	for i, led := range leds {
+		m.SetPixelColor(i, led.R, led.G, led.B)
 	}
 
 	err := c.fadeCandy.Send(m)
@@ -102,31 +93,41 @@ func (c *Cube) resetPatterns() {
 func (c *Cube) MergePatterns() {
 	for i := range c.Patterns {
 		for p := 0; p < LEDS; p++ {
-			if i == 0 { //we dont want to merge the first Pattern with the still black "finalCube"
-				c.finalCube[p] = c.Patterns[i].leds[p]
-			} else { //and later we merge all folowing Patterns
-				//				if c.Patterns[i].leds[p].OnOrOff() {
-				c.finalCube[p].Color = blendYCbCr(c.finalCube[p].Color, c.Patterns[i].leds[p].Color)
-				//				} else {
-				//					c.finalCube[p].Color = c.finalCube[p].Color.BlendRgb(c.Patterns[i].leds[p].Color, c.Patterns[i].blackOpacity)
-				//				}
-			}
+			c.finalCube[p] = blendLeds(c.finalCube[p], c.Patterns[i].leds[p])
 		}
 	}
 }
 
-func blendYCbCr(col1, col2 color.NYCbCrA) color.NYCbCrA {
-	//	nY = (col1.Y + col2.Y) / 2
-	nY := math.Max(float64(col1.Y), float64(col2.Y))
-	nCb := (float64(col1.Cb) + float64(col2.Cb)) / 2
-	nCr := (float64(col1.Cr) + float64(col2.Cr)) / 2
-	nA := (float64(col1.A) + float64(col2.A)) / 2
+//func blendYCbCr(col1, col2 color.NYCbCrA) color.NYCbCrA {
+//	//	nY = (col1.Y + col2.Y) / 2
+//	nY := math.Max(float64(col1.Y), float64(col2.Y))
+//	nCb := (float64(col1.Cb) + float64(col2.Cb)) / 2
+//	nCr := (float64(col1.Cr) + float64(col2.Cr)) / 2
+//	nA := (float64(col1.A) + float64(col2.A)) / 2
 
-	var col color.NYCbCrA
-	col.Y = uint8(nY)
-	col.Cb = uint8(nCb)
-	col.Cr = uint8(nCr)
-	col.A = uint8(nA)
+//	var col color.NYCbCrA
+//	col.Y = uint8(nY)
+//	col.Cb = uint8(nCb)
+//	col.Cr = uint8(nCr)
+//	col.A = uint8(nA)
 
-	return col
+//	return col
+//}
+
+func blendLeds(col1, col2 Led) Led {
+	var newCol Led
+
+	if col1.Off() {
+		newCol.R, newCol.G, newCol.B = col2.RGB()
+	} else if col2.Off() {
+		newCol.R, newCol.G, newCol.B = col1.RGB()
+	} else {
+		r1, g1, b1 := col1.RGB()
+		r2, g2, b2 := col2.RGB()
+		newCol.R = (r1 + r2) / 2
+		newCol.G = (g1 + g2) / 2
+		newCol.B = (b1 + b2) / 2
+	}
+
+	return newCol
 }

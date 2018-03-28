@@ -102,9 +102,9 @@ func (r *RunningLight) updateSimple() {
 	for i := 0; i < r.LengthPar; i++ {
 		// all LEDs Black, only LED at current postion colored
 		if i != ledNr {
-			r.Leds[i+r.OffsetPar].Color.Y = 0
+			r.Leds[i+r.OffsetPar].V = 0
 		} else {
-			r.Leds[i+r.OffsetPar].Color.Y = 255
+			r.Leds[i+r.OffsetPar].V = 1
 		}
 	}
 }
@@ -117,7 +117,7 @@ func (r *RunningLight) updateStride() {
 	for i := 0; i < r.LengthPar; i++ {
 		// calculate the color of every LED based on the distance to the current position of the Light
 		//r.Leds[i+r.OffsetPar].Color = BLACK.BlendRgb(r.Color, 1-math.Min(1, dist(pos, float64(i))))
-		r.Leds[i+r.OffsetPar].Color.Y = uint8((1 - math.Min(1, dist(pos, float64(i)))) * 255)
+		r.Leds[i+r.OffsetPar].V = 1 - math.Min(1, dist(pos, float64(i)))
 	}
 }
 
@@ -130,7 +130,7 @@ func (r *RunningLight) updateGauß() {
 		distance := dist(pos, float64(i))
 		gaus := (1 / (math.Sqrt(math.Pi / 3))) * math.Exp(-(1)*math.Pow(distance, float64(2)))
 		//r.Leds[i+r.OffsetPar].Color = BLACK.BlendRgb(r.Color, gaus)
-		r.Leds[i+r.OffsetPar].Color.Y = uint8(gaus * 255)
+		r.Leds[i+r.OffsetPar].V = gaus
 
 	}
 }
