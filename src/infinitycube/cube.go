@@ -1,7 +1,7 @@
 package main
 
 import (
-	//	"fmt"
+	// "fmt"
 	//	"image/color"
 	"log"
 	//	"math"
@@ -91,6 +91,13 @@ func (c *Cube) resetPatterns() {
 }
 
 func (c *Cube) MergePatterns() {
+
+	// start from black
+	for i, _ := range c.finalCube {
+		c.finalCube[i].reset()
+	}
+
+	// merge all generated patterns
 	for i := range c.Patterns {
 		for p := 0; p < LEDS; p++ {
 			c.finalCube[p] = blendLeds(c.finalCube[p], c.Patterns[i].leds[p])
@@ -118,15 +125,22 @@ func blendLeds(col1, col2 Led) Led {
 	var newCol Led
 
 	if col1.Off() {
+		newCol = col2
 		newCol.R, newCol.G, newCol.B = col2.RGB()
 	} else if col2.Off() {
+		newCol = col1
 		newCol.R, newCol.G, newCol.B = col1.RGB()
 	} else {
 		r1, g1, b1 := col1.RGB()
 		r2, g2, b2 := col2.RGB()
-		newCol.R = (r1 + r2) / 2
-		newCol.G = (g1 + g2) / 2
-		newCol.B = (b1 + b2) / 2
+
+		// merge
+		nR := (r1 + r2) / 2
+		nG := (g1 + g2) / 2
+		nB := (b1 + b2) / 2
+
+		// set new color
+		newCol.FromRGB(nR, nG, nB)
 	}
 
 	return newCol

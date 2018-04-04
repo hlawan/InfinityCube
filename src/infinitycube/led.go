@@ -1,6 +1,7 @@
 package main
 
 import (
+	//"fmt"
 	"math"
 )
 
@@ -14,13 +15,15 @@ func (a *Led) RGB() (r, g, b uint8) {
 	// Direct implementation of the graph in this image:
 	// https://en.wikipedia.org/wiki/HSL_and_HSV#/media/File:HSV-RGB-comparison.svg
 
+	a.fixRanges()
+
 	C := a.V * a.S
-	segment := a.H / 60
-	X := C * (1 - math.Abs(float64(segment%2)-1))
+	segment := float64(a.H) / 60.0
+	X := C * (1 - math.Abs(math.Mod(segment, 2)-1))
 
 	var r1, g1, b1 float64
 
-	switch segment {
+	switch uint8(segment) {
 	case 0:
 		r1 = C
 		g1 = X
@@ -52,46 +55,86 @@ func (a *Led) RGB() (r, g, b uint8) {
 	g1 += m
 	b1 += m
 
-	r = uint8(r1 * 255)
-	g = uint8(g1 * 255)
-	b = uint8(b1 * 255)
+	a.R = uint8(r1 * 255)
+	a.G = uint8(g1 * 255)
+	a.B = uint8(b1 * 255)
 
-	return r, g, b
+	return a.R, a.G, a.B
 }
 
-//func (a *Led) RGB() (r, g, b uint8) {
-//	// Direct implementation of the graph in this image:
-//	// https://en.wikipedia.org/wiki/HSL_and_HSV#/media/File:HSV-RGB-comparison.svg
-//	max := uint32(a.V) * 255
-//	min := uint32(a.V) * uint32(255-a.S)
+func (a *Led) FromRGB(rInt, gInt, bInt uint8) {
+	// from https://www.rapidtables.com/convert/color/rgb-to-hsv.html
 
-//	a.H %= 360
-//	segment := a.H / 60
-//	offset := uint32(a.H % 60)
-//	mid := ((max - min) * offset) / 60
+	a.R = rInt
+	a.G = gInt
+	a.B = bInt
 
-//	switch segment {
-//	case 0:
-//		return max, min + mid, min
-//	case 1:
-//		return max - mid, max, min
-//	case 2:
-//		return min, max, min + mid
-//	case 3:
-//		return min, max - mid, max
-//	case 4:
-//		return min + mid, min, max
-//	case 5:
-//		return max, min, max - mid
-//	}
+	r := float64(rInt) / 255.0
+	g := float64(gInt) / 255.0
+	b := float64(bInt) / 255.0
 
-//	return 0, 0, 0
-//}
+	cMax := math.Max(r, math.Max(g, b))
+	cMin := math.Min(r, math.Min(g, b))
+
+	delta := cMax - cMin
+
+	// calc Hue
+	nH := 0.0
+
+	if delta > 0 {
+		if cMax == r {
+			nH = (g - b) / delta
+		} else if cMax == g {
+			nH = ((b - r) / delta) + 2
+		} else if cMax == b {
+			nH = ((r - g) / delta) + 4
+		}
+	}
+	a.H = uint16(60*nH) % 360
+
+	// calc Saturation
+	if cMax > 0 {
+		a.S = delta / cMax
+	} else {
+		a.S = 0
+	}
+
+	// calc Value
+	a.V = cMax
+}
 
 func (a *Led) Off() bool {
-	if a.V > 0 {
+	if a.V > 1e-3 {
 		return false
 	} else {
 		return true
 	}
+}
+
+func (a *Led) fixRanges() {
+	if a.V > 1 {
+		a.V = 1
+	}
+	if a.V < 0 {
+		a.V = 0
+	}
+
+	if a.S > 1 {
+		a.S = 1
+	}
+	if a.S < 0 {
+		a.S = 0
+	}
+
+	a.H = a.H % 360
+
+}
+
+func (a *Led) reset() {
+	a.H = 0
+	a.S = 0
+	a.V = 0
+	a.R = 0
+	a.G = 0
+	a.B = 0
 }

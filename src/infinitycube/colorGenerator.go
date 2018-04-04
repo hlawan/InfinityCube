@@ -29,8 +29,8 @@ func (cc *ConstantColor) Colorize(leds []Led) []Led {
 	for _, led := range leds {
 
 		var colLed Led
-		colLed.S = 255
-		colLed.H = 180
+		colLed.S = 1
+		colLed.H = 60
 
 		// dont touch brightness/value
 		colLed.V = led.V
