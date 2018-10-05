@@ -46,12 +46,12 @@ type ProcessedAudio struct {
 }
 
 func NewSoundSingnal() *SoundSingnal {
-	var err error
+	//var err error
 	d := &SoundSingnal{}
 	d.buffer = make([]SAMPLE, FRAMES_PER_BUFFER)
 	d.bufferChannel = make(chan []SAMPLE)
-	d.Stream, err = portaudio.OpenDefaultStream(1, 0, SAMPLE_RATE, FRAMES_PER_BUFFER, d.RecordCallback)
-	CheckErr(err)
+	//d.Stream, err = portaudio.OpenDefaultStream(1, 0, SAMPLE_RATE, FRAMES_PER_BUFFER, d.RecordCallback)
+	//CheckErr(err)
 	return d
 }
 
@@ -66,10 +66,10 @@ func NewProcessedAudio() *ProcessedAudio {
 }
 
 func StartSoundTracking() *SoundSingnal {
-	portaudio.Initialize()
+	//portaudio.Initialize()
 	s := NewSoundSingnal()
-	CheckErr(s.Start())
-	fmt.Println("Now recording")
+	//CheckErr(s.Start())
+	//fmt.Println("Now recording")
 	return s
 }
 
