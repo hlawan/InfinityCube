@@ -76,6 +76,7 @@ func NewEffectHandler(newDisplay Display, fps int, newAudio *ProcessedAudio) (eH
 		audio:         newAudio}
 
 	eH.listAvailableEffects()
+	eH.AddMultiRunningLight()
 	go eH.handleRequests()
 	return
 }

@@ -66,10 +66,24 @@ func NewProcessedAudio() *ProcessedAudio {
 }
 
 func StartSoundTracking() *SoundSingnal {
+
 	portaudio.Initialize()
 	s := NewSoundSingnal()
-	CheckErr(s.Start())
-	fmt.Println("Now recording")
+
+	// check if audio input stream is available on the system
+	if s.Stream != nil {
+		err := s.Start()
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Println("Audio input found")
+		}
+	} else {
+		if debugLvl >= 1 {
+			fmt.Println("No audio input available. Audio-reactive Effects will not work!")
+		}
+	}
+
 	return s
 }
 
