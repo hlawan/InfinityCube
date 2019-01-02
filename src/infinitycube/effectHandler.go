@@ -97,11 +97,21 @@ func NewEffectHandler(newDisplay Display, fps int, newAudio *ProcessedAudio) (eH
 func (eH *EffectHandler) render() {
 	loopStart := time.Now()
 
+	eH.checkPlayList()
 	eH.updateAll()
 	eH.myDisplay.Show()
 
 	if time.Since(loopStart) < (eH.loopTime) {
 		time.Sleep(eH.loopTime - time.Since(loopStart))
+	}
+}
+
+func (eH *EffectHandler) checkPlayList() {
+	if eH.currentPlaylist != nil {
+		newEffects := eH.currentPlaylist.SlotEffects()
+		if newEffects != nil {
+			eH.activeEffects = newEffects
+		}
 	}
 }
 
@@ -113,11 +123,11 @@ func (eH *EffectHandler) updateAll() {
 
 func (eH *EffectHandler) playAllEffects() {
 
-	slotCount := 3
+	slotCount := 4
 
 	ca := NewCellularAutomata(eH.myDisplay)
 	//ws := NewWhiteSpectrum(eH.myDisplay, eH.audio)
-	//wes := NewWhiteEdgeSpectrum(eH.myDisplay, eH.audio)
+	wes := NewWhiteEdgeSpectrum(eH.myDisplay, eH.audio)
 	//ev := NewEdgeVolume(eH.myDisplay, eH.audio)
 	hsv := NewHsvFade(eH.myDisplay, eH.updateRate)
 	rl := NewRunningLight(eH.myDisplay)
@@ -130,10 +140,11 @@ func (eH *EffectHandler) playAllEffects() {
 		slots = append(slots, slot)
 	}
 
-	slots[0][ca] = 5
-	slots[1][grl] = 8
-	slots[1][rl] = 10
-	slots[2][hsv] = 15
+	slots[0][ca] = 5 * time.Second
+	slots[1][grl] = 5 * time.Second
+	slots[1][rl] = 5 * time.Second
+	slots[2][hsv] = 5 * time.Second
+	slots[3][wes] = 5 * time.Second
 
 	eH.currentPlaylist = NewPlayList("all Effects", slots)
 
