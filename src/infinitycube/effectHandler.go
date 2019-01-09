@@ -126,15 +126,16 @@ func (eH *EffectHandler) updateAll() {
 
 func (eH *EffectHandler) playAllEffects() {
 
-	slotCount := 2
+	slotCount := 1
 
 	//ca := NewCellularAutomata(eH.myDisplay)
 	//ws := NewWhiteSpectrum(eH.myDisplay, eH.audio)
 	//wes := NewWhiteEdgeSpectrum(eH.myDisplay, eH.audio)
 	//ev := NewEdgeVolume(eH.myDisplay, eH.audio)
 	//hsv := NewHsvFade(eH.myDisplay, eH.updateRate)
-	rl := NewRunningLight(eH.myDisplay)
-	grl := NewMultiRunningLight(eH.myDisplay, eH.updateRate)
+	//rl := NewRunningLight(eH.myDisplay)
+	//grl := NewMultiRunningLight(eH.myDisplay, eH.updateRate)
+	sine := NewSine(eH.myDisplay)
 
 	slots := []map[Effector]time.Duration{}
 
@@ -143,9 +144,9 @@ func (eH *EffectHandler) playAllEffects() {
 		slots = append(slots, slot)
 	}
 
-	slots[0][rl] = 5 * time.Second
-	slots[1][grl] = 10 * time.Second
-	slots[1][rl] = 8 * time.Second
+	slots[0][sine] = 5 * time.Second
+	//slots[1][grl] = 10 * time.Second
+	//slots[1][rl] = 8 * time.Second
 	//slots[2][hsv] = 5 * time.Second
 	//slots[3][wes] = 5 * time.Second
 
