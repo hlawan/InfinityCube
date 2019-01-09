@@ -2,7 +2,6 @@
 package main
 
 import (
-	//"fmt"
 	"time"
 )
 
@@ -20,9 +19,9 @@ func NewPlayList(name string, EffectList []map[Effector]time.Duration) *PlayList
 		Name:       name,
 		Effects:    EffectList,
 		slotTimes:  make([]time.Duration, len(EffectList)),
-		activeSlot: 0,
+		activeSlot: -1,
 		totalTime:  0 * time.Second,
-		lastChange: time.Now().Add(-24 * time.Hour),
+		lastChange: time.Now(),
 	}
 
 	// find max effect duration for each slot an calculate total runtime of playList
@@ -39,23 +38,29 @@ func NewPlayList(name string, EffectList []map[Effector]time.Duration) *PlayList
 		pl.slotTimes[i] = tMax
 		pl.totalTime += tMax
 	}
-
 	return pl
 }
 
-func (pl *PlayList) selectSlot() int {
+func (pl *PlayList) slotChange() bool {
 
+	// first run
+	if pl.activeSlot == -1 {
+		return true
+	}
+
+	// slot finished
 	if time.Since(pl.lastChange) > pl.slotTimes[pl.activeSlot] {
-		return pl.activeSlot + 1
+		return true
 	} else {
-		return pl.activeSlot
+		return false
 	}
 
 }
 
 func (pl *PlayList) SlotEffects() []Effector {
 
-	if pl.activeSlot < pl.selectSlot() {
+	if pl.slotChange() {
+		pl.activeSlot = (pl.activeSlot + 1) % len(pl.Effects)
 
 		slotEffects := make([]Effector, len(pl.Effects[pl.activeSlot]))
 
@@ -65,7 +70,6 @@ func (pl *PlayList) SlotEffects() []Effector {
 			i++
 		}
 
-		pl.activeSlot = (pl.activeSlot + 1) % len(pl.slotTimes)
 		pl.lastChange = time.Now()
 
 		return slotEffects
