@@ -134,8 +134,25 @@ func (eH *EffectHandler) playAllEffects() {
 	//ev := NewEdgeVolume(eH.myDisplay, eH.audio)
 	//hsv := NewHsvFade(eH.myDisplay, eH.updateRate)
 	//rl := NewRunningLight(eH.myDisplay)
-	//grl := NewMultiRunningLight(eH.myDisplay, eH.updateRate)
+	grl := NewMultiRunningLight(eH.myDisplay, eH.updateRate)
+
+	// sine 1
 	sine := NewSine(eH.myDisplay)
+	sine.Effect.LengthPar = LEDS
+	sine.Frequency = 2 * EDGES_PER_SIDE
+	sine.SetLoopTime(5 * EDGES_PER_SIDE)
+	cc := NewConstantColor(&sine.Effect)
+	cc.ColorPar.H = 0
+	sine.Effect.Painter = cc
+
+	// sine 2
+	sine2 := NewSine(eH.myDisplay)
+	sine2.Effect.LengthPar = LEDS
+	sine2.Frequency = 3 * EDGES_PER_SIDE
+	sine2.SetLoopTime(7 * EDGES_PER_SIDE)
+	cc2 := NewConstantColor(&sine2.Effect)
+	cc2.ColorPar.H = 30
+	sine2.Effect.Painter = cc2
 
 	slots := []map[Effector]time.Duration{}
 
@@ -144,8 +161,9 @@ func (eH *EffectHandler) playAllEffects() {
 		slots = append(slots, slot)
 	}
 
-	slots[0][sine] = 5 * time.Second
-	//slots[1][grl] = 10 * time.Second
+	slots[0][sine] = 10 * time.Second
+	slots[0][grl] = 10 * time.Second
+	slots[0][sine2] = 10 * time.Second
 	//slots[1][rl] = 8 * time.Second
 	//slots[2][hsv] = 5 * time.Second
 	//slots[3][wes] = 5 * time.Second

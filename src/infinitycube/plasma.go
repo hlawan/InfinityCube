@@ -11,7 +11,7 @@ type Sine struct {
 	Frequency float64 // defines how many waves are displayed per edge
 	offset    float64 // moves the waves along the edge
 	delta     float64 // step size the offset increases per loop
-	LoopTime  float64 // [s] time the waves need to move one edge length
+	loopTime  float64 // [s] time the waves need to move one edge length
 	Direction bool
 }
 
@@ -22,12 +22,12 @@ func NewSine(disp Display) *Sine {
 		Effect:    ef,
 		Frequency: 2,
 		offset:    0,
-		LoopTime:  1,
+		loopTime:  1,
 		Direction: true,
 	}
 
 	s.Painter = NewConstantColor(&s.Effect)
-	s.SetDelta(s.LoopTime)
+	s.SetDelta(s.loopTime)
 	s.LengthPar = EDGE_LENGTH
 
 	return s
@@ -35,6 +35,11 @@ func NewSine(disp Display) *Sine {
 
 func (s *Sine) SetDelta(sec float64) {
 	s.delta = (float64(1) / (sec * float64(fpsTarget))) * 2 * math.Pi * s.Frequency
+}
+
+func (s *Sine) SetLoopTime(sec float64) {
+	s.loopTime = sec
+	s.SetDelta(sec)
 }
 
 func (s *Sine) Update() {
