@@ -139,8 +139,8 @@ func (eH *EffectHandler) playAllEffects() {
 	// sine 1
 	sine := NewSine(eH.myDisplay)
 	sine.Effect.LengthPar = LEDS
-	sine.Frequency = 2 * EDGES_PER_SIDE
-	sine.SetLoopTime(5 * EDGES_PER_SIDE)
+	sine.Frequency = 2 * NR_OF_SIDES
+	sine.SetLoopTime(5 * NR_OF_SIDES)
 	cc := NewConstantColor(&sine.Effect)
 	cc.ColorPar.H = 0
 	sine.Effect.Painter = cc
@@ -148,8 +148,8 @@ func (eH *EffectHandler) playAllEffects() {
 	// sine 2
 	sine2 := NewSine(eH.myDisplay)
 	sine2.Effect.LengthPar = LEDS
-	sine2.Frequency = 3 * EDGES_PER_SIDE
-	sine2.SetLoopTime(7 * EDGES_PER_SIDE)
+	sine2.Frequency = 3 * NR_OF_SIDES
+	sine2.SetLoopTime(7 * NR_OF_SIDES)
 	cc2 := NewConstantColor(&sine2.Effect)
 	cc2.ColorPar.H = 30
 	sine2.Effect.Painter = cc2
