@@ -7,7 +7,7 @@ import (
 
 type Led struct {
 	H       uint16  /*0..360*/
-	S, V    float64 /*0..255*/
+	S, V    float64 /*0..1*/
 	R, G, B uint8   /*0..255*/
 }
 
