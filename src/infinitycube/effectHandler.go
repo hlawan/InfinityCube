@@ -126,34 +126,7 @@ func (eH *EffectHandler) updateAll() {
 
 func (eH *EffectHandler) playAllEffects() {
 
-	slotCount := 1
-
-	//ca := NewCellularAutomata(eH.myDisplay)
-	//ws := NewWhiteSpectrum(eH.myDisplay, eH.audio)
-	//wes := NewWhiteEdgeSpectrum(eH.myDisplay, eH.audio)
-	//ev := NewEdgeVolume(eH.myDisplay, eH.audio)
-	//hsv := NewHsvFade(eH.myDisplay, eH.updateRate)
-	//rl := NewRunningLight(eH.myDisplay)
-	grl := NewMultiRunningLight(eH.myDisplay, eH.updateRate)
-
-	// sine 1
-	sine := NewSine(eH.myDisplay)
-	sine.Effect.LengthPar = LEDS
-	sine.Frequency = 2 * NR_OF_SIDES
-	sine.SetLoopTime(5 * NR_OF_SIDES)
-	cc := NewConstantColor(&sine.Effect)
-	cc.ColorPar.H = 0
-	sine.Effect.Painter = cc
-
-	// sine 2
-	sine2 := NewSine(eH.myDisplay)
-	sine2.Effect.LengthPar = LEDS
-	sine2.Frequency = 3 * NR_OF_SIDES
-	sine2.SetLoopTime(7 * NR_OF_SIDES)
-	cc2 := NewConstantColor(&sine2.Effect)
-	cc2.ColorPar.H = 30
-	sine2.Effect.Painter = cc2
-
+	slotCount := 2
 	slots := []map[Effector]time.Duration{}
 
 	for i := 1; i <= slotCount; i++ {
@@ -161,10 +134,42 @@ func (eH *EffectHandler) playAllEffects() {
 		slots = append(slots, slot)
 	}
 
-	slots[0][sine] = 10 * time.Second
-	slots[0][grl] = 10 * time.Second
-	slots[0][sine2] = 10 * time.Second
-	//slots[1][rl] = 8 * time.Second
+	// create effects with colorgenerators
+
+	//ca := NewCellularAutomata(eH.myDisplay)
+	//ws := NewWhiteSpectrum(eH.myDisplay, eH.audio)
+	//wes := NewWhiteEdgeSpectrum(eH.myDisplay, eH.audio)
+	//ev := NewEdgeVolume(eH.myDisplay, eH.audio)
+	//rl := NewRunningLight(eH.myDisplay)
+	cc0 := NewConstantColor(1, 60)
+	grl := NewMultiRunningLight(eH.myDisplay, cc0)
+
+	// sine 1
+	sine := NewSine(eH.myDisplay)
+	sine.Effect.LengthPar = LEDS
+	sine.Frequency = 2 * NR_OF_SIDES
+	sine.SetLoopTime(5 * NR_OF_SIDES)
+	cc := NewConstantColor(1, 0)
+	sine.Effect.Painter = cc
+
+	// sine 2
+	sine2 := NewSine(eH.myDisplay)
+	sine2.Effect.LengthPar = LEDS
+	sine2.Frequency = 3 * NR_OF_SIDES
+	sine2.SetLoopTime(7 * NR_OF_SIDES)
+	cc2 := NewConstantColor(1, 30)
+	sine2.Effect.Painter = cc2
+
+	// multi running light 2
+	hsv := NewHsvFade(10.0, 0.0)
+	mrl2 := NewMultiRunningLight(eH.myDisplay, hsv)
+
+	// assign effects and timings to slots
+
+	slots[1][sine] = 10 * time.Second
+	slots[1][grl] = 10 * time.Second
+	slots[1][sine2] = 10 * time.Second
+	slots[0][mrl2] = 20 * time.Second
 	//slots[2][hsv] = 5 * time.Second
 	//slots[3][wes] = 5 * time.Second
 
@@ -396,7 +401,8 @@ func (eH *EffectHandler) AddRunningLight() {
 }
 
 func (eH *EffectHandler) AddMultiRunningLight() {
-	grl := NewMultiRunningLight(eH.myDisplay, eH.updateRate)
+	cc0 := NewConstantColor(1, 60)
+	grl := NewMultiRunningLight(eH.myDisplay, cc0)
 	eH.activeEffects = append(eH.activeEffects, grl)
 }
 

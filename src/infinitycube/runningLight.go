@@ -28,7 +28,7 @@ func NewRunningLight(disp Display) *RunningLight {
 	}
 
 	r.SetDelta(r.IntervalPar)
-	r.Painter = NewConstantColor(&r.Effect)
+	r.Painter = NewConstantColor(1, 240)
 
 	return r
 }
@@ -149,14 +149,16 @@ type MultiRunningLight struct {
 	ledsPerDisplayPar int
 }
 
-func NewMultiRunningLight(disp Display, fps int) *MultiRunningLight {
+func NewMultiRunningLight(disp Display, cg ColorGenerator) *MultiRunningLight {
 	ef := NewEffect(disp, 0.5, 0.0)
 
 	r := &MultiRunningLight{
 		Effect:            ef,
-		fpsTarget:         fps,
+		fpsTarget:         fpsTarget,
 		IntervalPar:       5,
 		ledsPerDisplayPar: 2}
+
+	r.Painter = cg
 
 	// for every edge
 	for i := 0; i < NR_OF_SIDES*EDGES_PER_SIDE; i++ {
@@ -172,6 +174,7 @@ func NewMultiRunningLight(disp Display, fps int) *MultiRunningLight {
 			rl.Bounce = true
 			rl.SetDelta(r.IntervalPar)
 			rl.BlackOpacity = 0
+			rl.Painter = r.Painter
 			r.runningLights = append(r.runningLights, rl)
 		}
 	}
@@ -180,6 +183,7 @@ func NewMultiRunningLight(disp Display, fps int) *MultiRunningLight {
 }
 
 func (r *MultiRunningLight) Update() {
+	r.Painter.Update()
 	for _, effect := range r.runningLights {
 		effect.IntervalPar = r.IntervalPar // update delta (work around) to be improved ;)
 		effect.Update()

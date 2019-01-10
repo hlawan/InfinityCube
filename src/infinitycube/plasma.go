@@ -26,7 +26,7 @@ func NewSine(disp Display) *Sine {
 		Direction: true,
 	}
 
-	s.Painter = NewConstantColor(&s.Effect)
+	s.Painter = NewConstantColor(1, 0)
 	s.SetDelta(s.loopTime)
 	s.LengthPar = EDGE_LENGTH
 
