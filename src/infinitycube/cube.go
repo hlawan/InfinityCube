@@ -105,22 +105,6 @@ func (c *Cube) MergePatterns() {
 	}
 }
 
-//func blendYCbCr(col1, col2 color.NYCbCrA) color.NYCbCrA {
-//	//	nY = (col1.Y + col2.Y) / 2
-//	nY := math.Max(float64(col1.Y), float64(col2.Y))
-//	nCb := (float64(col1.Cb) + float64(col2.Cb)) / 2
-//	nCr := (float64(col1.Cr) + float64(col2.Cr)) / 2
-//	nA := (float64(col1.A) + float64(col2.A)) / 2
-
-//	var col color.NYCbCrA
-//	col.Y = uint8(nY)
-//	col.Cb = uint8(nCb)
-//	col.Cr = uint8(nCr)
-//	col.A = uint8(nA)
-
-//	return col
-//}
-
 func blendLeds(col1, col2 Led) Led {
 	var newCol Led
 
@@ -135,9 +119,9 @@ func blendLeds(col1, col2 Led) Led {
 		r2, g2, b2 := col2.RGB()
 
 		// merge
-		nR := (r1 + r2) / 2
-		nG := (g1 + g2) / 2
-		nB := (b1 + b2) / 2
+		nR := uint8((uint16(r1) + uint16(r2)) / 2)
+		nG := uint8((uint16(g1) + uint16(g2)) / 2)
+		nB := uint8((uint16(b1) + uint16(b2)) / 2)
 
 		// set new color
 		newCol.FromRGB(nR, nG, nB)
