@@ -13,8 +13,8 @@ type ConstantColor struct {
 func NewConstantColor(eff *Effect) *ConstantColor {
 
 	var col Led
-	col.S = 255
-	col.H = 180
+	col.S = 1
+	col.H = 60
 
 	cc := &ConstantColor{
 		myEffect: eff,
@@ -29,8 +29,8 @@ func (cc *ConstantColor) Colorize(leds []Led) []Led {
 	for _, led := range leds {
 
 		var colLed Led
-		colLed.S = 1
-		colLed.H = 60
+		colLed.S = cc.ColorPar.S
+		colLed.H = cc.ColorPar.H
 
 		// dont touch brightness/value
 		colLed.V = led.V
