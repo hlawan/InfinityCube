@@ -10,6 +10,10 @@ type ColorGenerator interface {
 	Update()
 }
 
+func correctGamma(inputValue float64) float64 {
+	return math.Pow(inputValue, 0.5)
+}
+
 type ConstantColor struct {
 	ColorPar Led
 }
@@ -39,8 +43,8 @@ func (cc *ConstantColor) Colorize(leds []Led) []Led {
 		colLed.S = cc.ColorPar.S
 		colLed.H = cc.ColorPar.H
 
-		// dont touch brightness/value
-		colLed.V = led.V
+		// Gamma correction
+		colLed.V = correctGamma(led.V)
 
 		colLeds = append(colLeds, colLed)
 	}
@@ -80,8 +84,8 @@ func (hsv *HsvFade) Colorize(leds []Led) []Led {
 		colLed.S = 1.0
 		colLed.H = uint16(math.Round(hsv.angle))
 
-		// dont touch brightness/value
-		colLed.V = led.V
+		// Gamma correction
+		colLed.V = correctGamma(led.V)
 
 		colLeds = append(colLeds, colLed)
 	}
