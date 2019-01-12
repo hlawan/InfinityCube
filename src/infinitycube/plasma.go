@@ -3,6 +3,7 @@ package main
 import (
 	//"fmt"
 	"math"
+	"time"
 )
 
 type Sine struct {
@@ -15,7 +16,7 @@ type Sine struct {
 	Direction bool
 }
 
-func NewSine(disp Display) *Sine {
+func NewSine(disp Display, cg ColorGenerator) *Sine {
 	ef := NewEffect(disp, 0.5, 0.0)
 
 	s := &Sine{
@@ -26,9 +27,9 @@ func NewSine(disp Display) *Sine {
 		Direction: true,
 	}
 
-	s.Painter = NewConstantColor(1, 0)
+	s.Painter = cg
 	s.SetDelta(s.loopTime)
-	s.LengthPar = EDGE_LENGTH
+	s.LengthPar = disp.NrOfLeds()
 
 	return s
 }
@@ -53,10 +54,36 @@ func (s *Sine) Update() {
 		distance := float64(i) * ((2.0 * math.Pi) / float64(s.LengthPar))
 		sine := 0.8 + math.Sin((s.Frequency*distance)+s.offset)
 		s.Leds[i+s.OffsetPar].V = sine
-
 	}
 
+	// every update function of an effe
+	s.Painter.Update()
 	s.Leds = s.Painter.Colorize(s.Leds)
-
 	s.myDisplay.AddPattern(s.Leds, s.ColorOpacity, s.BlackOpacity)
+}
+
+func MagmaPlasma(eH *EffectHandler, playTime time.Duration) map[Effector]time.Duration {
+	// sine 1
+	cc1 := NewConstantColor(1, 0)
+	sine1 := NewSine(eH.myDisplay, cc1)
+	sine1.Frequency = 2 * NR_OF_SIDES
+	sine1.SetLoopTime(5 * NR_OF_SIDES)
+
+	// sine 2
+	cc2 := NewConstantColor(1, 30)
+	sine2 := NewSine(eH.myDisplay, cc2)
+	sine2.Frequency = 3 * NR_OF_SIDES
+	sine2.SetLoopTime(7 * NR_OF_SIDES)
+
+	// multi running light
+	cc3 := NewConstantColor(1, 60)
+	mrl := NewMultiRunningLight(eH.myDisplay, cc3)
+
+	magmaPlasma := map[Effector]time.Duration{}
+
+	magmaPlasma[sine1] = playTime
+	magmaPlasma[sine2] = playTime
+	magmaPlasma[mrl] = playTime
+
+	return magmaPlasma
 }

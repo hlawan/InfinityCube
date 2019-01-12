@@ -104,7 +104,7 @@ func (a *Led) FromRGB(rInt, gInt, bInt uint8) {
 }
 
 func (a *Led) Off() bool {
-	if a.V > 1e-12 {
+	if a.V > 1e-3 {
 		return false
 	} else {
 		return true
