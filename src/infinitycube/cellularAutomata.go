@@ -1,90 +1,142 @@
 package main
 
-//import (
-//	"math/rand"
-//	"time"
-//)
+import (
+	"fmt"
+	"math/rand"
+	"time"
+)
 
-//type CellularAutomata struct {
-//	Effect
-//	Rule          int
-//	SecsPerGenPar float64
-//	lastUpdate    time.Time
-//}
+type CellularAutomata struct {
+	Effect
+	currentGeneration []bool
+	nextGeneration    []bool
+	ledVs             []float64
+	secsPerGenPar     float64
+	delta             float64
+	generationChange  time.Time
+}
 
-///*
-//func NewCellularAutomata(newDisplay Display, colorOpacity, blackOpacity float64, rule int, SecsPerGenPar float64) *CellularAutomata {
-//	cA := &CellularAutomata{
-//		ColorOpacity: colorOpacity,
-//		BlackOpacity: blackOpacity,
-//		Rule:         rule,
-//		SecsPerGenPar:   SecsPerGenPar,
-//		myDisplay:		newDisplay,
-//		Leds: 				make([]Led, newDisplay.NrOfLeds())}
+func NewCellularAutomata(newDisp Display, cg ColorGenerator) *CellularAutomata {
+	ef := NewEffect(newDisp, 0.5, 0.0)
 
-//	cA.lastUpdate = time.Now()
-//	cA.sprinkle()
-//	return cA
-//}*/
+	cA := &CellularAutomata{
+		Effect:            ef,
+		currentGeneration: make([]bool, len(ef.Leds)),
+		nextGeneration:    make([]bool, len(ef.Leds)),
+		ledVs:             make([]float64, len(ef.Leds)),
+		secsPerGenPar:     2}
 
-//func NewCellularAutomata(newDisp Display) *CellularAutomata {
-//	ef := NewEffect(newDisp, 0.5, 0.0)
+	cA.SetDelta(cA.secsPerGenPar)
+	cA.Painter = cg
+	cA.generationChange = time.Now()
+	cA.sprinkle()
+	return cA
+}
 
-//	cA := &CellularAutomata{
-//		Effect:        ef,
-//		Rule:          152,
-//		SecsPerGenPar: 0.33}
+func (cA *CellularAutomata) SetDelta(sec float64) {
+	cA.delta = (float64(1) / (sec * float64(fpsTarget)))
+	fmt.Println(cA.delta)
+}
 
-//	cA.lastUpdate = time.Now()
-//	cA.sprinkle()
-//	return cA
-//}
+func (cA *CellularAutomata) SetSecsPerGen(sec float64) {
+	cA.secsPerGenPar = sec
+	cA.SetDelta(sec)
+}
 
-//func (cA *CellularAutomata) sprinkle() {
-//	rand.Seed(int64(time.Now().Nanosecond()))
-//	for i := 0; i < LEDS; i++ {
-//		if rand.Float64() < 0.3 {
-//			cA.Leds[i].Color = red
-//		} else {
-//			cA.Leds[i].Color = black
-//		}
-//	}
-//}
+func (cA *CellularAutomata) sprinkle() {
+	rand.Seed(int64(time.Now().Nanosecond()))
 
-//func (cA *CellularAutomata) Update() {
-//	var a, b, c bool
-//	nextGen := make([]Led, len(cA.Leds))
-//	if time.Since(cA.lastUpdate) > (time.Duration(int(1000*cA.SecsPerGenPar)) * time.Millisecond) {
-//		for i := 0; i < LEDS; i++ {
-//			if i == 0 {
-//				a = cA.Leds[LEDS-1].OnOrOff()
-//				b = cA.Leds[i].OnOrOff()
-//				c = cA.Leds[i+1].OnOrOff()
-//			} else if i == LEDS-1 {
-//				a = cA.Leds[i-1].OnOrOff()
-//				b = cA.Leds[i].OnOrOff()
-//				c = cA.Leds[0].OnOrOff()
-//			} else {
-//				a = cA.Leds[i-1].OnOrOff()
-//				b = cA.Leds[i].OnOrOff()
-//				c = cA.Leds[i+1].OnOrOff()
-//			}
+	for i := 0; i < len(cA.Leds); i++ {
+		if rand.Float64() < 0.3 {
+			cA.currentGeneration[i] = true
+			cA.ledVs[i] = 1.0
+		} else {
+			cA.currentGeneration[i] = false
+			cA.ledVs[i] = 0.0
+		}
+	}
 
-//			if r150(a, b, c) == true {
-//				nextGen[i].Color = red
-//			} else {
-//				nextGen[i].Color = black
-//			}
-//		}
-//		cA.Leds = nextGen
-//		cA.myDisplay.AddPattern(cA.Leds, cA.ColorOpacity, cA.BlackOpacity)
-//		cA.lastUpdate = time.Now()
-//	}
-//}
+	cA.calcNextGeneration()
+}
 
-//func r150(a, b, c bool) bool {
-//	if (a && b && c) || (a && !b && !c) || (!a && b && !c) || (!a && !b && c) {
-//		return true
-//	}
-//	return false
-//}
+func (cA *CellularAutomata) Update() {
+
+	if time.Since(cA.generationChange) > (time.Duration(cA.secsPerGenPar) * time.Second) { //(time.Duration(int(1000*cA.SecsPerGenPar)) * time.Millisecond) {
+		copy(cA.currentGeneration, cA.nextGeneration)
+		cA.calcNextGeneration()
+	}
+
+	for i, led := range cA.ledVs {
+		v := led
+
+		if cA.nextGeneration[i] == true {
+			v += cA.delta
+
+		} else {
+			v -= cA.delta
+
+		}
+
+		if v > 1.0 {
+			v = 1.0
+		}
+		if v < 0.0 {
+			v = 0.0
+		}
+
+		cA.ledVs[i] = v
+		cA.Leds[i].setV(v)
+	}
+
+	// every update function of an effect ends with this snippet
+	cA.Painter.Update()
+	cA.Leds = cA.Painter.Colorize(cA.Leds)
+	//fmt.Println(cA.Leds)
+
+	cA.myDisplay.AddPattern(cA.Leds, cA.ColorOpacity, cA.BlackOpacity)
+}
+
+func (cA *CellularAutomata) calcNextGeneration() {
+	var a, b, c bool
+
+	// wrap leds to a circle
+	for i := 0; i < len(cA.Leds); i++ {
+		if i == 0 {
+			// first led => check end
+			a = cA.currentGeneration[LEDS-1]
+			b = cA.currentGeneration[i]
+			c = cA.currentGeneration[i+1]
+		} else if i == LEDS-1 {
+			// last led => check beginning
+			a = cA.currentGeneration[i-1]
+			b = cA.currentGeneration[i]
+			c = cA.currentGeneration[0]
+		} else {
+			// default => check neigbors
+			a = cA.currentGeneration[i-1]
+			b = cA.currentGeneration[i]
+			c = cA.currentGeneration[i+1]
+		}
+
+		cA.nextGeneration[i] = r150(a, b, c)
+	}
+
+	cA.generationChange = time.Now()
+}
+
+func r150(a, b, c bool) bool {
+	if (a && b && c) || (a && !b && !c) || (!a && b && !c) || (!a && !b && c) {
+		return true
+	}
+	return false
+}
+
+func CellularAutomataMonochrome(eH *EffectHandler, playTime time.Duration) map[Effector]time.Duration {
+	cc1 := NewConstantColor(1, 0)
+	ca := NewCellularAutomata(eH.myDisplay, cc1)
+
+	automata := map[Effector]time.Duration{}
+	automata[ca] = playTime
+
+	return automata
+}
