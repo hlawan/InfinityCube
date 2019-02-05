@@ -56,7 +56,7 @@ func (s *Sine) Update() {
 		s.Leds[i+s.OffsetPar].V = sine
 	}
 
-	// every update function of an effe
+	// every update function of an effect ends with this snippet
 	s.Painter.Update()
 	s.Leds = s.Painter.Colorize(s.Leds)
 	s.myDisplay.AddPattern(s.Leds, s.ColorOpacity, s.BlackOpacity)

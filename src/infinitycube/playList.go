@@ -71,7 +71,6 @@ func (pl *PlayList) SlotEffects() []Effector {
 		}
 
 		pl.lastChange = time.Now()
-
 		return slotEffects
 	} else {
 		return nil
