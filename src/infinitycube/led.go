@@ -138,3 +138,10 @@ func (a *Led) reset() {
 	a.G = 0
 	a.B = 0
 }
+
+func (a *Led) setV(nV float64) {
+	a.V = nV
+
+	// after Setting V: RGB has to be updated as well
+	a.R, a.G, a.B = a.RGB()
+}
