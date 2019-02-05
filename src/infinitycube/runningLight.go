@@ -4,6 +4,7 @@ import (
 	//"fmt"
 	"math"
 	//"github.com/lucasb-eyer/go-colorful"
+	"time"
 )
 
 type RunningLight struct {
@@ -188,4 +189,14 @@ func (r *MultiRunningLight) Update() {
 		effect.IntervalPar = r.IntervalPar // update delta (work around) to be improved ;)
 		effect.Update()
 	}
+}
+
+func MultiRunningLightHSV(eH *EffectHandler, playTime time.Duration) map[Effector]time.Duration {
+	hsv := NewHsvFade(60, 0)
+	mrl := NewMultiRunningLight(eH.myDisplay, hsv)
+
+	effectMap := map[Effector]time.Duration{}
+	effectMap[mrl] = playTime
+
+	return effectMap
 }
