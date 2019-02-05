@@ -4,7 +4,7 @@ import (
 	// "fmt"
 	//	"image/color"
 	"log"
-	//	"math"
+	"math"
 	"time"
 
 	"github.com/kellydunn/go-opc"
@@ -105,27 +105,48 @@ func (c *Cube) MergePatterns() {
 	}
 }
 
+// func blendLeds(col1, col2 Led) Led {
+// 	var newCol Led
+
+// 	if col1.Off() {
+// 		newCol = col2
+// 		newCol.R, newCol.G, newCol.B = col2.RGB()
+// 	} else if col2.Off() {
+// 		newCol = col1
+// 		newCol.R, newCol.G, newCol.B = col1.RGB()
+// 	} else {
+// 		r1, g1, b1 := col1.RGB()
+// 		r2, g2, b2 := col2.RGB()
+
+// 		// merge
+// 		nR := uint8((uint16(r1) + uint16(r2)) / 2)
+// 		nG := uint8((uint16(g1) + uint16(g2)) / 2)
+// 		nB := uint8((uint16(b1) + uint16(b2)) / 2)
+
+// 		// set new color
+// 		newCol.FromRGB(nR, nG, nB)
+// 	}
+
+// 	return newCol
+// }
+
 func blendLeds(col1, col2 Led) Led {
 	var newCol Led
 
-	if col1.Off() {
-		newCol = col2
-		newCol.R, newCol.G, newCol.B = col2.RGB()
-	} else if col2.Off() {
-		newCol = col1
-		newCol.R, newCol.G, newCol.B = col1.RGB()
-	} else {
-		r1, g1, b1 := col1.RGB()
-		r2, g2, b2 := col2.RGB()
+	r1, g1, b1 := col1.RGB()
+	r2, g2, b2 := col2.RGB()
 
-		// merge
-		nR := uint8((uint16(r1) + uint16(r2)) / 2)
-		nG := uint8((uint16(g1) + uint16(g2)) / 2)
-		nB := uint8((uint16(b1) + uint16(b2)) / 2)
+	// merge
+	nR := uint8((float64(r1) + float64(r2)) / 2.0)
+	nG := uint8((float64(g1) + float64(g2)) / 2.0)
+	nB := uint8((float64(b1) + float64(b2)) / 2.0)
 
-		// set new color
-		newCol.FromRGB(nR, nG, nB)
-	}
+	// set new color
+	newCol.FromRGB(nR, nG, nB)
+
+	// restore brightness
+	nV := math.Max(col1.V, col2.V)
+	newCol.setV(nV)
 
 	return newCol
 }
