@@ -6,7 +6,7 @@ import (
 )
 
 type ColorGenerator interface {
-	Colorize([]Led) []Led
+	Colorize([]Color) []Color
 	Update()
 }
 
@@ -15,12 +15,12 @@ func correctGamma(inputValue float64) float64 {
 }
 
 type ConstantColor struct {
-	ColorPar Led
+	ColorPar Color
 }
 
 func NewConstantColor(Saturation float64, Hue uint16) *ConstantColor {
 
-	var col Led
+	var col Color
 	col.S = Saturation
 	col.H = Hue
 
@@ -33,13 +33,13 @@ func (cc *ConstantColor) Update() {
 
 }
 
-func (cc *ConstantColor) Colorize(leds []Led) []Led {
+func (cc *ConstantColor) Colorize(leds []Color) []Color {
 
-	var colLeds []Led
+	var colLeds []Color
 
 	for _, led := range leds {
 
-		var colLed Led
+		var colLed Color
 		colLed.S = cc.ColorPar.S
 		colLed.H = cc.ColorPar.H
 
@@ -74,13 +74,13 @@ func (hsv *HsvFade) Update() {
 	hsv.angle = math.Mod(hsv.angle, 360)
 }
 
-func (hsv *HsvFade) Colorize(leds []Led) []Led {
+func (hsv *HsvFade) Colorize(leds []Color) []Color {
 
-	var colLeds []Led
+	var colLeds []Color
 
 	for _, led := range leds {
 
-		var colLed Led
+		var colLed Color
 		colLed.S = 1.0
 		colLed.H = uint16(math.Round(hsv.angle))
 

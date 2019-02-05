@@ -13,7 +13,7 @@ import (
 // the blackOpacity and the colorOpacity of its leds and which Display
 // it belongs to.
 type Effect struct {
-	Leds         []Led
+	Leds         []Color
 	Painter      ColorGenerator
 	OffsetPar    int
 	LengthPar    int
@@ -26,7 +26,7 @@ type Effect struct {
 
 func NewEffect(disp Display, colorOp, blackOp float64) Effect {
 	ef := Effect{
-		Leds:         make([]Led, disp.NrOfLeds()),
+		Leds:         make([]Color, disp.NrOfLeds()),
 		OffsetPar:    0,
 		LengthPar:    disp.NrOfLeds(),
 		ColorOpacity: colorOp,
@@ -39,7 +39,7 @@ func NewEffect(disp Display, colorOp, blackOp float64) Effect {
 
 func NewTimedEffect(disp Display, colorOp, blackOp float64, playTimeSec int64) Effect {
 	ef := Effect{
-		Leds:         make([]Led, disp.NrOfLeds()),
+		Leds:         make([]Color, disp.NrOfLeds()),
 		OffsetPar:    0,
 		LengthPar:    disp.NrOfLeds(),
 		ColorOpacity: colorOp,
@@ -61,7 +61,7 @@ type Effector interface {
 // by various Effectors.
 type Display interface {
 	NrOfLeds() int
-	AddPattern([]Led, float64, float64)
+	AddPattern([]Color, float64, float64)
 	Show()
 }
 

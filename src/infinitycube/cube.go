@@ -13,12 +13,12 @@ import (
 type Cube struct {
 	fadeCandy *opc.Client
 	Patterns  []Pattern //every effect generator adds a Pattern
-	finalCube []Led     //all Patterns are merged to one finalCube, which then will be sent to the real cube
+	finalCube []Color   //all Patterns are merged to one finalCube, which then will be sent to the real cube
 }
 
 type Consumer interface {
 	Tick(time.Duration, interface{})
-	AddPattern([LEDS]Led, float64, float64)
+	AddPattern([LEDS]Color, float64, float64)
 }
 
 func NewCube(server string, nrOfLeds int) (c *Cube, err error) {
@@ -27,7 +27,7 @@ func NewCube(server string, nrOfLeds int) (c *Cube, err error) {
 	err = oc.Connect("tcp", server)
 	c = &Cube{
 		fadeCandy: oc,
-		finalCube: make([]Led, nrOfLeds)}
+		finalCube: make([]Color, nrOfLeds)}
 
 	if err != nil {
 		log.Fatal("Could not connect to Fadecandy server", err)
@@ -68,12 +68,12 @@ func (c *Cube) Tick(d time.Duration, o interface{}) {
 }
 
 type Pattern struct {
-	leds         []Led
+	leds         []Color
 	colorOpacity float64
 	blackOpacity float64
 }
 
-func NewPattern(newLeds []Led, cOp, bOp float64) (pc *Pattern) {
+func NewPattern(newLeds []Color, cOp, bOp float64) (pc *Pattern) {
 	pc = &Pattern{
 		leds:         newLeds,
 		colorOpacity: cOp,
@@ -81,7 +81,7 @@ func NewPattern(newLeds []Led, cOp, bOp float64) (pc *Pattern) {
 	return
 }
 
-func (c *Cube) AddPattern(leds []Led, colorOpacity float64, blackOpacity float64) {
+func (c *Cube) AddPattern(leds []Color, colorOpacity float64, blackOpacity float64) {
 	pc := NewPattern(leds, colorOpacity, blackOpacity)
 	c.Patterns = append(c.Patterns, *pc)
 }
@@ -108,10 +108,10 @@ func (c *Cube) MergePatterns() {
 // func blendLeds(col1, col2 Led) Led {
 // 	var newCol Led
 
-// 	if col1.Off() {
+// 	if col1.Black {
 // 		newCol = col2
 // 		newCol.R, newCol.G, newCol.B = col2.RGB()
-// 	} else if col2.Off() {
+// 	} else if col2.Black {
 // 		newCol = col1
 // 		newCol.R, newCol.G, newCol.B = col1.RGB()
 // 	} else {
@@ -130,8 +130,8 @@ func (c *Cube) MergePatterns() {
 // 	return newCol
 // }
 
-func blendLeds(col1, col2 Led) Led {
-	var newCol Led
+func blendLeds(col1, col2 Color) Color {
+	var newCol Color
 
 	r1, g1, b1 := col1.RGB()
 	r2, g2, b2 := col2.RGB()

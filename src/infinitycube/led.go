@@ -5,13 +5,13 @@ import (
 	"math"
 )
 
-type Led struct {
+type Color struct {
 	H       uint16  /*0..360*/
 	S, V    float64 /*0..1*/
 	R, G, B uint8   /*0..255*/
 }
 
-func (a *Led) RGB() (r, g, b uint8) {
+func (a *Color) RGB() (r, g, b uint8) {
 	// Direct implementation of the graph in this image:
 	// https://en.wikipedia.org/wiki/HSL_and_HSV#/media/File:HSV-RGB-comparison.svg
 
@@ -62,7 +62,7 @@ func (a *Led) RGB() (r, g, b uint8) {
 	return a.R, a.G, a.B
 }
 
-func (a *Led) FromRGB(rInt, gInt, bInt uint8) {
+func (a *Color) FromRGB(rInt, gInt, bInt uint8) {
 	// from https://www.rapidtables.com/convert/color/rgb-to-hsv.html
 
 	a.R = rInt
@@ -103,7 +103,7 @@ func (a *Led) FromRGB(rInt, gInt, bInt uint8) {
 	a.V = cMax
 }
 
-func (a *Led) Off() bool {
+func (a *Color) Black() bool {
 	if a.V > 1e-3 {
 		return false
 	} else {
@@ -111,7 +111,7 @@ func (a *Led) Off() bool {
 	}
 }
 
-func (a *Led) fixRanges() {
+func (a *Color) fixRanges() {
 	if a.V > 1 {
 		a.V = 1
 	}
@@ -130,7 +130,7 @@ func (a *Led) fixRanges() {
 
 }
 
-func (a *Led) reset() {
+func (a *Color) reset() {
 	a.H = 0
 	a.S = 0
 	a.V = 0
@@ -139,7 +139,7 @@ func (a *Led) reset() {
 	a.B = 0
 }
 
-func (a *Led) setV(nV float64) {
+func (a *Color) setV(nV float64) {
 	a.V = nV
 
 	// after Setting V: RGB has to be updated as well
