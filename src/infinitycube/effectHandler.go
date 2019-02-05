@@ -125,32 +125,15 @@ func (eH *EffectHandler) updateAll() {
 
 func (eH *EffectHandler) playAllEffects() {
 
-	slotCount := 1
 	slots := []map[Effector]time.Duration{}
 
-	for i := 1; i <= slotCount; i++ {
-		slot := map[Effector]time.Duration{}
-		slots = append(slots, slot)
-	}
-
-	// create effects with colorgenerators
-
-	//ca := NewCellularAutomata(eH.myDisplay)
-	//ws := NewWhiteSpectrum(eH.myDisplay, eH.audio)
-	//wes := NewWhiteEdgeSpectrum(eH.myDisplay, eH.audio)
-	//ev := NewEdgeVolume(eH.myDisplay, eH.audio)
-	//rl := NewRunningLight(eH.myDisplay)
-	//cc0 := NewConstantColor(1, 60)
-	//grl := NewMultiRunningLight(eH.myDisplay, cc0)
-
-	// assign effects and timings to slots
-
-	slots[0] = MagmaPlasma(eH, 30)
-	//slots[2][hsv] = 5 * time.Second
-	//slots[3][wes] = 5 * time.Second
+	slots = append(slots, MultiRunningLightHSV(eH, 30*time.Second))
+	slots = append(slots, LinearEdgeSpectrumMonochrome(eH, 30*time.Second))
+	slots = append(slots, CellularAutomataMonochrome(eH, 30*time.Second))
+	slots = append(slots, LinearSpectrumMonochrome(eH, 30*time.Second))
+	slots = append(slots, MagmaPlasma(eH, 30*time.Second))
 
 	eH.currentPlaylist = NewPlayList("all Effects", slots)
-
 }
 
 func (eH *EffectHandler) handleRequests() (err error) {
