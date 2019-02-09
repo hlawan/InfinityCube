@@ -17,6 +17,7 @@ type Effect struct {
 	LengthPar    int
 	ColorOpacity float64
 	BlackOpacity float64
+	playTime     time.Duration
 	myDisplay    Display
 }
 
@@ -27,6 +28,20 @@ func NewEffect(disp Display, colorOp, blackOp float64) Effect {
 		LengthPar:    disp.NrOfLeds(),
 		ColorOpacity: colorOp,
 		BlackOpacity: blackOp,
+		playTime:     20 * time.Second,
+		myDisplay:    disp}
+
+	return ef
+}
+
+func NewTimedEffect(disp Display, colorOp, blackOp float64, playTimeSec int64) Effect {
+	ef := Effect{
+		Leds:         make([]Led, disp.NrOfLeds()),
+		OffsetPar:    0,
+		LengthPar:    disp.NrOfLeds(),
+		ColorOpacity: colorOp,
+		BlackOpacity: blackOp,
+		playTime:     time.Duration(playTimeSec) * time.Second,
 		myDisplay:    disp}
 
 	return ef
@@ -53,6 +68,7 @@ type Display interface {
 type EffectHandler struct {
 	activeEffects    []Effector
 	effectParameter  []map[string]string
+	currentPlaylist  *PlayList
 	availableEffects []string
 	effectRequest    chan string
 	myDisplay        Display
@@ -81,6 +97,7 @@ func NewEffectHandler(newDisplay Display, fps int, newAudio *ProcessedAudio) (eH
 func (eH *EffectHandler) render() {
 	loopStart := time.Now()
 
+	eH.checkPlayList()
 	eH.updateAll()
 	eH.myDisplay.Show()
 
@@ -89,10 +106,48 @@ func (eH *EffectHandler) render() {
 	}
 }
 
+func (eH *EffectHandler) checkPlayList() {
+	if eH.currentPlaylist != nil {
+		newEffects := eH.currentPlaylist.SlotEffects()
+		if newEffects != nil {
+			eH.activeEffects = newEffects
+		}
+	}
+}
+
 func (eH *EffectHandler) updateAll() {
 	for _, effect := range eH.activeEffects {
 		effect.Update()
 	}
+}
+
+func (eH *EffectHandler) playAllEffects() {
+
+	slotCount := 4
+
+	ca := NewCellularAutomata(eH.myDisplay)
+	//ws := NewWhiteSpectrum(eH.myDisplay, eH.audio)
+	wes := NewWhiteEdgeSpectrum(eH.myDisplay, eH.audio)
+	//ev := NewEdgeVolume(eH.myDisplay, eH.audio)
+	hsv := NewHsvFade(eH.myDisplay, eH.updateRate)
+	rl := NewRunningLight(eH.myDisplay)
+	grl := NewMultiRunningLight(eH.myDisplay, eH.updateRate)
+
+	slots := []map[Effector]time.Duration{}
+
+	for i := 1; i <= slotCount; i++ {
+		slot := map[Effector]time.Duration{}
+		slots = append(slots, slot)
+	}
+
+	slots[0][ca] = 5 * time.Second
+	slots[1][grl] = 5 * time.Second
+	slots[1][rl] = 5 * time.Second
+	slots[2][hsv] = 5 * time.Second
+	slots[3][wes] = 5 * time.Second
+
+	eH.currentPlaylist = NewPlayList("all Effects", slots)
+
 }
 
 func (eH *EffectHandler) handleRequests() (err error) {
