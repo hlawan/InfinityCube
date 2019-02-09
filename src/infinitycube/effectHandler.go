@@ -323,6 +323,11 @@ func (eH *EffectHandler) AddMultiRunningLight() {
 	eH.activeEffects = append(eH.activeEffects, grl)
 }
 
+func (eH *EffectHandler) AddFullWhiteLight() {
+	fw := NewFullWhite(eH.myDisplay)
+	eH.activeEffects = append(eH.activeEffects, fw)
+}
+
 func (eH *EffectHandler) AddPrettyPrint() {
 	fmt.Println("look at me I'm so pretty :-*")
 }
