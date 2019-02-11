@@ -127,6 +127,7 @@ func (eH *EffectHandler) playAllEffects() {
 
 	slots := []map[Effector]time.Duration{}
 
+	slots = append(slots, EdgeVolumeRedGreen(eH, 30*time.Second))
 	slots = append(slots, MultiRunningLightHSV(eH, 30*time.Second))
 	slots = append(slots, LinearEdgeSpectrumMonochrome(eH, 30*time.Second))
 	slots = append(slots, CellularAutomataMonochrome(eH, 30*time.Second))

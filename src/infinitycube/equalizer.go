@@ -1,11 +1,10 @@
 package main
 
 import (
-	//"fmt"
 	"time"
 )
 
-//Effect: Linear Spectrum
+// Effect: Linear Spectrum
 type LinearSpectrum struct {
 	Effect
 	sound *ProcessedAudio
@@ -70,7 +69,7 @@ func (e *LinearEdgeSpectrum) Update() {
 		}
 	}
 
-	// every update function of an effect ends with this snippet
+	//every update function of an effect ends with this snippet
 	e.Painter.Update()
 	e.Leds = e.Painter.Colorize(e.Leds)
 	e.myDisplay.AddPattern(e.Leds, e.ColorOpacity, e.BlackOpacity)
@@ -87,52 +86,58 @@ func LinearEdgeSpectrumMonochrome(eH *EffectHandler, playTime time.Duration) map
 }
 
 //Effect: Edge Volume
-// type EdgeVolume struct {
-// 	Effect
-// 	sound *ProcessedAudio
-// }
+type EdgeVolume struct {
+	Effect
+	sound *ProcessedAudio
+}
 
-// func NewEdgeVolume(disp Display, cg ColorGenerators *ProcessedAudio) *EdgeVolume {
-// 	ef := NewEffect(disp, 0.5, 0.0)
+func NewEdgeVolume(disp Display, cg ColorGenerator, s *ProcessedAudio) *EdgeVolume {
+	ef := NewEffect(disp, 0.5, 0.0)
 
-// 	e := &EdgeVolume{
-// 		Effect: ef,
-// 		sound:  s,
-// 	}
-// 	return e
-// }
+	e := &EdgeVolume{
+		Effect: ef,
+		sound:  s,
+	}
 
-// func (e *EdgeVolume) Update() {
-// 	for i := 0; i < e.LengthPar; i++ {
+	e.Painter = cg
 
-// 		r := float64(i%EDGE_LENGTH) * 1.0 / float64(EDGE_LENGTH)
-// 		g := notNegative(1 - (float64(i%EDGE_LENGTH) * 1.0 / float64(EDGE_LENGTH)) - 0.2)
-// 		b := 0.0
+	return e
+}
 
-// 		effectIndex := (i % (2 * EDGE_LENGTH))
+func (e *EdgeVolume) Update() {
 
-// 		if effectIndex < (EDGE_LENGTH) {
-// 			p := (e.LengthPar + e.OffsetPar) - (i) - EDGE_LENGTH
-// 			e.Leds[p].Color = colorful.Color{r, g, b}
-// 			if float64(effectIndex) > e.sound.maxPeak*EDGE_LENGTH {
-// 				e.Leds[p].Color = e.Leds[p].Color.BlendRgb(black, 1.0)
-// 			}
-// 		} else {
-// 			k := e.OffsetPar + i
-// 			e.Leds[k].Color = colorful.Color{r, g, b}
-// 			if float64(effectIndex-EDGE_LENGTH) > e.sound.maxPeak*EDGE_LENGTH {
-// 				e.Leds[k].Color = e.Leds[k].Color.BlendRgb(black, 1.0)
-// 			}
-// 		}
-// 	}
+	for i := range e.Leds {
 
-// 	e.myDisplay.AddPattern(e.Leds, e.ColorOpacity, e.BlackOpacity)
-// }
+		effectIndex := i % EDGE_LENGTH
 
-// func notNegative(nr float64) float64 {
-// 	if nr < 0 {
-// 		return 0
-// 	} else {
-// 		return nr
-// 	}
-// }
+		if float64(effectIndex) < e.sound.maxPeak*EDGE_LENGTH {
+			e.Leds[i].setV(1.0)
+		} else {
+			e.Leds[i].setV(0.0)
+		}
+
+	}
+
+	// every update function of an effect ends with this snippet
+	e.Painter.Update()
+	e.Leds = e.Painter.Colorize(e.Leds)
+	e.myDisplay.AddPattern(e.Leds, e.ColorOpacity, e.BlackOpacity)
+}
+
+func EdgeVolumeRedGreen(eH *EffectHandler, playTime time.Duration) map[Effector]time.Duration {
+
+	green := Color{R: 0, G: 255, B: 0}
+	red := Color{R: 255, G: 0, B: 0}
+
+	colors := make([]Color, 2)
+	colors[0] = green
+	colors[1] = red
+
+	colGrad := NewColorGradient(colors, EDGE_LENGTH)
+	vol := NewEdgeVolume(eH.myDisplay, colGrad, eH.audio)
+
+	effectMap := map[Effector]time.Duration{}
+	effectMap[vol] = playTime
+
+	return effectMap
+}
