@@ -133,8 +133,8 @@ func (c *Cube) MergePatterns() {
 func blendLeds(col1, col2 Color) Color {
 	var newCol Color
 
-	r1, g1, b1 := col1.RGB()
-	r2, g2, b2 := col2.RGB()
+	r1, g1, b1 := col1.RGBfromHSV()
+	r2, g2, b2 := col2.RGBfromHSV()
 
 	// merge
 	nR := uint8((float64(r1) + float64(r2)) / 2.0)

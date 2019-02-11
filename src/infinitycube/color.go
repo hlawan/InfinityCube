@@ -12,6 +12,10 @@ type Color struct {
 }
 
 func (a *Color) RGB() (r, g, b uint8) {
+	return a.R, a.G, a.B
+}
+
+func (a *Color) RGBfromHSV() (r, g, b uint8) {
 	// Direct implementation of the graph in this image:
 	// https://en.wikipedia.org/wiki/HSL_and_HSV#/media/File:HSV-RGB-comparison.svg
 
@@ -143,5 +147,5 @@ func (a *Color) setV(nV float64) {
 	a.V = nV
 
 	// after Setting V: RGB has to be updated as well
-	a.R, a.G, a.B = a.RGB()
+	a.R, a.G, a.B = a.RGBfromHSV()
 }
