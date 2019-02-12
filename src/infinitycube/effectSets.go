@@ -1,5 +1,19 @@
 package main
 
+import (
+	"time"
+)
+
+func StaticWhite(eH *EffectHandler, playTime time.Duration) map[Effector]time.Duration {
+	cc1 := NewConstantColor(0, 0)
+	solid := NewSolidBrightness(eH.myDisplay, cc1, 1.0)
+
+	effectMap := map[Effector]time.Duration{}
+	effectMap[solid] = playTime
+
+	return effectMap
+}
+
 func StaticGradientGreenRed(eH *EffectHandler, playTime time.Duration) map[Effector]time.Duration {
 
 	green := Color{R: 0, G: 255, B: 0}

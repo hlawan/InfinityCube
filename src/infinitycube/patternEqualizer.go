@@ -1,9 +1,5 @@
 package main
 
-import (
-	"time"
-)
-
 // Effect: Linear Spectrum
 type LinearSpectrum struct {
 	Effect

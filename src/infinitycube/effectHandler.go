@@ -368,6 +368,13 @@ func (eH *EffectHandler) AddMagmaPlasma() {
 	}
 }
 
+func (eH *EffectHandler) AddFullWhite() {
+	eH.stopPlayList()
+	cc1 := NewConstantColor(0, 0)
+	effect := NewSolidBrightness(eH.myDisplay, cc1, 1.0)
+	eH.activeEffects = append(eH.activeEffects, effect)
+}
+
 func (eH *EffectHandler) AddPrettyPrint() {
 	fmt.Println("look at me I'm so pretty :-*")
 }

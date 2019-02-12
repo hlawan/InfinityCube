@@ -1,9 +1,5 @@
 package main
 
-import (
-	"time"
-)
-
 type SolidBrightness struct {
 	Effect
 	Brightness float64

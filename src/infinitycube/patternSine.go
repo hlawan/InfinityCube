@@ -1,9 +1,7 @@
 package main
 
 import (
-	//"fmt"
 	"math"
-	"time"
 )
 
 type Sine struct {

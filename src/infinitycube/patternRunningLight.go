@@ -1,10 +1,7 @@
 package main
 
 import (
-	//"fmt"
 	"math"
-	//"github.com/lucasb-eyer/go-colorful"
-	"time"
 )
 
 type RunningLight struct {
