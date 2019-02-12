@@ -105,6 +105,7 @@ func (eH *EffectHandler) checkPlayList() {
 func (eH *EffectHandler) stopPlayList() {
 	if eH.currentPlaylist != nil {
 		eH.currentPlaylist = nil
+		eH.activeEffects = nil
 	}
 }
 
