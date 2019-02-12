@@ -130,13 +130,3 @@ func r150(a, b, c bool) bool {
 	}
 	return false
 }
-
-func CellularAutomataMonochrome(eH *EffectHandler, playTime time.Duration) map[Effector]time.Duration {
-	cc1 := NewConstantColor(1, 0)
-	ca := NewCellularAutomata(eH.myDisplay, cc1)
-
-	automata := map[Effector]time.Duration{}
-	automata[ca] = playTime
-
-	return automata
-}

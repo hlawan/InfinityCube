@@ -190,13 +190,3 @@ func (r *MultiRunningLight) Update() {
 		effect.Update()
 	}
 }
-
-func MultiRunningLightHSV(eH *EffectHandler, playTime time.Duration) map[Effector]time.Duration {
-	hsv := NewHsvFade(60, 0)
-	mrl := NewMultiRunningLight(eH.myDisplay, hsv)
-
-	effectMap := map[Effector]time.Duration{}
-	effectMap[mrl] = playTime
-
-	return effectMap
-}

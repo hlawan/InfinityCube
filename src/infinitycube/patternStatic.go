@@ -33,21 +33,3 @@ func (sb *SolidBrightness) Update() {
 	sb.Leds = sb.Painter.Colorize(sb.Leds)
 	sb.myDisplay.AddEffect(sb.Effect)
 }
-
-func StaticGradient(eH *EffectHandler, playTime time.Duration) map[Effector]time.Duration {
-
-	green := Color{R: 0, G: 255, B: 0}
-	red := Color{R: 255, G: 0, B: 0}
-
-	colors := make([]Color, 2)
-	colors[0] = green
-	colors[1] = red
-
-	colGrad := NewColorGradient(colors, EDGE_LENGTH)
-	solid := NewSolidBrightness(eH.myDisplay, colGrad, 1.0)
-
-	effectMap := map[Effector]time.Duration{}
-	effectMap[solid] = playTime
-
-	return effectMap
-}

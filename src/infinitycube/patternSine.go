@@ -61,29 +61,3 @@ func (s *Sine) Update() {
 	s.Leds = s.Painter.Colorize(s.Leds)
 	s.myDisplay.AddEffect(s.Effect)
 }
-
-func MagmaPlasma(eH *EffectHandler, playTime time.Duration) map[Effector]time.Duration {
-	// sine 1
-	cc1 := NewConstantColor(1, 0)
-	sine1 := NewSine(eH.myDisplay, cc1)
-	sine1.Frequency = 2 * NR_OF_SIDES
-	sine1.SetLoopTime(5 * NR_OF_SIDES)
-
-	// sine 2
-	cc2 := NewConstantColor(1, 30)
-	sine2 := NewSine(eH.myDisplay, cc2)
-	sine2.Frequency = 3 * NR_OF_SIDES
-	sine2.SetLoopTime(7 * NR_OF_SIDES)
-
-	// multi running light
-	cc3 := NewConstantColor(1, 60)
-	mrl := NewMultiRunningLight(eH.myDisplay, cc3)
-
-	magmaPlasma := map[Effector]time.Duration{}
-
-	magmaPlasma[sine1] = playTime
-	magmaPlasma[sine2] = playTime
-	magmaPlasma[mrl] = playTime
-
-	return magmaPlasma
-}

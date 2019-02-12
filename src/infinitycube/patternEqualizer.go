@@ -33,16 +33,6 @@ func (e *LinearSpectrum) Update() {
 	e.myDisplay.AddEffect(e.Effect)
 }
 
-func LinearSpectrumMonochrome(eH *EffectHandler, playTime time.Duration) map[Effector]time.Duration {
-	cc1 := NewConstantColor(1, 0)
-	spec := NewLinearSpectrum(eH.myDisplay, cc1, eH.audio)
-
-	effectMap := map[Effector]time.Duration{}
-	effectMap[spec] = playTime
-
-	return effectMap
-}
-
 // Effect: Linear Edge Spectrum
 type LinearEdgeSpectrum struct {
 	Effect
@@ -73,16 +63,6 @@ func (e *LinearEdgeSpectrum) Update() {
 	e.Painter.Update()
 	e.Leds = e.Painter.Colorize(e.Leds)
 	e.myDisplay.AddEffect(e.Effect)
-}
-
-func LinearEdgeSpectrumMonochrome(eH *EffectHandler, playTime time.Duration) map[Effector]time.Duration {
-	cc1 := NewConstantColor(0, 0)
-	spec := NewLinearEdgeSpectrum(eH.myDisplay, cc1, eH.audio)
-
-	effectMap := map[Effector]time.Duration{}
-	effectMap[spec] = playTime
-
-	return effectMap
 }
 
 //Effect: Edge Volume
@@ -122,22 +102,4 @@ func (e *EdgeVolume) Update() {
 	e.Painter.Update()
 	e.Leds = e.Painter.Colorize(e.Leds)
 	e.myDisplay.AddEffect(e.Effect)
-}
-
-func EdgeVolumeRedGreen(eH *EffectHandler, playTime time.Duration) map[Effector]time.Duration {
-
-	green := Color{R: 0, G: 255, B: 0}
-	red := Color{R: 255, G: 0, B: 0}
-
-	colors := make([]Color, 2)
-	colors[0] = green
-	colors[1] = red
-
-	colGrad := NewColorGradient(colors, EDGE_LENGTH)
-	vol := NewEdgeVolume(eH.myDisplay, colGrad, eH.audio)
-
-	effectMap := map[Effector]time.Duration{}
-	effectMap[vol] = playTime
-
-	return effectMap
 }
