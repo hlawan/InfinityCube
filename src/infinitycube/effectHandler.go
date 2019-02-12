@@ -102,6 +102,12 @@ func (eH *EffectHandler) checkPlayList() {
 	}
 }
 
+func (eH *EffectHandler) stopPlayList() {
+	if eH.currentPlaylist != nil {
+		eH.currentPlaylist = nil
+	}
+}
+
 func (eH *EffectHandler) updateAll() {
 	for _, effect := range eH.activeEffects {
 		effect.Update()
@@ -314,41 +320,52 @@ func FloatToString(input_num float64) string {
 }
 
 // List of addable Effects
-
-//func (eH *EffectHandler) AddCellularAutomata() {
-//	ca := NewCellularAutomata(eH.myDisplay)
-//	eH.activeEffects = append(eH.activeEffects, ca)
-//}
-
-//func (eH *EffectHandler) AddWhiteSpectrum() {
-//	ws := NewWhiteSpectrum(eH.myDisplay, eH.audio)
-//	eH.activeEffects = append(eH.activeEffects, ws)
-//}
-
-//func (eH *EffectHandler) AddWhiteEdgeSpectrum() {
-//	wes := NewWhiteEdgeSpectrum(eH.myDisplay, eH.audio)
-//	eH.activeEffects = append(eH.activeEffects, wes)
-//}
-
-//func (eH *EffectHandler) AddEdgeVolume() {
-//	ev := NewEdgeVolume(eH.myDisplay, eH.audio)
-//	eH.activeEffects = append(eH.activeEffects, ev)
-//}
-
-//func (eH *EffectHandler) AddHsvFade() {
-//	hsv := NewHsvFade(eH.myDisplay, eH.updateRate)
-//	eH.activeEffects = append(eH.activeEffects, hsv)
-//}
-
-func (eH *EffectHandler) AddRunningLight() {
-	rl := NewRunningLight(eH.myDisplay)
-	eH.activeEffects = append(eH.activeEffects, rl)
+func (eH *EffectHandler) AddCellularAutomataMonochrome() {
+	eH.stopPlayList()
+	effectSet := CellularAutomataMonochrome(eH, 30*time.Second)
+	for effect, _ := range effectSet {
+		eH.activeEffects = append(eH.activeEffects, effect)
+	}
 }
 
-func (eH *EffectHandler) AddMultiRunningLight() {
-	cc0 := NewConstantColor(1, 60)
-	grl := NewMultiRunningLight(eH.myDisplay, cc0)
-	eH.activeEffects = append(eH.activeEffects, grl)
+func (eH *EffectHandler) AddLinearEdgeSpectrumMonochrome() {
+	eH.stopPlayList()
+	effectSet := LinearEdgeSpectrumMonochrome(eH, 30*time.Second)
+	for effect, _ := range effectSet {
+		eH.activeEffects = append(eH.activeEffects, effect)
+	}
+}
+
+func (eH *EffectHandler) AddLinearSpectrumMonochrome() {
+	eH.stopPlayList()
+	effectSet := LinearSpectrumMonochrome(eH, 30*time.Second)
+	for effect, _ := range effectSet {
+		eH.activeEffects = append(eH.activeEffects, effect)
+	}
+}
+
+func (eH *EffectHandler) AddEdgeVolumeRedGreen() {
+	eH.stopPlayList()
+	effectSet := EdgeVolumeRedGreen(eH, 30*time.Second)
+	for effect, _ := range effectSet {
+		eH.activeEffects = append(eH.activeEffects, effect)
+	}
+}
+
+func (eH *EffectHandler) AddMultiRunningLightHSV() {
+	eH.stopPlayList()
+	effectSet := MultiRunningLightHSV(eH, 30*time.Second)
+	for effect, _ := range effectSet {
+		eH.activeEffects = append(eH.activeEffects, effect)
+	}
+}
+
+func (eH *EffectHandler) AddMagmaPlasma() {
+	eH.stopPlayList()
+	effectSet := MagmaPlasma(eH, 30*time.Second)
+	for effect, _ := range effectSet {
+		eH.activeEffects = append(eH.activeEffects, effect)
+	}
 }
 
 func (eH *EffectHandler) AddPrettyPrint() {
