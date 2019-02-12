@@ -59,7 +59,7 @@ func (s *Sine) Update() {
 	// every update function of an effect ends with this snippet
 	s.Painter.Update()
 	s.Leds = s.Painter.Colorize(s.Leds)
-	s.myDisplay.AddPattern(s.Leds, s.ColorOpacity, s.BlackOpacity)
+	s.myDisplay.AddEffect(s.Effect)
 }
 
 func MagmaPlasma(eH *EffectHandler, playTime time.Duration) map[Effector]time.Duration {

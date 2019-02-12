@@ -28,9 +28,10 @@ func (sb *SolidBrightness) Update() {
 		sb.Leds[i].setV(sb.Brightness)
 	}
 
+	// every update function of an effect ends with this snippet
 	sb.Painter.Update()
 	sb.Leds = sb.Painter.Colorize(sb.Leds)
-	sb.myDisplay.AddPattern(sb.Leds, sb.ColorOpacity, sb.BlackOpacity)
+	sb.myDisplay.AddEffect(sb.Effect)
 }
 
 func StaticGradient(eH *EffectHandler, playTime time.Duration) map[Effector]time.Duration {

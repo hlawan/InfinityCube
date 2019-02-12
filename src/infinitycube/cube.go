@@ -1,37 +1,29 @@
 package main
 
 import (
-	// "fmt"
-	//	"image/color"
 	"log"
 	"math"
-	"time"
 
 	"github.com/kellydunn/go-opc"
 )
 
 type Cube struct {
 	fadeCandy *opc.Client
-	Patterns  []Pattern //every effect generator adds a Pattern
-	finalCube []Color   //all Patterns are merged to one finalCube, which then will be sent to the real cube
-}
-
-type Consumer interface {
-	Tick(time.Duration, interface{})
-	AddPattern([LEDS]Color, float64, float64)
+	Effects   []Effect
+	finalCube []Color //all Effects are merged to one finalCube, which then will be sent to the real cube
 }
 
 func NewCube(server string, nrOfLeds int) (c *Cube, err error) {
-	// Create a client
 	oc := opc.NewClient()
 	err = oc.Connect("tcp", server)
+	if err != nil {
+		log.Fatal("Could not connect to Fadecandy server", err)
+	}
+
 	c = &Cube{
 		fadeCandy: oc,
 		finalCube: make([]Color, nrOfLeds)}
 
-	if err != nil {
-		log.Fatal("Could not connect to Fadecandy server", err)
-	}
 	return
 }
 
@@ -40,8 +32,8 @@ func (c *Cube) NrOfLeds() (nrOfLeds int) {
 }
 
 func (c *Cube) render() {
-	c.MergePatterns()
-	c.resetPatterns()
+	c.MergeEffects()
+	c.resetEffects()
 }
 
 func (c *Cube) Show() {
@@ -63,34 +55,15 @@ func (c *Cube) Show() {
 	}
 }
 
-func (c *Cube) Tick(d time.Duration, o interface{}) {
-	//moved stuff to renderCube()
+func (c *Cube) AddEffect(newEffect Effect) {
+	c.Effects = append(c.Effects, newEffect)
 }
 
-type Pattern struct {
-	leds         []Color
-	colorOpacity float64
-	blackOpacity float64
+func (c *Cube) resetEffects() {
+	c.Effects = nil
 }
 
-func NewPattern(newLeds []Color, cOp, bOp float64) (pc *Pattern) {
-	pc = &Pattern{
-		leds:         newLeds,
-		colorOpacity: cOp,
-		blackOpacity: bOp}
-	return
-}
-
-func (c *Cube) AddPattern(leds []Color, colorOpacity float64, blackOpacity float64) {
-	pc := NewPattern(leds, colorOpacity, blackOpacity)
-	c.Patterns = append(c.Patterns, *pc)
-}
-
-func (c *Cube) resetPatterns() {
-	c.Patterns = nil
-}
-
-func (c *Cube) MergePatterns() {
+func (c *Cube) MergeEffects() {
 
 	// start from black
 	for i, _ := range c.finalCube {
@@ -98,37 +71,12 @@ func (c *Cube) MergePatterns() {
 	}
 
 	// merge all generated patterns
-	for i := range c.Patterns {
+	for i := range c.Effects {
 		for p := 0; p < LEDS; p++ {
-			c.finalCube[p] = blendLeds(c.finalCube[p], c.Patterns[i].leds[p])
+			c.finalCube[p] = blendLeds(c.finalCube[p], c.Effects[i].Leds[p])
 		}
 	}
 }
-
-// func blendLeds(col1, col2 Led) Led {
-// 	var newCol Led
-
-// 	if col1.Black {
-// 		newCol = col2
-// 		newCol.R, newCol.G, newCol.B = col2.RGB()
-// 	} else if col2.Black {
-// 		newCol = col1
-// 		newCol.R, newCol.G, newCol.B = col1.RGB()
-// 	} else {
-// 		r1, g1, b1 := col1.RGB()
-// 		r2, g2, b2 := col2.RGB()
-
-// 		// merge
-// 		nR := uint8((uint16(r1) + uint16(r2)) / 2)
-// 		nG := uint8((uint16(g1) + uint16(g2)) / 2)
-// 		nB := uint8((uint16(b1) + uint16(b2)) / 2)
-
-// 		// set new color
-// 		newCol.FromRGB(nR, nG, nB)
-// 	}
-
-// 	return newCol
-// }
 
 func blendLeds(col1, col2 Color) Color {
 	var newCol Color

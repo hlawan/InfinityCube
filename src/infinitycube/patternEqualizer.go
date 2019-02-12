@@ -30,7 +30,7 @@ func (e *LinearSpectrum) Update() {
 	// every update function of an effect ends with this snippet
 	e.Painter.Update()
 	e.Leds = e.Painter.Colorize(e.Leds)
-	e.myDisplay.AddPattern(e.Leds, e.ColorOpacity, e.BlackOpacity)
+	e.myDisplay.AddEffect(e.Effect)
 }
 
 func LinearSpectrumMonochrome(eH *EffectHandler, playTime time.Duration) map[Effector]time.Duration {
@@ -72,7 +72,7 @@ func (e *LinearEdgeSpectrum) Update() {
 	//every update function of an effect ends with this snippet
 	e.Painter.Update()
 	e.Leds = e.Painter.Colorize(e.Leds)
-	e.myDisplay.AddPattern(e.Leds, e.ColorOpacity, e.BlackOpacity)
+	e.myDisplay.AddEffect(e.Effect)
 }
 
 func LinearEdgeSpectrumMonochrome(eH *EffectHandler, playTime time.Duration) map[Effector]time.Duration {
@@ -121,7 +121,7 @@ func (e *EdgeVolume) Update() {
 	// every update function of an effect ends with this snippet
 	e.Painter.Update()
 	e.Leds = e.Painter.Colorize(e.Leds)
-	e.myDisplay.AddPattern(e.Leds, e.ColorOpacity, e.BlackOpacity)
+	e.myDisplay.AddEffect(e.Effect)
 }
 
 func EdgeVolumeRedGreen(eH *EffectHandler, playTime time.Duration) map[Effector]time.Duration {

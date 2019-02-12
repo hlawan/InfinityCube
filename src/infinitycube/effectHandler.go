@@ -46,7 +46,7 @@ type Effector interface {
 // by various Effectors.
 type Display interface {
 	NrOfLeds() int
-	AddPattern([]Color, float64, float64)
+	AddEffect(Effect)
 	Show()
 }
 

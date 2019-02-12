@@ -91,9 +91,9 @@ func (cA *CellularAutomata) Update() {
 	// every update function of an effect ends with this snippet
 	cA.Painter.Update()
 	cA.Leds = cA.Painter.Colorize(cA.Leds)
-	//fmt.Println(cA.Leds)
 
-	cA.myDisplay.AddPattern(cA.Leds, cA.ColorOpacity, cA.BlackOpacity)
+	cA.myDisplay.AddEffect(cA.Effect)
+
 }
 
 func (cA *CellularAutomata) calcNextGeneration() {

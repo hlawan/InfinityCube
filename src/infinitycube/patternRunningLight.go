@@ -60,10 +60,10 @@ func (r *RunningLight) Update() {
 		r.updateSimple()
 	}
 
+	// every update function of an effect ends with this snippet
+	r.Painter.Update()
 	r.Leds = r.Painter.Colorize(r.Leds)
-	//fmt.Println(r.Leds)
-
-	r.myDisplay.AddPattern(r.Leds, r.ColorOpacity, r.BlackOpacity)
+	r.myDisplay.AddEffect(r.Effect)
 }
 
 func (r *RunningLight) moveLightPosition() {
