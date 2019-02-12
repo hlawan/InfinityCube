@@ -19,7 +19,6 @@ type Effect struct {
 	LengthPar    int
 	ColorOpacity float64
 	BlackOpacity float64
-	playTime     time.Duration
 	myDisplay    Display
 	mux          sync.Mutex
 }
@@ -31,20 +30,6 @@ func NewEffect(disp Display, colorOp, blackOp float64) Effect {
 		LengthPar:    disp.NrOfLeds(),
 		ColorOpacity: colorOp,
 		BlackOpacity: blackOp,
-		playTime:     20 * time.Second,
-		myDisplay:    disp}
-
-	return ef
-}
-
-func NewTimedEffect(disp Display, colorOp, blackOp float64, playTimeSec int64) Effect {
-	ef := Effect{
-		Leds:         make([]Color, disp.NrOfLeds()),
-		OffsetPar:    0,
-		LengthPar:    disp.NrOfLeds(),
-		ColorOpacity: colorOp,
-		BlackOpacity: blackOp,
-		playTime:     time.Duration(playTimeSec) * time.Second,
 		myDisplay:    disp}
 
 	return ef
