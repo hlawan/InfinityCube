@@ -7,6 +7,10 @@ import (
 	"github.com/kellydunn/go-opc"
 )
 
+const MAX_POWER_SINGLE_LED = 0.05 * 5 // 50 mA * 5V
+const MAX_POWER_WATTS = 80
+const PARALLEL_STRIPES = 1
+
 type Cube struct {
 	fadeCandy *opc.Client
 	Effects   []Effect
@@ -38,6 +42,7 @@ func (c *Cube) render() {
 
 func (c *Cube) Show() {
 	c.render()
+	c.scaleFinalPattern(MAX_POWER_WATTS, PARALLEL_STRIPES)
 	leds := c.finalCube
 
 	// send pixel data
@@ -97,4 +102,30 @@ func blendLeds(col1, col2 Color) Color {
 	newCol.setV(nV)
 
 	return newCol
+}
+
+// scaleFinalPattern estimates the requested power by the lightning pattern, stored in c.finalCube
+// given the max allowed power maxPowerWatts and the number of parallelly controlles stripes parallelStripes
+// the function downscales (darkens) the pattern, if the requested power is too high.
+func (c *Cube) scaleFinalPattern(maxPowerWatts float64, parallelStripes uint32) {
+	// calculate requested power
+	requestedPowerWatts := 0.0
+	powerOuputFactor := 1.0
+	leds := c.finalCube
+	for i, _ := range leds {
+		power := (float64(leds[i].R)/255.0 + float64(leds[i].G)/255.0 + float64(leds[i].B)/255.0) / 3.0 * MAX_POWER_SINGLE_LED
+		requestedPowerWatts += power
+	}
+	requestedPowerWatts *= float64(parallelStripes)
+	// scale pattern
+	if requestedPowerWatts > maxPowerWatts {
+		powerOuputFactor = maxPowerWatts / requestedPowerWatts
+		log.Printf("Requested Power: %v, max allowed: %v\n", requestedPowerWatts, maxPowerWatts)
+		log.Printf("Downscale power with factor %v.\n", powerOuputFactor)
+		for i, _ := range leds {
+			c.finalCube[i].R = uint8(powerOuputFactor * float64(leds[i].R))
+			c.finalCube[i].G = uint8(powerOuputFactor * float64(leds[i].G))
+			c.finalCube[i].B = uint8(powerOuputFactor * float64(leds[i].B))
+		}
+	}
 }

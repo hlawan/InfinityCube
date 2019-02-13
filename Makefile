@@ -72,3 +72,7 @@ clean:
 .PHONY: cube
 cube: infinitycube
 	sudo bin/infinitycube -serial cube
+
+.PHONY: test
+test: infinitycube content
+	$(GO) test infinitycube
