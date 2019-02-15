@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"math"
 
 	"github.com/kellydunn/go-opc"
 )
@@ -36,7 +35,7 @@ func (c *Cube) NrOfLeds() (nrOfLeds int) {
 }
 
 func (c *Cube) render() {
-	c.MergeEffects()
+	c.SumEffects()
 	c.resetEffects()
 }
 
@@ -68,40 +67,41 @@ func (c *Cube) resetEffects() {
 	c.Effects = nil
 }
 
-func (c *Cube) MergeEffects() {
+func (c *Cube) SumEffects() {
 
 	// start from black
-	for i, _ := range c.finalCube {
-		c.finalCube[i].reset()
-	}
+	for pos, _ := range c.finalCube {
 
-	// merge all generated patterns
-	for i := range c.Effects {
-		for p := 0; p < LEDS; p++ {
-			c.finalCube[p] = blendLeds(c.finalCube[p], c.Effects[i].Leds[p])
+		// add all colours togehter
+		nRf, nGf, nBf := 0.0, 0.0, 0.0
+		for _, eff := range c.Effects {
+
+			R, G, B := eff.Leds[pos].RGBfromHSV()
+
+			nRf += float64(R)
+			nGf += float64(G)
+			nBf += float64(B)
 		}
+
+		// Limit values
+		if nRf > 255 {
+			nRf = 255
+		}
+		if nGf > 255 {
+			nGf = 255
+		}
+		if nBf > 255 {
+			nBf = 255
+		}
+
+		// cast to fit color tyoe
+		nR8 := uint8(nRf)
+		nG8 := uint8(nGf)
+		nB8 := uint8(nBf)
+
+		// set new color
+		c.finalCube[pos].FromRGB(nR8, nG8, nB8)
 	}
-}
-
-func blendLeds(col1, col2 Color) Color {
-	var newCol Color
-
-	r1, g1, b1 := col1.RGBfromHSV()
-	r2, g2, b2 := col2.RGBfromHSV()
-
-	// merge
-	nR := uint8((float64(r1) + float64(r2)) / 2.0)
-	nG := uint8((float64(g1) + float64(g2)) / 2.0)
-	nB := uint8((float64(b1) + float64(b2)) / 2.0)
-
-	// set new color
-	newCol.FromRGB(nR, nG, nB)
-
-	// restore brightness
-	nV := math.Max(col1.V, col2.V)
-	newCol.setV(nV)
-
-	return newCol
 }
 
 // scaleFinalPattern estimates the requested power by the lightning pattern, stored in c.finalCube
