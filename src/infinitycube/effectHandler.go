@@ -15,6 +15,7 @@ import (
 type Effect struct {
 	Leds         []Color
 	Painter      ColorGenerator
+	Dimming      float64
 	OffsetPar    int
 	LengthPar    int
 	ColorOpacity float64
@@ -26,6 +27,7 @@ type Effect struct {
 func NewEffect(disp Display, colorOp, blackOp float64) Effect {
 	ef := Effect{
 		Leds:         make([]Color, disp.NrOfLeds()),
+		Dimming:      1.0,
 		OffsetPar:    0,
 		LengthPar:    disp.NrOfLeds(),
 		ColorOpacity: colorOp,

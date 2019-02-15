@@ -78,9 +78,9 @@ func (c *Cube) SumEffects() {
 
 			R, G, B := eff.Leds[pos].RGBfromHSV()
 
-			nRf += float64(R)
-			nGf += float64(G)
-			nBf += float64(B)
+			nRf += eff.Dimming * float64(R)
+			nGf += eff.Dimming * float64(G)
+			nBf += eff.Dimming * float64(B)
 		}
 
 		// Limit values
