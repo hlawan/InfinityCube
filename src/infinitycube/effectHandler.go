@@ -37,10 +37,15 @@ func NewEffect(disp Display, colorOp, blackOp float64) Effect {
 	return ef
 }
 
+func (ef *Effect) SetDimming(d float64) {
+	ef.Dimming = d
+}
+
 // An Effector is able to generate (light-)Patterns. The Update() method gets
 // called by its EffectHandler and has to call the AddPattern() method of its
 // Display.
 type Effector interface {
+	SetDimming(float64)
 	Update()
 }
 
@@ -121,12 +126,12 @@ func (eH *EffectHandler) playAllEffects() {
 
 	slots := []map[Effector]time.Duration{}
 
-	slots = append(slots, EdgeVolumeRedGreen(eH, 30*time.Second))
-	slots = append(slots, MultiRunningLightHSV(eH, 30*time.Second))
-	slots = append(slots, LinearEdgeSpectrumMonochrome(eH, 30*time.Second))
-	slots = append(slots, CellularAutomataMonochrome(eH, 30*time.Second))
-	slots = append(slots, LinearSpectrumMonochrome(eH, 30*time.Second))
-	slots = append(slots, MagmaPlasma(eH, 30*time.Second))
+	slots = append(slots, MultiRunningLightHSV(eH, 10*time.Second))
+	slots = append(slots, MagmaPlasma(eH, 10*time.Second))
+	slots = append(slots, CellularAutomataMonochrome(eH, 10*time.Second))
+	slots = append(slots, EdgeVolumeRedGreen(eH, 5*time.Second))
+	slots = append(slots, LinearEdgeSpectrumMonochrome(eH, 5*time.Second))
+	slots = append(slots, LinearSpectrumMonochrome(eH, 5*time.Second))
 
 	eH.currentPlaylist = NewPlayList("all Effects", slots)
 }
