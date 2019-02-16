@@ -95,8 +95,10 @@ func (hsv *HsvFade) Colorize(leds []Color) []Color {
 }
 
 type ColorGradient struct {
-	Elements []Color
-	length   int
+	Elements      []Color
+	length        int
+	nrOfSegments  int
+	segmentLength int
 }
 
 func NewColorGradient(colorElements []Color, gradientLength int) *ColorGradient {
@@ -107,8 +109,11 @@ func NewColorGradient(colorElements []Color, gradientLength int) *ColorGradient 
 	}
 
 	cg := &ColorGradient{
-		Elements: colorElements,
-		length:   gradientLength}
+		Elements:      colorElements,
+		length:        gradientLength,
+		nrOfSegments:  len(colorElements) - 1,
+		segmentLength: gradientLength / (len(colorElements) - 1),
+	}
 
 	return cg
 }
@@ -123,7 +128,12 @@ func (grad *ColorGradient) Colorize(leds []Color) []Color {
 
 	for i, led := range leds {
 
-		colLed := linearGradient(i%EDGE_LENGTH, EDGE_LENGTH, grad.Elements[0], grad.Elements[1])
+		currentSegment := (i / grad.segmentLength) % grad.nrOfSegments
+		fmt.Println(currentSegment)
+		ele1 := currentSegment
+		ele2 := currentSegment + 1
+
+		colLed := linearGradient(i%grad.segmentLength, grad.segmentLength, grad.Elements[ele1], grad.Elements[ele2])
 
 		// Gamma correction
 		colLed.V = correctGamma(led.V)

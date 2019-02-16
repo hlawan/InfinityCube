@@ -14,16 +14,20 @@ func StaticWhite(eH *EffectHandler, playTime time.Duration) map[Effector]time.Du
 	return effectMap
 }
 
-func StaticGradientGreenRed(eH *EffectHandler, playTime time.Duration) map[Effector]time.Duration {
+func StaticGradientRedSunset(eH *EffectHandler, playTime time.Duration) map[Effector]time.Duration {
 
-	green := Color{R: 0, G: 255, B: 0}
-	red := Color{R: 255, G: 0, B: 0}
+	greenish := Color{R: 52, G: 92, B: 125} //(53, 92, 125)
+	blueish := Color{R: 108, G: 91, B: 123} //(108, 91, 123)
+	redish := Color{R: 192, G: 108, B: 132} // (192, 108, 132)
 
-	colors := make([]Color, 2)
-	colors[0] = green
-	colors[1] = red
+	colors := make([]Color, 5)
+	colors[0] = redish
+	colors[1] = blueish
+	colors[2] = greenish
+	colors[3] = blueish
+	colors[4] = redish
 
-	colGrad := NewColorGradient(colors, EDGE_LENGTH)
+	colGrad := NewColorGradient(colors, 2*EDGE_LENGTH)
 	solid := NewSolidBrightness(eH.myDisplay, colGrad, 1.0)
 
 	effectMap := map[Effector]time.Duration{}
@@ -61,6 +65,23 @@ func MagmaPlasma(eH *EffectHandler, playTime time.Duration) map[Effector]time.Du
 func CellularAutomataMonochrome(eH *EffectHandler, playTime time.Duration) map[Effector]time.Duration {
 	cc1 := NewConstantColor(1, 0)
 	ca := NewCellularAutomata(eH.myDisplay, cc1)
+
+	automata := map[Effector]time.Duration{}
+	automata[ca] = playTime
+
+	return automata
+}
+
+func CellularAutomatagGradient(eH *EffectHandler, playTime time.Duration) map[Effector]time.Duration {
+	blue := Color{R: 63, G: 43, B: 150}
+	white := Color{R: 168, G: 192, B: 255}
+
+	colors := make([]Color, 2)
+	colors[0] = blue
+	colors[1] = white
+
+	colGrad := NewColorGradient(colors, 2*EDGE_LENGTH)
+	ca := NewCellularAutomata(eH.myDisplay, colGrad)
 
 	automata := map[Effector]time.Duration{}
 	automata[ca] = playTime
