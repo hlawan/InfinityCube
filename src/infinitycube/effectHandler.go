@@ -13,26 +13,22 @@ import (
 // the blackOpacity and the colorOpacity of its leds and which Display
 // it belongs to.
 type Effect struct {
-	Leds         []Color
-	Painter      ColorGenerator
-	Dimming      float64
-	OffsetPar    int
-	LengthPar    int
-	ColorOpacity float64
-	BlackOpacity float64
-	myDisplay    Display
-	mux          sync.Mutex
+	Leds      []Color
+	Painter   ColorGenerator
+	Dimming   float64
+	OffsetPar int
+	LengthPar int
+	myDisplay Display
+	mux       sync.Mutex
 }
 
 func NewEffect(disp Display, colorOp, blackOp float64) Effect {
 	ef := Effect{
-		Leds:         make([]Color, disp.NrOfLeds()),
-		Dimming:      1.0,
-		OffsetPar:    0,
-		LengthPar:    disp.NrOfLeds(),
-		ColorOpacity: colorOp,
-		BlackOpacity: blackOp,
-		myDisplay:    disp}
+		Leds:      make([]Color, disp.NrOfLeds()),
+		Dimming:   1.0,
+		OffsetPar: 0,
+		LengthPar: disp.NrOfLeds(),
+		myDisplay: disp}
 
 	return ef
 }
@@ -75,11 +71,10 @@ type EffectHandler struct {
 
 func NewEffectHandler(newDisplay Display, fps int, newAudio *ProcessedAudio) (eH *EffectHandler) {
 	eH = &EffectHandler{
-		myDisplay:  newDisplay,
-		lastUpdate: time.Now(),
-		updateRate: fps,
-		loopTime:   time.Duration(float64(1000000000) / float64(fps)), // in nanoseconds
-		//effectParameter: make([]map[string][]string),
+		myDisplay:     newDisplay,
+		lastUpdate:    time.Now(),
+		updateRate:    fps,
+		loopTime:      time.Duration(float64(1000000000) / float64(fps)), // in nanoseconds
 		effectRequest: make(chan string),
 		audio:         newAudio}
 

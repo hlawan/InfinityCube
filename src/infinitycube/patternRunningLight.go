@@ -171,7 +171,6 @@ func NewMultiRunningLight(disp Display, cg ColorGenerator) *MultiRunningLight {
 			rl.Position = float64(o) * gap
 			rl.Bounce = true
 			rl.SetDelta(r.IntervalPar)
-			rl.BlackOpacity = 0
 			rl.Painter = r.Painter
 			r.runningLights = append(r.runningLights, rl)
 		}
