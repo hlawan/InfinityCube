@@ -4,6 +4,16 @@ import (
 	"time"
 )
 
+func GoldenStarDust(eH *EffectHandler, playTime time.Duration) map[Effector]time.Duration {
+	cc1 := NewConstantColor(0.77, 47)
+	sd := NewStarDust(eH.myDisplay, cc1, eH.audio)
+
+	effectMap := map[Effector]time.Duration{}
+	effectMap[sd] = playTime
+
+	return effectMap
+}
+
 func StaticWhite(eH *EffectHandler, playTime time.Duration) map[Effector]time.Duration {
 	cc1 := NewConstantColor(0, 0)
 	solid := NewSolidBrightness(eH.myDisplay, cc1, 1.0)
@@ -14,7 +24,7 @@ func StaticWhite(eH *EffectHandler, playTime time.Duration) map[Effector]time.Du
 	return effectMap
 }
 
-func StaticGradientRedSunset(eH *EffectHandler, playTime time.Duration) map[Effector]time.Duration {
+func RedSunsetStarDust(eH *EffectHandler, playTime time.Duration) map[Effector]time.Duration {
 
 	greenish := Color{R: 52, G: 92, B: 125} //(53, 92, 125)
 	blueish := Color{R: 108, G: 91, B: 123} //(108, 91, 123)
@@ -30,8 +40,12 @@ func StaticGradientRedSunset(eH *EffectHandler, playTime time.Duration) map[Effe
 	colGrad := NewColorGradient(colors, 2*EDGE_LENGTH)
 	solid := NewSolidBrightness(eH.myDisplay, colGrad, 1.0)
 
+	cc1 := NewConstantColor(0.60, 187)
+	sd := NewStarDust(eH.myDisplay, cc1, eH.audio)
+
 	effectMap := map[Effector]time.Duration{}
 	effectMap[solid] = playTime
+	effectMap[sd] = playTime
 
 	return effectMap
 }

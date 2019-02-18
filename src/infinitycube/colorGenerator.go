@@ -129,7 +129,6 @@ func (grad *ColorGradient) Colorize(leds []Color) []Color {
 	for i, led := range leds {
 
 		currentSegment := (i / grad.segmentLength) % grad.nrOfSegments
-		fmt.Println(currentSegment)
 		ele1 := currentSegment
 		ele2 := currentSegment + 1
 
