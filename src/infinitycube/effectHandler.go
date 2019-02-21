@@ -117,7 +117,7 @@ func (eH *EffectHandler) updateAll() {
 	}
 }
 
-func (eH *EffectHandler) playAllEffects() {
+func (eH *EffectHandler) AddPlayAllEffects() {
 
 	slots := []map[Effector]time.Duration{}
 	slots = append(slots, RedSunsetStarDust(eH, 20*time.Second))

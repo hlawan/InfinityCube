@@ -70,7 +70,8 @@ func main() {
 		are active.
 	*/
 	eH := NewEffectHandler(c, fpsTarget, audio)
-	eH.playAllEffects()
+	eH.AddPlayAllEffects()
+
 	// the webserver displays the webInterface, where effects can be add/configured
 	StartWebServer(audio, eH.availableEffects, eH.effectRequest)
 
