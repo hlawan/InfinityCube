@@ -373,6 +373,13 @@ func (eH *EffectHandler) AddMagmaPlasma() {
 	}
 }
 
+func (eH *EffectHandler) AddGreenBinaryWheel() {
+	eH.stopPlayList()
+	cc1 := NewConstantColor(0.8, 130)
+	effect := NewBinaryWheel(eH.myDisplay, cc1, EDGE_LENGTH, 300*time.Millisecond)
+	eH.activeEffects = append(eH.activeEffects, effect)
+}
+
 func (eH *EffectHandler) AddFullWhite() {
 	eH.stopPlayList()
 	cc1 := NewConstantColor(0, 0)

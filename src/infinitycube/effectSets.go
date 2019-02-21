@@ -4,6 +4,16 @@ import (
 	"time"
 )
 
+func GreenBinaryWheel(eH *EffectHandler, playTime time.Duration) map[Effector]time.Duration {
+	cc1 := NewConstantColor(0.8, 130)
+	sd := NewBinaryWheel(eH.myDisplay, cc1, EDGE_LENGTH, 300*time.Millisecond)
+
+	effectMap := map[Effector]time.Duration{}
+	effectMap[sd] = playTime
+
+	return effectMap
+}
+
 func GoldenStarDust(eH *EffectHandler, playTime time.Duration) map[Effector]time.Duration {
 	cc1 := NewConstantColor(0.77, 47)
 	sd := NewStarDust(eH.myDisplay, cc1, eH.audio)
