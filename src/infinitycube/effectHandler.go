@@ -380,6 +380,10 @@ func (eH *EffectHandler) AddFullWhite() {
 	eH.activeEffects = append(eH.activeEffects, effect)
 }
 
+func (eH *EffectHandler) AddOff() {
+	eH.activeEffects = nil
+}
+
 func (eH *EffectHandler) AddPrettyPrint() {
 	fmt.Println("look at me I'm so pretty :-*")
 }
