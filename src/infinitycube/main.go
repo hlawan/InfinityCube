@@ -27,7 +27,7 @@ import (
 */
 const (
 	debugLvl       = 1
-	fpsTarget      = 100
+	fpsTarget      = 50
 	fpsDuration    = time.Second / fpsTarget
 	EDGE_LENGTH    = 14 //in my setup there are always 14 leds in a row
 	EDGES_PER_SIDE = 4  //well for me its a square...so 4
@@ -70,7 +70,7 @@ func main() {
 		are active.
 	*/
 	eH := NewEffectHandler(c, fpsTarget, audio)
-	eH.AddPlayAllEffects()
+	eH.AddPlayNonReactive()
 
 	// the webserver displays the webInterface, where effects can be add/configured
 	StartWebServer(audio, eH.availableEffects, eH.effectRequest)

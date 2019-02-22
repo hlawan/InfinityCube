@@ -145,7 +145,7 @@ func (eH *EffectHandler) AddPlayAllEffects() {
 	eH.currentPlaylist = NewPlayList("all Effects", slots)
 }
 
-func (eH *EffectHandler) AddPlayNoneReactive() {
+func (eH *EffectHandler) AddPlayNonReactive() {
 	slots := eH.nonReactiveEffects()
 	eH.currentPlaylist = NewPlayList("non-reactive Effects", slots)
 }
