@@ -117,20 +117,42 @@ func (eH *EffectHandler) updateAll() {
 	}
 }
 
+func (eH *EffectHandler) nonReactiveEffects() []map[Effector]time.Duration {
+	slots := []map[Effector]time.Duration{}
+	slots = append(slots, RedSunsetStarDust(eH, 20*time.Second))
+	slots = append(slots, CellularAutomatagGradient(eH, 20*time.Second))
+	slots = append(slots, MultiRunningLightHSV(eH, 20*time.Second))
+	slots = append(slots, MagmaPlasma(eH, 20*time.Second))
+	slots = append(slots, GoldenStarDust(eH, 20*time.Second))
+	slots = append(slots, CellularAutomataMonochrome(eH, 20*time.Second))
+	return slots
+}
+
+func (eH *EffectHandler) reactiveEffects() []map[Effector]time.Duration {
+	slots := []map[Effector]time.Duration{}
+	slots = append(slots, EdgeVolumeRedGreen(eH, 20*time.Second))
+	slots = append(slots, LinearEdgeSpectrumMonochrome(eH, 20*time.Second))
+	slots = append(slots, LinearSpectrumMonochrome(eH, 20*time.Second))
+	return slots
+
+}
+
 func (eH *EffectHandler) AddPlayAllEffects() {
 
 	slots := []map[Effector]time.Duration{}
-	slots = append(slots, RedSunsetStarDust(eH, 20*time.Second))
-	slots = append(slots, CellularAutomatagGradient(eH, 10*time.Second))
-	slots = append(slots, MultiRunningLightHSV(eH, 10*time.Second))
-	slots = append(slots, MagmaPlasma(eH, 10*time.Second))
-	slots = append(slots, GoldenStarDust(eH, 20*time.Second))
-	slots = append(slots, CellularAutomataMonochrome(eH, 10*time.Second))
-	slots = append(slots, EdgeVolumeRedGreen(eH, 5*time.Second))
-	slots = append(slots, LinearEdgeSpectrumMonochrome(eH, 5*time.Second))
-	slots = append(slots, LinearSpectrumMonochrome(eH, 5*time.Second))
-
+	slots = append(slots, eH.nonReactiveEffects()...)
+	slots = append(slots, eH.reactiveEffects()...)
 	eH.currentPlaylist = NewPlayList("all Effects", slots)
+}
+
+func (eH *EffectHandler) AddPlayNoneReactive() {
+	slots := eH.nonReactiveEffects()
+	eH.currentPlaylist = NewPlayList("non-reactive Effects", slots)
+}
+
+func (eH *EffectHandler) AddPlayReactive() {
+	slots := eH.reactiveEffects()
+	eH.currentPlaylist = NewPlayList("reactive Effects", slots)
 }
 
 func (eH *EffectHandler) handleRequests() (err error) {
@@ -383,7 +405,7 @@ func (eH *EffectHandler) AddGreenBinaryWheel() {
 func (eH *EffectHandler) AddFullWhite() {
 	eH.stopPlayList()
 	cc1 := NewConstantColor(0, 0)
-	effect := NewSolidBrightness(eH.myDisplay, cc1, 1.0)
+	effect := NewSolidBrightness(eH.myDisplay, cc1, 0.9)
 	eH.activeEffects = append(eH.activeEffects, effect)
 }
 
