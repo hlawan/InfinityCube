@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	SAMPLE_RATE       = 44100
-	FRAMES_PER_BUFFER = 256
+	SAMPLE_RATE       = 20000
+	FRAMES_PER_BUFFER = 512
 	NUM_CHANNELS      = 1
 	DEBUG             = false
 )
