@@ -32,6 +32,7 @@ infinitycube: content
 	$(GO) get github.com/mjibson/go-dsp/spectral
 	$(GO) get github.com/kellydunn/go-opc
 	$(GO) get github.com/fatih/structs
+	$(GO) get github.com/paypal/gatt
 	$(GO) install infinitycube
 
 .PHONY: format

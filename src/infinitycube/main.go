@@ -45,7 +45,7 @@ var (
 	serverPtr      = flag.String("fcserver", "localhost:7890", "Fadecandy server and port to connect to")
 	serial_port    = flag.String("serial", "/dev/zero", "serial port")
 	listen_address = flag.String("listen", ":2500", "http service address")
-	static_path    = flag.String("static", "/home/jonas/goProjects/static", "path to the static content")
+	static_path    = flag.String("static", "static", "path to the static content")
 )
 
 func main() {
@@ -74,6 +74,7 @@ func main() {
 
 	// the webserver displays the webInterface, where effects can be add/configured
 	StartWebServer(audio, eH.availableEffects, eH.effectRequest)
+	setupBtServer()
 
 	// from now on the effectHandler renders the effects
 	for {
