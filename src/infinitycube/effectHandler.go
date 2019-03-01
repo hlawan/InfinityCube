@@ -410,7 +410,7 @@ func (eH *EffectHandler) AddFullWhite() {
 }
 
 func (eH *EffectHandler) AddOff() {
-	eH.activeEffects = nil
+	eH.stopPlayList()
 }
 
 func (eH *EffectHandler) AddPrettyPrint() {
