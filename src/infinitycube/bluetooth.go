@@ -12,16 +12,28 @@ import (
 //--------------------------------------------------------------------------
 // gatt service
 //--------------------------------------------------------------------------
-func CubeService() *gatt.Service {
+func CubeService(eH *EffectHandler) *gatt.Service {
 	s := gatt.NewService(gatt.MustParseUUID("19fc95c0-c111-11e3-9904-0002a5d5c51b"))
 	s.AddCharacteristic(gatt.MustParseUUID("44fac9e0-c111-11e3-9246-0002a5d5c51b")).HandleReadFunc(
 		func(rsp gatt.ResponseWriter, req *gatt.ReadRequest) {
 			log.Println("read request")
-			fmt.Fprintf(rsp, "123456")
+			fmt.Fprintf(rsp, eH.currentPlaylist.Name)
 		})
 	s.AddCharacteristic(gatt.MustParseUUID("45fac9e0-c111-11e3-9246-0002a5d5c51b")).HandleWriteFunc(
 		func(r gatt.Request, data []byte) (status byte) {
 			log.Println("write request", data)
+			switch data[0] {
+			case 0:
+				eH.AddOff()
+			case 1:
+				eH.AddPlayAllEffects()
+			case 2:
+				eH.AddPlayNonReactive()
+			case 3:
+				eH.AddPlayReactive()
+			default:
+			}
+
 			return gatt.StatusSuccess
 		})
 
@@ -31,7 +43,7 @@ func CubeService() *gatt.Service {
 //--------------------------------------------------------------------------
 // gatt server
 //--------------------------------------------------------------------------
-func setupBtServer() {
+func setupBtServer(eH *EffectHandler) {
 	d, err := gatt.NewDevice(option.DefaultServerOptions...)
 	if err != nil {
 		log.Fatalf("Failed to open device, err: %s", err)
@@ -54,11 +66,11 @@ func setupBtServer() {
 			d.AddService(service.NewGattService())              // no effect on OS X
 
 			// A simple count service for demo.
-			s1 := CubeService()
+			s1 := CubeService(eH)
 			d.AddService(s1)
 
 			// Advertise device name and service's UUIDs.
-			d.AdvertiseNameAndServices("Gopher", []gatt.UUID{s1.UUID()})
+			d.AdvertiseNameAndServices("InfinityCube", []gatt.UUID{s1.UUID()})
 
 			// Advertise as an OpenBeacon iBeacon
 			d.AdvertiseIBeacon(gatt.MustParseUUID("AA6062F098CA42118EC4193EB73CCEB6"), 1, 2, -59)
